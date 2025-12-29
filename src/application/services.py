@@ -137,3 +137,113 @@ class CapitalIncreaseService:
         print("\n" + "🎉" * 25)
         print(" " * 15 + "전체 업데이트 완료!")
         print("🎉" * 25 + "\n")
+
+    def daily_update(self, days_back: int = 1) -> None:
+        """일일 업데이트 워크플로우를 실행합니다.
+        
+        최근 N일간의 데이터를 다운로드하고 기존 엑셀에 병합합니다.
+        
+        Args:
+            days_back: 과거 며칠까지 가져올지 (기본값: 1 = 어제~오늘)
+        """
+        from datetime import datetime, timedelta
+        import os
+        
+        print("\n" + "📅" * 25)
+        print(" " * 10 + f"유상증자 데이터 Daily 업데이트")
+        print("📅" * 25 + "\n")
+
+        # 날짜 계산
+        today = datetime.now()
+        start_date = (today - timedelta(days=days_back)).strftime("%Y%m%d")
+        end_date = today.strftime("%Y%m%d")
+        
+        print(f"📆 수집 기간: {start_date} ~ {end_date}")
+
+        # 1. 최근 데이터 다운로드
+        count = self.download_reports(start_date, end_date)
+        
+        if count == 0:
+            print("\n⚠️ 새로운 공시가 없습니다.")
+            return
+
+        # 2. 인코딩 변환
+        self.convert_xml_encoding()
+
+        # 3. 새 데이터 파싱
+        print("\n" + "=" * 50)
+        print("📊 신규 데이터 파싱")
+        print("=" * 50)
+        
+        xml_files = glob.glob(str(self.xml_directory / "*.xml"))
+        new_decisions: List[CapitalIncreaseDecision] = []
+        
+        for xml_file in xml_files:
+            decision = self.parser.parse(xml_file)
+            if decision and not decision.is_limited_liability_company():
+                new_decisions.append(decision)
+
+        print(f"✅ {len(new_decisions)}건의 신규 데이터를 파싱했습니다.")
+
+        # 4. 기존 데이터와 병합
+        if new_decisions:
+            self._merge_and_save(new_decisions)
+        else:
+            print("⚠️ 저장할 신규 데이터가 없습니다.")
+
+        print("\n" + "🎉" * 25)
+        print(" " * 15 + "Daily 업데이트 완료!")
+        print("🎉" * 25 + "\n")
+
+    def _merge_and_save(self, new_decisions: List[CapitalIncreaseDecision]) -> None:
+        """기존 엑셀 데이터와 신규 데이터를 병합하여 저장합니다.
+        
+        Args:
+            new_decisions: 신규 유상증자 결정 목록
+        """
+        import pandas as pd
+        
+        excel_path = self.data_directory / "유상증자.xlsx"
+        
+        # 기존 데이터 로드
+        existing_decisions: List[CapitalIncreaseDecision] = []
+        
+        if excel_path.exists():
+            print("\n📖 기존 엑셀 데이터 로드 중...")
+            try:
+                # 모든 시트의 데이터를 읽어서 중복 확인용으로 사용
+                existing_data = pd.read_excel(excel_path, sheet_name=None)
+                existing_filenames = set()
+                
+                for sheet_name, df in existing_data.items():
+                    if not df.empty and '종목명' in df.columns:
+                        # 각 시트의 데이터 개수 출력
+                        print(f"  - {sheet_name}년: {len(df)}건")
+                
+                print(f"✅ 기존 데이터 로드 완료")
+            except Exception as e:
+                print(f"⚠️ 기존 데이터 로드 실패: {e}")
+        
+        # 전체 XML 파일 재파싱 (신규 + 기존)
+        print("\n🔄 전체 데이터 재구성 중...")
+        xml_files = glob.glob(str(self.xml_directory / "*.xml"))
+        all_decisions: List[CapitalIncreaseDecision] = []
+        
+        for xml_file in xml_files:
+            decision = self.parser.parse(xml_file)
+            if decision and not decision.is_limited_liability_company():
+                all_decisions.append(decision)
+        
+        # 중복 제거 (source_filename 기준)
+        seen_filenames = set()
+        unique_decisions = []
+        for decision in all_decisions:
+            if decision.source_filename not in seen_filenames:
+                seen_filenames.add(decision.source_filename)
+                unique_decisions.append(decision)
+        
+        print(f"✅ 총 {len(unique_decisions)}건의 고유 데이터 (중복 {len(all_decisions) - len(unique_decisions)}건 제거)")
+        
+        # 엑셀 저장
+        self.excel_writer.write(unique_decisions)
+

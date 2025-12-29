@@ -20,6 +20,8 @@ def main():
   %(prog)s download --start 20250101   # 특정 날짜부터 다운로드
   %(prog)s convert                     # XML 파일들 UTF-8 변환
   %(prog)s export                      # XML 파싱 후 엑셀 저장
+  %(prog)s daily                       # 일일 업데이트 (어제~오늘)
+  %(prog)s daily --days 7              # 최근 7일 업데이트
   %(prog)s update --full               # 전체 프로세스 실행
         """
     )
@@ -44,6 +46,15 @@ def main():
 
     # export 명령
     subparsers.add_parser("export", help="XML 파싱 후 엑셀 저장")
+
+    # daily 명령
+    daily_parser = subparsers.add_parser("daily", help="일일 업데이트 (최근 데이터)")
+    daily_parser.add_argument(
+        "--days",
+        type=int,
+        default=1,
+        help="과거 며칠까지 가져올지 (기본값: 1 = 어제~오늘)"
+    )
 
     # update 명령
     update_parser = subparsers.add_parser("update", help="데이터 업데이트")
@@ -78,6 +89,9 @@ def main():
 
         elif args.command == "export":
             service.parse_and_export_to_excel()
+
+        elif args.command == "daily":
+            service.daily_update(args.days)
 
         elif args.command == "update":
             if args.full:
