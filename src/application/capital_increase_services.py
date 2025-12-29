@@ -10,8 +10,8 @@ from typing import List
 from ..domain import CapitalIncreaseDecision
 from ..infrastructure import (
     DartApiClient,
-    DartXmlParser,
-    ExcelWriter,
+    CapitalIncreaseXmlParser,
+    CapitalIncreaseExcelWriter,
     FileEncodingConverter
 )
 
@@ -44,8 +44,8 @@ class CapitalIncreaseService:
         self.data_directory = Path(data_directory)
         self.xml_directory = self.data_directory / "xml"
         self.api_client = DartApiClient(api_key=api_key, save_directory=str(self.data_directory))
-        self.parser = DartXmlParser()
-        self.excel_writer = ExcelWriter(output_path=str(self.data_directory / "유상증자.xlsx"))
+        self.parser = CapitalIncreaseXmlParser()
+        self.excel_writer = CapitalIncreaseExcelWriter(output_path=str(self.data_directory / "유상증자.xlsx"))
         self.file_converter = FileEncodingConverter()
 
     def download_reports(self, start_date: str, end_date: str = None) -> int:

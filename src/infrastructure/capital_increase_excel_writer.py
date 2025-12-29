@@ -11,13 +11,13 @@ import pandas as pd
 from ..domain import CapitalIncreaseDecision
 
 
-__all__ = ["ExcelWriter"]
+__all__ = ["CapitalIncreaseExcelWriter"]
 
 
-class ExcelWriter:
+class CapitalIncreaseExcelWriter:
     """유상증자 데이터 엑셀 작성기
     
-    도메인 모델 리스트를 받아 연도별 시트로 분리하여 엑셀 파일을 생성합니다.
+    유상증자 도메인 모델 리스트를 받아 연도별 시트로 분리하여 엑셀 파일을 생성합니다.
     """
 
     EXCEL_COLUMNS = [

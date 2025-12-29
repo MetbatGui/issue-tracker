@@ -1,6 +1,6 @@
 """XML 파싱 인프라스트럭처
 
-DART XML 파일을 파싱하여 도메인 모델로 변환합니다.
+DART XML 파일을 파싱하여 유상증자 도메인 모델로 변환합니다.
 """
 import os
 from datetime import datetime
@@ -10,13 +10,13 @@ from lxml import etree
 from ..domain import CapitalIncreaseDecision, StockInfo, FundingPurpose
 
 
-__all__ = ["DartXmlParser"]
+__all__ = ["CapitalIncreaseXmlParser"]
 
 
-class DartXmlParser:
-    """DART XML 파서
+class CapitalIncreaseXmlParser:
+    """유상증자 DART XML 파서
     
-    XML 파일에서 데이터를 추출하여 도메인 모델로 변환합니다.
+    XML 파일에서 데이터를 추출하여 유상증자 도메인 모델로 변환합니다.
     """
 
     @staticmethod
