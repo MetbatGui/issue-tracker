@@ -128,7 +128,13 @@ class DartApiClient:
 
     @staticmethod
     def filter_capital_increase_reports(data_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """유상증자결정 공시만 필터링합니다.
+        """유상증자 관련 공시를 필터링합니다.
+        
+        다음 패턴을 모두 포함:
+        - 유상증자결정
+        - 유무상증자결정
+        - 주요사항보고서(유상증자결정)
+        - 주요사항보고서(유무상증자결정)
         
         Args:
             data_list: API 응답의 공시 목록
@@ -139,15 +145,21 @@ class DartApiClient:
         if not data_list:
             return []
 
-        regex = re.compile(r"^(\[기재정정\]\s*)?유상증자결정(\s*\(.*\))?$")
+        # "유상증자" 또는 "유무상증자"가 포함된 모든 공시
         return [
             item for item in data_list
-            if regex.fullmatch(item.get("report_nm", "").strip())
+            if "유상증자" in item.get("report_nm", "") or "유무상증자" in item.get("report_nm", "")
         ]
 
     @staticmethod
     def filter_bonus_shares_reports(data_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """무상증자결정 공시만 필터링합니다.
+        """무상증자 관련 공시를 필터링합니다.
+        
+        다음 패턴을 모두 포함:
+        - 무상증자결정
+        - 유무상증자결정
+        - 주요사항보고서(무상증자결정)
+        - 주요사항보고서(유무상증자결정)
         
         Args:
             data_list: API 응답의 공시 목록
@@ -158,10 +170,10 @@ class DartApiClient:
         if not data_list:
             return []
 
-        regex = re.compile(r"^(\[기재정정\]\s*)?무상증자결정(\s*\(.*\))?$")
+        # "무상증자" 또는 "유무상증자"가 포함된 모든 공시
         return [
             item for item in data_list
-            if regex.fullmatch(item.get("report_nm", "").strip())
+            if "무상증자" in item.get("report_nm", "") or "유무상증자" in item.get("report_nm", "")
         ]
 
     def collect_reports(
