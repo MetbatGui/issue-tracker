@@ -6,7 +6,7 @@ import sys
 import argparse
 from datetime import datetime
 
-from .application import CapitalIncreaseService
+from .application import CapitalIncreaseService, BonusSharesService
 
 
 def main():
@@ -69,6 +69,26 @@ def main():
         help="시작 날짜 (YYYYMMDD, 기본값: 20200101)"
     )
 
+    # bonus 명령 (무상증자)
+    bonus_parser = subparsers.add_parser("bonus", help="무상증자 데이터 처리")
+    bonus_subparsers = bonus_parser.add_subparsers(dest="bonus_command", help="무상증자 하위 명령")
+    
+    # bonus daily
+    bonus_daily = bonus_subparsers.add_parser("daily", help="무상증자 일일 업데이트")
+    bonus_daily.add_argument("--days", type=int, default=1, help="과거 며칠까지 (기본: 1)")
+    
+    # bonus full
+    bonus_full = bonus_subparsers.add_parser("full", help="무상증자 전체 업데이트")
+    bonus_full.add_argument("--start", default="20200101", help="시작 날짜 (기본: 20200101)")
+    
+    # bonus export
+    bonus_subparsers.add_parser("export", help="무상증자 엑셀 생성")
+    
+    # bonus download
+    bonus_download = bonus_subparsers.add_parser("download", help="무상증자 데이터 다운로드")
+    bonus_download.add_argument("--start", default="20200101", help="시작 날짜")
+    bonus_download.add_argument("--end", default=None, help="종료 날짜")
+
     args = parser.parse_args()
 
     # 명령 없이 실행 시 도움말 출력
@@ -76,30 +96,46 @@ def main():
         parser.print_help()
         sys.exit(0)
 
-    # 서비스 초기화
-    service = CapitalIncreaseService()
-
     # 명령 실행
     try:
-        if args.command == "download":
-            service.download_reports(args.start, args.end)
-
-        elif args.command == "convert":
-            service.convert_xml_encoding()
-
-        elif args.command == "export":
-            service.parse_and_export_to_excel()
-
-        elif args.command == "daily":
-            service.daily_update(args.days)
-
-        elif args.command == "update":
-            if args.full:
-                service.full_update(args.start)
+        # 무상증자 명령어
+        if args.command == "bonus":
+            bonus_service = BonusSharesService()
+            
+            if args.bonus_command == "daily":
+                bonus_service.daily_update(getattr(args, 'days', 1))
+            elif args.bonus_command == "full":
+                bonus_service.full_update(getattr(args, 'start', '20200101'))
+            elif args.bonus_command == "export":
+                bonus_service.parse_and_export_to_excel()
+            elif args.bonus_command == "download":
+                bonus_service.download_reports(args.start, getattr(args, 'end', None))
             else:
-                print("--full 옵션을 사용하세요.")
-                update_parser.print_help()
-                sys.exit(1)
+                print("bonus 하위 명령어를 지정하세요.")
+                return
+        
+        # 유상증자 명령어 (기본)
+        else:
+            service = CapitalIncreaseService()
+            
+            if args.command == "download":
+                service.download_reports(args.start, args.end)
+
+            elif args.command == "convert":
+                service.convert_xml_encoding()
+
+            elif args.command == "export":
+                service.parse_and_export_to_excel()
+
+            elif args.command == "daily":
+                service.daily_update(args.days)
+
+            elif args.command == "update":
+                if args.full:
+                    service.full_update(args.start)
+                else:
+                    print("--full 옵션을 사용하세요.")
+                    sys.exit(1)
 
     except Exception as e:
         print(f"\n❌ 오류 발생: {e}", file=sys.stderr)

@@ -145,6 +145,25 @@ class DartApiClient:
             if regex.fullmatch(item.get("report_nm", "").strip())
         ]
 
+    @staticmethod
+    def filter_bonus_shares_reports(data_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """무상증자결정 공시만 필터링합니다.
+        
+        Args:
+            data_list: API 응답의 공시 목록
+            
+        Returns:
+            필터링된 공시 목록
+        """
+        if not data_list:
+            return []
+
+        regex = re.compile(r"^(\[기재정정\]\s*)?무상증자결정(\s*\(.*\))?$")
+        return [
+            item for item in data_list
+            if regex.fullmatch(item.get("report_nm", "").strip())
+        ]
+
     def collect_reports(
         self,
         start_date: str,

@@ -55,3 +55,41 @@ class CapitalIncreaseDecision:
     def year(self) -> Optional[int]:
         """공시일 기준 연도를 반환합니다."""
         return self.disclosure_date.year if self.disclosure_date else None
+
+
+@dataclass(frozen=True)
+class BonusSharesDecision:
+    """무상증자 결정 데이터 엔티티
+    
+    Attributes:
+        source_filename: 원본 XML 파일명
+        company_name: 회사명
+        new_shares: 신주 발행 정보 (종류와 수)
+        par_value: 1주당 액면가액
+        total_shares_before: 증자전 발행주식총수
+        assign_per_share: 1주당 신주배정 주식수
+        board_resolution_date: 이사회결의일
+        disclosure_date: 공시일 (일자)
+        record_date: 신주배정기준일
+        listing_date: 신주의 상장 예정일
+    """
+    source_filename: str
+    company_name: str
+    new_shares: StockInfo
+    par_value: int
+    total_shares_before: int
+    assign_per_share: float
+    board_resolution_date: Optional[date]
+    disclosure_date: Optional[date]
+    record_date: Optional[date]
+    listing_date: Optional[date]
+
+    def is_limited_liability_company(self) -> bool:
+        """유한책임회사 여부를 확인합니다."""
+        return "유한책임회사" in self.company_name
+
+    @property
+    def year(self) -> Optional[int]:
+        """공시일 기준 연도를 반환합니다."""
+        return self.disclosure_date.year if self.disclosure_date else None
+
