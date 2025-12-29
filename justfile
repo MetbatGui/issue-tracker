@@ -1,5 +1,8 @@
 # 유상증자 데이터 처리 프로젝트 - Just 명령어
 
+# PowerShell 사용 설정
+set shell := ["powershell.exe", "-Command"]
+
 # 기본 헬프 메시지 표시
 default:
     @just --list
