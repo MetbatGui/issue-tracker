@@ -24,6 +24,10 @@ export:
 convert:
     uv run python -m src.cli convert
 
+# 특정 날짜부터 오늘까지 다운로드
+download start:
+    uv run python -m src.cli download --start {{start}}
+
 # 특정 기간 데이터 다운로드
-download start end="":
-    uv run python -m src.cli download --start {{start}} {{if end != "" { "--end " + end } else { "" }}}
+download-period start end:
+    uv run python -m src.cli download --start {{start}} --end {{end}}
