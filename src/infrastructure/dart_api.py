@@ -128,13 +128,14 @@ class DartApiClient:
 
     @staticmethod
     def filter_capital_increase_reports(data_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """유상증자 관련 공시를 필터링합니다.
+        """유상증자 보고서를 필터링합니다 (유무상증자 제외).
         
-        다음 패턴을 모두 포함:
+        수집 대상:
         - 유상증자결정
-        - 유무상증자결정
+        - 유상증자결정(자율공시)(종속회사의주요경영사항)
+        - 유상증자결정(종속회사의주요경영사항)
         - 주요사항보고서(유상증자결정)
-        - 주요사항보고서(유무상증자결정)
+        - 주요사항보고서(유상증자결정)(기재정정)
         
         Args:
             data_list: API 응답의 공시 목록
@@ -145,21 +146,22 @@ class DartApiClient:
         if not data_list:
             return []
 
-        # "유상증자" 또는 "유무상증자"가 포함된 모든 공시
+        # "유상증자"를 포함하지만 "유무상"은 제외
         return [
             item for item in data_list
-            if "유상증자" in item.get("report_nm", "") or "유무상증자" in item.get("report_nm", "")
+            if "유상증자" in item.get("report_nm", "") and "유무상" not in item.get("report_nm", "")
         ]
 
     @staticmethod
     def filter_bonus_shares_reports(data_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """무상증자 관련 공시를 필터링합니다.
+        """무상증자 보고서를 필터링합니다 (유무상증자 제외).
         
-        다음 패턴을 모두 포함:
+        수집 대상:
         - 무상증자결정
-        - 유무상증자결정
+        - 무상증자결정(자율공시)(종속회사의주요경영사항)
+        - 무상증자결정(종속회사의주요경영사항)
         - 주요사항보고서(무상증자결정)
-        - 주요사항보고서(유무상증자결정)
+        - 주요사항보고서(무상증자결정)(기재정정)
         
         Args:
             data_list: API 응답의 공시 목록
@@ -170,24 +172,53 @@ class DartApiClient:
         if not data_list:
             return []
 
-        # "무상증자" 또는 "유무상증자"가 포함된 모든 공시
+        # "무상증자"를 포함하지만 "유무상"은 제외
         return [
             item for item in data_list
-            if "무상증자" in item.get("report_nm", "") or "유무상증자" in item.get("report_nm", "")
+            if "무상증자" in item.get("report_nm", "") and "유무상" not in item.get("report_nm", "")
+        ]
+    
+    @staticmethod
+    def filter_dual_increase_reports(data_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """유무상증자 보고서를 필터링합니다.
+        
+        수집 대상:
+        - 유무상증자결정
+        - 유무상증자결정(자율공시)(종속회사의주요경영사항)
+        - 유무상증자결정(종속회사의주요경영사항)
+        - 주요사항보고서(유무상증자결정)
+        - 주요사항보고서(유무상증자결정)(기재정정)
+        
+        Args:
+            data_list: API 응답의 공시 목록
+            
+        Returns:
+            필터링된 공시 목록
+        """
+        if not data_list:
+            return []
+
+        return [
+            item for item in data_list
+            if "유무상증자" in item.get("report_nm", "")
         ]
 
-    def collect_reports(
+    def _collect_reports_with_filter(
         self,
         start_date: str,
-        end_date: Optional[str] = None,
-        interval_days: int = 90
+        end_date: Optional[str],
+        interval_days: int,
+        filter_func,
+        report_type_name: str
     ) -> List[Dict[str, Any]]:
-        """기간 내 유상증자 공시를 수집하고 XML을 다운로드합니다.
+        """필터 함수를 사용하여 보고서를 수집하는 공통 로직
         
         Args:
             start_date: 시작일자 (YYYYMMDD)
             end_date: 종료일자 (YYYYMMDD). None이면 오늘
             interval_days: API 호출 간격 (일)
+            filter_func: 필터링 함수
+            report_type_name: 보고서 유형명 (로그용)
             
         Returns:
             수집된 공시 목록 (xml_path 추가됨)
@@ -198,9 +229,9 @@ class DartApiClient:
         curr_start = datetime.strptime(start_date, "%Y%m%d")
         final_end = datetime.strptime(end_date, "%Y%m%d")
         all_filtered_reports = []
-
-        print(f"🚀 수집 시작: {start_date} ~ {end_date}")
-        print(f"📂 XML 저장 경로: {self.xml_save_path}")
+        
+        print(f"[수집 시작] {start_date} ~ {end_date} ({report_type_name})")
+        print(f"[XML 저장] {self.xml_save_path}")
 
         while curr_start <= final_end:
             curr_end = curr_start + timedelta(days=interval_days)
@@ -210,7 +241,7 @@ class DartApiClient:
             bgn_de = curr_start.strftime("%Y%m%d")
             end_de = curr_end.strftime("%Y%m%d")
 
-            print(f"\n📅 기간 검색: {bgn_de} ~ {end_de}")
+            print(f"\n[기간 검색] {bgn_de} ~ {end_de}")
 
             page = 1
             while True:
@@ -220,7 +251,7 @@ class DartApiClient:
                     break
                 if result.get('status') != '000':
                     if result.get('status') != '013':  # 데이터 없음
-                        print(f"  ⚠️ API 메시지: {result.get('message')}")
+                        print(f"  [경고] API 메시지: {result.get('message')}")
                     break
 
                 list_data = result.get('list', [])
@@ -228,7 +259,7 @@ class DartApiClient:
                     break
 
                 # 필터링 및 XML 다운로드
-                filtered = self.filter_capital_increase_reports(list_data)
+                filtered = filter_func(list_data)
                 for item in filtered:
                     xml_path = self.download_document_xml(
                         item['rcept_no'],
@@ -248,5 +279,133 @@ class DartApiClient:
 
             curr_start = curr_end + timedelta(days=1)
 
-        print("\n\n✅ 전체 수집 및 XML 다운로드 완료.")
+        print("\n\n[완료] 전체 수집 및 XML 다운로드 완료.")
         return all_filtered_reports
+
+    def collect_reports(
+        self,
+        start_date: str,
+        end_date: Optional[str] = None,
+        interval_days: int = 90,
+        report_type: str = "capital_increase"
+    ) -> List[Dict[str, Any]]:
+        """기간 내 공시를 수집하고 XML을 다운로드합니다 (하위 호환용).
+        
+        Args:
+            start_date: 시작일자 (YYYYMMDD)
+            end_date: 종료일자 (YYYYMMDD). None이면 오늘
+            interval_days: API 호출 간격 (일)
+            report_type: 보고서 유형 ("capital_increase", "bonus_shares", "dual_increase")
+            
+        Returns:
+            수집된 공시 목록 (xml_path 추가됨)
+        """
+        # 필터 함수 및 이름 선택
+        if report_type == "bonus_shares":
+            filter_func = self.filter_bonus_shares_reports
+            report_type_name = "무상증자"
+        elif report_type == "dual_increase":
+            filter_func = self.filter_dual_increase_reports
+            report_type_name = "유무상증자"
+        else:  # capital_increase (기본값)
+            filter_func = self.filter_capital_increase_reports
+            report_type_name = "유상증자"
+        
+        return self._collect_reports_with_filter(
+            start_date=start_date,
+            end_date=end_date,
+            interval_days=interval_days,
+            filter_func=filter_func,
+            report_type_name=report_type_name
+        )
+    
+    def collect_capital_increase_reports(
+        self,
+        start_date: str,
+        end_date: Optional[str] = None,
+        interval_days: int = 90
+    ) -> List[Dict[str, Any]]:
+        """유상증자 보고서만 수집합니다.
+        
+        수집 대상:
+        - 주요사항보고서(유상증자결정)
+        
+        Args:
+            start_date: 시작일자 (YYYYMMDD)
+            end_date: 종료일자 (YYYYMMDD). None이면 오늘
+            interval_days: API 호출 간격 (일)
+            
+        Returns:
+            유상증자 공시 목록
+        """
+        return self._collect_reports_with_filter(
+            start_date=start_date,
+            end_date=end_date,
+            interval_days=interval_days,
+            filter_func=self.filter_capital_increase_reports,
+            report_type_name="유상증자"
+        )
+    
+    def collect_bonus_shares_reports(
+        self,
+        start_date: str,
+        end_date: Optional[str] = None,
+        interval_days: int = 90
+    ) -> List[Dict[str, Any]]:
+        """무상증자 보고서만 수집합니다 (유무상증자 제외).
+        
+        수집 대상:
+        - 무상증자결정
+        - 무상증자결정(자율공시)(종속회사의주요경영사항)
+        - 무상증자결정(종속회사의주요경영사항)
+        - 주요사항보고서(무상증자결정)
+        - 주요사항보고서(무상증자결정)(기재정정)
+        
+        주의: 유무상증자는 제외됩니다.
+        
+        Args:
+            start_date: 시작일자 (YYYYMMDD)
+            end_date: 종료일자 (YYYYMMDD). None이면 오늘
+            interval_days: API 호출 간격 (일)
+            
+        Returns:
+            무상증자 공시 목록
+        """
+        return self._collect_reports_with_filter(
+            start_date=start_date,
+            end_date=end_date,
+            interval_days=interval_days,
+            filter_func=self.filter_bonus_shares_reports,
+            report_type_name="무상증자"
+        )
+    
+    def collect_dual_increase_reports(
+        self,
+        start_date: str,
+        end_date: Optional[str] = None,
+        interval_days: int = 90
+    ) -> List[Dict[str, Any]]:
+        """유무상증자 보고서만 수집합니다.
+        
+        수집 대상:
+        - 유무상증자결정
+        - 유무상증자결정(자율공시)(종속회사의주요경영사항)
+        - 유무상증자결정(종속회사의주요경영사항)
+        - 주요사항보고서(유무상증자결정)
+        - 주요사항보고서(유무상증자결정)(기재정정)
+        
+        Args:
+            start_date: 시작일자 (YYYYMMDD)
+            end_date: 종료일자 (YYYYMMDD). None이면 오늘
+            interval_days: API 호출 간격 (일)
+            
+        Returns:
+            유무상증자 공시 목록
+        """
+        return self._collect_reports_with_filter(
+            start_date=start_date,
+            end_date=end_date,
+            interval_days=interval_days,
+            filter_func=self.filter_dual_increase_reports,
+            report_type_name="유무상증자"
+        )
