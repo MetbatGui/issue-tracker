@@ -4,12 +4,16 @@
 """
 from .dart_api import DartApiClient
 from .capital_increase_xml_parser import CapitalIncreaseXmlParser
+from .bonus_xml_parser import BonusSharesXmlParser
 from .capital_increase_excel_writer import CapitalIncreaseExcelWriter
+from .bonus_excel_writer import BonusSharesExcelWriter
 from .file_converter import FileEncodingConverter
 
 __all__ = [
     "DartApiClient",
     "CapitalIncreaseXmlParser",
+    "BonusSharesXmlParser",
     "CapitalIncreaseExcelWriter",
-    "FileEncodingConverter"
+    "BonusSharesExcelWriter",
+    "FileEncodingConverter",
 ]
