@@ -104,18 +104,58 @@ class BonusSharesXmlParser:
             par_val_node = root.find(".//TE[@ACODE='FVAL']")
             bfr_stock_node = root.find(".//TE[@ACODE='BFR_CST_CNT']")
 
-            # 비율
+            # 비율 (NEW_ASN_CNT 또는 NEW_ASN_CST)
             ratio_node = root.find(".//TE[@ACODE='NEW_ASN_CNT']")
+            if ratio_node is None:
+                ratio_node = root.find(".//TE[@ACODE='NEW_ASN_CST']")
 
             # 날짜 정보
             drc_node = root.find(".//TU[@AUNIT='DRC_DT']")  # 이사회결의일
             dis_node = root.find(".//TU[@AUNIT='DIS_DT']")  # 공시일
             rec_node = root.find(".//TU[@AUNIT='ALL_BS_DT']")  # 신주배정기준일
-            lst_node = root.find(".//TU[@AUNIT='LST_DT']")  # 신주상장예정일
+            
+            # 신주의 상장 예정일 (LST_DT -> LST_PLN_DT -> 텍스트 검색 순)
+            lst_date = None
+            
+            # 1. LST_DT 시도
+            lst_node = root.find(".//TU[@AUNIT='LST_DT']")
+            lst_date = cls._parse_date(lst_node)
 
-            return BonusSharesDecision(
+            # 2. LST_PLN_DT 시도
+            if not lst_date:
+                lst_pln_node = root.find(".//TU[@AUNIT='LST_PLN_DT']")
+                lst_date = cls._parse_date(lst_pln_node)
+
+            # 3. 텍스트 레이블("신주의 상장 예정일")로 검색 시도
+            if not lst_date:
+                # "신주의 상장 예정일" 텍스트를 포함하는 TD 태그 검색
+                for td in root.iter("TD"):
+                    text = "".join(td.itertext())
+                    if "신주의 상장 예정일" in text:
+                        # 바로 다음 형제 TU 태그 찾기
+                        next_tag = td.getnext()
+                        if next_tag is not None and next_tag.tag == "TU":
+                            lst_date = cls._parse_date(next_tag)
+                            if lst_date:
+                                break
+                        # 혹은 부모의 다음 TU (구조에 따라 다를 수 있음, 일단 sibling 우선)
+
+            # 회사명 파싱 (CRP_NM -> COMPANY-NAME -> 파일명)
+            company_name_node = root.find(".//TE[@ACODE='CRP_NM']")
+            company_name = cls._get_text(company_name_node)
+            
+            if not company_name:
+                header_name_node = root.find(".//COMPANY-NAME")
+                company_name = cls._get_text(header_name_node)
+            
+            if not company_name:
+                # 파일명에서 추출 (예: "DS단석_2024..." -> "DS단석")
+                base_name = os.path.basename(file_path)
+                company_name = base_name.split("_")[0]
+
+            decision = BonusSharesDecision(
                 source_filename=os.path.basename(file_path),
-                company_name=cls._get_text(crp_nm_node) or "Unknown",
+                company_name=company_name,
                 new_shares=stock_info,
                 par_value=cls._clean_int(cls._get_text(par_val_node)),
                 total_shares_before=cls._clean_int(cls._get_text(bfr_stock_node)),
@@ -123,8 +163,25 @@ class BonusSharesXmlParser:
                 board_resolution_date=cls._parse_date(drc_node),
                 disclosure_date=cls._parse_date(dis_node),
                 record_date=cls._parse_date(rec_node),
-                listing_date=cls._parse_date(lst_node)
+                listing_date=lst_date
             )
+
+            # 공시일(DIS_DT)이 없으면 파일명에서 추출 시도
+            if not decision.disclosure_date:
+                import re
+                # 파일명 형식: "회사명_YYYYMMDDnnnnnn.xml"
+                match = re.search(r'_(\d{8})\d+\.xml$', os.path.basename(file_path))
+                if match:
+                    date_str = match.group(1)
+                    try:
+                        extracted_date = datetime.strptime(date_str, "%Y%m%d").date()
+                        # dataclass는 frozen=True이므로 replace로 새로운 객체 생성
+                        from dataclasses import replace
+                        decision = replace(decision, disclosure_date=extracted_date)
+                    except ValueError:
+                        pass
+
+            return decision
         except Exception as e:
             print(f"[Parser Error] {file_path}: {e}")
             return None
