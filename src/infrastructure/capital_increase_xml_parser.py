@@ -142,9 +142,11 @@ class CapitalIncreaseXmlParser:
                 other=cls._clean_int(cls._get_text(root.find(".//TE[@ACODE='FND_USE3']")))
             )
 
-            # 방식 및 비율
+            # 방식 및 비율 (NEW_ASN_CNT 또는 NEW_ASN_CST)
             method_node = root.find(".//TU[@AUNIT='CI_MTH']")
             ratio_node = root.find(".//TE[@ACODE='NEW_ASN_CNT']")
+            if ratio_node is None:
+                ratio_node = root.find(".//TE[@ACODE='NEW_ASN_CST']")
 
             # 날짜 정보
             drc_node = root.find(".//TU[@AUNIT='DRC_DT']")
@@ -153,9 +155,22 @@ class CapitalIncreaseXmlParser:
             pym_node = root.find(".//TU[@AUNIT='PYM_DT']")
             sub_node = root.find(".//TU[@AUNIT='SH_BGN_DT']")
 
-            return CapitalIncreaseDecision(
+            # 회사명 파싱 (CRP_NM -> COMPANY-NAME -> 파일명)
+            company_name_node = root.find(".//TE[@ACODE='CRP_NM']")
+            company_name = cls._get_text(company_name_node)
+            
+            if not company_name:
+                header_name_node = root.find(".//COMPANY-NAME")
+                company_name = cls._get_text(header_name_node)
+            
+            if not company_name:
+                # 파일명에서 추출
+                base_name = os.path.basename(file_path)
+                company_name = base_name.split("_")[0]
+
+            decision = CapitalIncreaseDecision(
                 source_filename=os.path.basename(file_path),
-                company_name=cls._get_text(crp_nm_node) or "Unknown",
+                company_name=company_name,
                 new_shares=stock_info,
                 par_value=cls._clean_int(cls._get_text(par_val_node)),
                 total_shares_before=cls._clean_int(cls._get_text(bfr_stock_node)),
@@ -169,6 +184,23 @@ class CapitalIncreaseXmlParser:
                 subscription_date=cls._parse_date(sub_node),
                 payment_date=cls._parse_date(pym_node)
             )
+
+            # 공시일(DIS_DT)이 없으면 파일명에서 추출 시도
+            if not decision.disclosure_date:
+                import re
+                # 파일명 형식: "회사명_YYYYMMDDnnnnnn.xml"
+                match = re.search(r'_(\d{8})\d+\.xml$', os.path.basename(file_path))
+                if match:
+                    date_str = match.group(1)
+                    try:
+                        extracted_date = datetime.strptime(date_str, "%Y%m%d").date()
+                        # dataclass는 frozen=True이므로 replace로 새로운 객체 생성
+                        from dataclasses import replace
+                        decision = replace(decision, disclosure_date=extracted_date)
+                    except ValueError:
+                        pass
+
+            return decision
         except Exception as e:
             print(f"[Parser Error] {file_path}: {e}")
             return None
