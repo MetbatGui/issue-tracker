@@ -47,13 +47,11 @@ class BonusSharesExcelWriter:
 
     @staticmethod
     def _format_stock_info(stock_info) -> str:
-        """주식 정보를 문자열로 변환합니다."""
-        parts = []
+        """주식 정보를 문자열(보통주 수량)로 변환합니다."""
+        # 보통주 수량만 쉼표 포함 숫자로 표기
         if stock_info.common > 0:
-            parts.append(f"보통주 {stock_info.common:,}주")
-        if stock_info.preferred > 0:
-            parts.append(f"우선주 {stock_info.preferred:,}주")
-        return ", ".join(parts) if parts else ""
+            return f"{stock_info.common:,}"
+        return "0"
 
     def _to_row_dict(self, decision: BonusSharesDecision) -> dict:
         """도메인 모델을 엑셀 행 딕셔너리로 변환합니다.
@@ -106,8 +104,8 @@ class BonusSharesExcelWriter:
                 year_df = df[df["연도"] == year][self.EXCEL_COLUMNS]  # 연도 컬럼 제외
                 sheet_name = str(int(year))
                 year_df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=1)
-                print(f"  📄 {sheet_name} 시트: {len(year_df)}건")
+                print(f"  [{sheet_name}] 시트: {len(year_df)}건")
 
-        print(f"\n✅ 엑셀 생성 완료: {self.output_path}")
-        print(f"📊 총 {len(df)}건의 데이터가 {len(years)}개 시트에 저장되었습니다.")
-        print(f"📅 생성된 시트: {', '.join([str(int(y)) for y in years])}")
+        print(f"\n[SUCCESS] 엑셀 생성 완료: {self.output_path}")
+        print(f"[INFO] 총 {len(df)}건의 데이터가 {len(years)}개 시트에 저장되었습니다.")
+        print(f"[INFO] 생성된 시트: {', '.join([str(int(y)) for y in years])}")

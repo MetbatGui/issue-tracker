@@ -116,8 +116,9 @@ class CapitalIncreaseExcelWriter:
                 year_df = df[df["연도"] == year][self.EXCEL_COLUMNS]  # 연도 컬럼 제외
                 sheet_name = str(int(year))
                 year_df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=1)
-                print(f"  📄 {sheet_name} 시트: {len(year_df)}건")
+                print(f"  [{sheet_name}] 시트: {len(year_df)}건")
 
-        print(f"\n✅ 엑셀 생성 완료: {self.output_path}")
-        print(f"📊 총 {len(df)}건의 데이터가 {len(years)}개 시트에 저장되었습니다.")
-        print(f"📅 생성된 시트: {', '.join([str(int(y)) for y in years])}")
+        print(f"\n[SUCCESS] 엑셀 생성 완료: {self.output_path}")
+        print(f"[INFO] 총 {len(df)}건의 데이터가 {len(years)}개 시트에 저장되었습니다.")
+        print(f"[INFO] 생성된 시트: {', '.join([str(int(y)) for y in years])}")
+
