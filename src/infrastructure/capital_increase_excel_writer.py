@@ -109,6 +109,9 @@ class CapitalIncreaseExcelWriter:
         # 연도 없는 데이터 필터링
         df = df[df["연도"].notna()]
 
+        # 일자 기준 오름차순 정렬
+        df = df.sort_values(by="일자", ascending=True)
+
         # 연도별로 그룹화
         years = sorted(df["연도"].unique())
 
