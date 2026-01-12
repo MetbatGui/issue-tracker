@@ -46,6 +46,8 @@ class CapitalIncreaseDecision:
     record_date: Optional[date]
     subscription_date: Optional[date]
     payment_date: Optional[date]
+    report_name: Optional[str] = None
+    is_correction: bool = False
 
     def is_limited_liability_company(self) -> bool:
         """유한책임회사 여부를 확인합니다."""
@@ -83,6 +85,8 @@ class BonusSharesDecision:
     disclosure_date: Optional[date]
     record_date: Optional[date]
     listing_date: Optional[date]
+    report_name: Optional[str] = None
+    is_correction: bool = False
 
     def is_limited_liability_company(self) -> bool:
         """유한책임회사 여부를 확인합니다."""

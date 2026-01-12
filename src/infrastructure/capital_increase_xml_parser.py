@@ -168,6 +168,25 @@ class CapitalIncreaseXmlParser:
                 base_name = os.path.basename(file_path)
                 company_name = base_name.split("_")[0]
 
+            # 보고서명 파싱 및 기재정정 여부 확인
+            doc_name_node = root.find(".//DOCUMENT-NAME")
+            report_name = cls._get_text(doc_name_node)
+            
+            # 기재정정 여부 판단
+            # 1. 문서 명에 '기재정정' 포함
+            # 2. CORRECTION 태그 존재
+            # 3. TITLE 태그에 '기재정정' 포함
+            is_correction = False
+            if report_name and "기재정정" in report_name:
+                is_correction = True
+            elif root.find(".//CORRECTION") is not None:
+                is_correction = True
+            else:
+                for title in root.iter("TITLE"):
+                    if "기재정정" in cls._get_text(title):
+                        is_correction = True
+                        break
+
             decision = CapitalIncreaseDecision(
                 source_filename=os.path.basename(file_path),
                 company_name=company_name,
@@ -182,7 +201,9 @@ class CapitalIncreaseXmlParser:
                 disclosure_date=cls._parse_date(dis_node),
                 record_date=cls._parse_date(rec_node),
                 subscription_date=cls._parse_date(sub_node),
-                payment_date=cls._parse_date(pym_node)
+                payment_date=cls._parse_date(pym_node),
+                report_name=report_name,
+                is_correction=is_correction
             )
 
             # 공시일(DIS_DT)이 없으면 파일명에서 추출 시도

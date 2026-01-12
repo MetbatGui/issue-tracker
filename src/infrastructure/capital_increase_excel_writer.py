@@ -23,6 +23,7 @@ class CapitalIncreaseExcelWriter:
     EXCEL_COLUMNS = [
         "일자",
         "종목명",
+        "기재정정여부",
         "유상증자공시일",
         "신주발행주식수",
         "1주당 액면가",
@@ -69,6 +70,7 @@ class CapitalIncreaseExcelWriter:
         return {
             "일자": disclosure_dt,
             "종목명": decision.company_name,
+            "기재정정여부": "[기재정정]" if decision.is_correction else "",
             "유상증자공시일": disclosure_dt,
             "신주발행주식수": decision.new_shares.common,
             "1주당 액면가": decision.par_value,

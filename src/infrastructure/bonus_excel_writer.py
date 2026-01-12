@@ -23,6 +23,7 @@ class BonusSharesExcelWriter:
     EXCEL_COLUMNS = [
         "일자",
         "종목명",
+        "기재정정여부",
         "이사회결의일",
         "신주의 종류와 수",
         "1주당 액면가액",
@@ -67,6 +68,7 @@ class BonusSharesExcelWriter:
         return {
             "일자": disclosure_dt,
             "종목명": decision.company_name,
+            "기재정정여부": "[기재정정]" if decision.is_correction else "",
             "이사회결의일": self._format_date(decision.board_resolution_date),
             "신주의 종류와 수": self._format_stock_info(decision.new_shares),
             "1주당 액면가액": decision.par_value,
