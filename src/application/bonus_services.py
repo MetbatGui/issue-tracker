@@ -49,7 +49,7 @@ class BonusSharesService:
         self.excel_writer = BonusSharesExcelWriter(output_path=str(self.data_directory / "무상증자.xlsx"))
         self.file_converter = FileEncodingConverter()
 
-    def download_reports(self, start_date: str, end_date: str = None) -> int:
+    def download_reports(self, start_date: str, end_date: str = None) -> List[str]:
         """무상증자 공시 데이터를 다운로드합니다.
         
         Args:
@@ -57,7 +57,7 @@ class BonusSharesService:
             end_date: 종료일자 (YYYYMMDD, 기본값: 오늘)
             
         Returns:
-            다운로드된 공시 건수
+            다운로드된 XML 파일 경로 리스트
         """
         print("=" * 50)
         print("📥 무상증자 공시 데이터 다운로드")
@@ -120,9 +120,12 @@ class BonusSharesService:
 
             curr_start = curr_end + timedelta(days=1)
 
+        # 다운로드된 파일 경로 추출
+        downloaded_files = [report['xml_path'] for report in all_filtered_reports if 'xml_path' in report]
+        
         print("\n\n✅ 전체 수집 및 XML 다운로드 완료.")
         print(f"✅ 총 {len(all_filtered_reports)}건의 공시를 다운로드했습니다.")
-        return len(all_filtered_reports)
+        return downloaded_files
 
     def convert_xml_encoding(self) -> dict:
         """XML 파일들을 UTF-8로 인코딩 변환합니다.
@@ -135,6 +138,43 @@ class BonusSharesService:
         print("=" * 50)
         
         return self.file_converter.convert_directory(self.xml_directory)
+    
+    def _convert_downloaded_files(self, file_paths: List[str]) -> dict:
+        """다운로드한 파일들만 UTF-8로 인코딩 변환합니다.
+        
+        Args:
+            file_paths: 변환할 파일 경로 리스트
+            
+        Returns:
+            변환 결과 통계 딕셔너리
+        """
+        if not file_paths:
+            return {"converted": 0, "already_utf8": 0, "errors": 0}
+        
+        print("\n" + "=" * 50)
+        print(f"🔄 다운로드한 {len(file_paths)}개 파일 UTF-8 변환")
+        print("=" * 50)
+        
+        converted = 0
+        already_utf8 = 0
+        errors = 0
+        
+        for file_path_str in file_paths:
+            file_path = Path(file_path_str)
+            result = self.file_converter.detect_and_read(file_path)
+            
+            if result and result[0].lower() != 'utf-8':
+                if self.file_converter.convert_to_utf8(file_path):
+                    converted += 1
+                else:
+                    errors += 1
+            elif result and result[0].lower() == 'utf-8':
+                already_utf8 += 1
+            else:
+                errors += 1
+        
+        print(f"\n✅ 변환 완료: {converted}개 | 이미 UTF-8: {already_utf8}개 | 오류: {errors}개")
+        return {"converted": converted, "already_utf8": already_utf8, "errors": errors}
 
     def parse_and_export_to_excel(self) -> int:
         """XML 파일들을 파싱하여 엑셀로 저장합니다.
@@ -184,10 +224,10 @@ class BonusSharesService:
         print("🎁" * 25 + "\n")
 
         # 1. 다운로드
-        self.download_reports(start_date, end_date)
+        downloaded_files = self.download_reports(start_date, end_date)
 
-        # 2. 인코딩 변환
-        self.convert_xml_encoding()
+        # 2. 다운로드한 파일만 인코딩 변환
+        self._convert_downloaded_files(downloaded_files)
 
         # 3. 파싱 및 엑셀 저장
         self.parse_and_export_to_excel()
@@ -218,14 +258,14 @@ class BonusSharesService:
         print(f"📆 수집 기간: {start_date} ~ {end_date}")
 
         # 1. 최근 데이터 다운로드
-        count = self.download_reports(start_date, end_date)
+        downloaded_files = self.download_reports(start_date, end_date)
         
-        if count == 0:
+        if not downloaded_files:
             print("\n⚠️ 새로운 공시가 없습니다.")
             return
 
-        # 2. 인코딩 변환
-        self.convert_xml_encoding()
+        # 2. 다운로드한 파일만 인코딩 변환
+        self._convert_downloaded_files(downloaded_files)
 
         # 3. 전체 XML 파일 재파싱
         print("\n" + "=" * 50)
