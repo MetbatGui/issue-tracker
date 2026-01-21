@@ -4,5 +4,12 @@
 """
 from .models import CapitalIncreaseDecision, BonusSharesDecision
 from .value_objects import StockInfo, FundingPurpose
+from .ports import StoragePort
 
-__all__ = ["CapitalIncreaseDecision", "BonusSharesDecision", "StockInfo", "FundingPurpose"]
+__all__ = [
+    "CapitalIncreaseDecision", 
+    "BonusSharesDecision", 
+    "StockInfo", 
+    "FundingPurpose",
+    "StoragePort"
+]

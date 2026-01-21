@@ -48,6 +48,9 @@ class CapitalIncreaseDecision:
     payment_date: Optional[date]
     report_name: Optional[str] = None
     is_correction: bool = False
+    rcept_no: str = ""
+    parent_rcp_no: Optional[str] = None
+    original_disclosure_date: Optional[date] = None
 
     def is_limited_liability_company(self) -> bool:
         """유한책임회사 여부를 확인합니다."""
@@ -87,6 +90,9 @@ class BonusSharesDecision:
     listing_date: Optional[date]
     report_name: Optional[str] = None
     is_correction: bool = False
+    rcept_no: str = ""
+    parent_rcp_no: Optional[str] = None
+    original_disclosure_date: Optional[date] = None
 
     def is_limited_liability_company(self) -> bool:
         """유한책임회사 여부를 확인합니다."""
