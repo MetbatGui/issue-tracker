@@ -165,14 +165,20 @@ def main():
                 print("="*60)
 
                 # 1. 유상증자
-                print("\n>>> [1/2] 유상증자 업데이트 시작")
+                print("\n>>> [1/3] 유상증자 업데이트 시작")
                 ci_service = CapitalIncreaseService()
                 ci_service.daily_update(days)
 
                 # 2. 무상증자
-                print("\n\n>>> [2/2] 무상증자 업데이트 시작")
+                print("\n\n>>> [2/3] 무상증자 업데이트 시작")
                 bonus_service = BonusSharesService()
                 bonus_service.daily_update(days)
+                
+                # 3. 유무상증자 (Dual Increase)
+                print("\n\n>>> [3/3] 유무상증자 업데이트 시작")
+                from .application import DualIncreaseService
+                dual_service = DualIncreaseService()
+                dual_service.daily_update(days)
 
                 print("\n" + "="*60)
                 print("✅ [ALL] 모든 업데이트가 완료되었습니다.")
