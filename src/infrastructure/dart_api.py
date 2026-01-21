@@ -259,6 +259,12 @@ class DartApiClient:
                     break
 
                 # 필터링 및 XML 다운로드
+                # KOSPI(Y), KOSDAQ(K) 만 필터링
+                list_data = [
+                    item for item in list_data 
+                    if item.get('corp_cls') in ['Y', 'K']
+                ]
+
                 filtered = filter_func(list_data)
                 for item in filtered:
                     xml_path = self.download_document_xml(

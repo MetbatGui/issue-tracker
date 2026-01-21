@@ -24,13 +24,16 @@ class BonusSharesExcelWriter:
         "일자",
         "종목명",
         "기재정정여부",
+        "접수번호",
+        "상위접수번호",
         "이사회결의일",
         "신주의 종류와 수",
         "1주당 액면가액",
         "증자전 발행주식총수",
         "신주배정기준일",
         "1주당 신주배정 주식수",
-        "신주의 상장 예정일"
+        "신주의 상장 예정일",
+        "최초공시일"
     ]
 
     def __init__(self, output_path: str = "data/무상증자/무상증자.xlsx"):
@@ -69,6 +72,8 @@ class BonusSharesExcelWriter:
             "일자": disclosure_dt,
             "종목명": decision.company_name,
             "기재정정여부": "[기재정정]" if decision.is_correction else "",
+            "접수번호": decision.rcept_no,
+            "상위접수번호": decision.parent_rcp_no if decision.parent_rcp_no else "",
             "이사회결의일": self._format_date(decision.board_resolution_date),
             "신주의 종류와 수": self._format_stock_info(decision.new_shares),
             "1주당 액면가액": decision.par_value,
@@ -76,6 +81,7 @@ class BonusSharesExcelWriter:
             "신주배정기준일": self._format_date(decision.record_date),
             "1주당 신주배정 주식수": decision.assign_per_share if decision.assign_per_share > 0 else "",
             "신주의 상장 예정일": self._format_date(decision.listing_date),
+            "최초공시일": self._format_date(decision.original_disclosure_date),
             "연도": decision.year
         }
 

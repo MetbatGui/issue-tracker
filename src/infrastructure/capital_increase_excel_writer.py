@@ -25,6 +25,8 @@ class CapitalIncreaseExcelWriter:
         "종목명",
         "기재정정여부",
         "유상증자공시일",
+        "접수번호",
+        "상위접수번호",
         "신주발행주식수",
         "1주당 액면가",
         "증자전 발행주식총수",
@@ -40,7 +42,8 @@ class CapitalIncreaseExcelWriter:
         "청약예정일",
         "납입일",
         "신주상장일",
-        "이사회결의일"
+        "이사회결의일",
+        "최초공시일"
     ]
 
     def __init__(self, output_path: str = "data/유상증자/유상증자.xlsx"):
@@ -72,6 +75,8 @@ class CapitalIncreaseExcelWriter:
             "종목명": decision.company_name,
             "기재정정여부": "[기재정정]" if decision.is_correction else "",
             "유상증자공시일": disclosure_dt,
+            "접수번호": decision.rcept_no,
+            "상위접수번호": decision.parent_rcp_no if decision.parent_rcp_no else "",
             "신주발행주식수": decision.new_shares.common,
             "1주당 액면가": decision.par_value,
             "증자전 발행주식총수": decision.total_shares_before,
@@ -88,6 +93,7 @@ class CapitalIncreaseExcelWriter:
             "납입일": self._format_date(decision.payment_date),
             "신주상장일": "",
             "이사회결의일": self._format_date(decision.board_resolution_date),
+            "최초공시일": self._format_date(decision.original_disclosure_date),
             "연도": decision.year
         }
 

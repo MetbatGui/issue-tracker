@@ -5,15 +5,21 @@
 from .dart_api import DartApiClient
 from .capital_increase_xml_parser import CapitalIncreaseXmlParser
 from .bonus_xml_parser import BonusSharesXmlParser
+from .dual_increase_xml_parser import DualIncreaseXmlParser
 from .capital_increase_excel_writer import CapitalIncreaseExcelWriter
 from .bonus_excel_writer import BonusSharesExcelWriter
 from .file_converter import FileEncodingConverter
+from .google_drive_adapter import GoogleDriveAdapter
+from .dart_history_scraper import DartHistoryScraper
 
 __all__ = [
     "DartApiClient",
     "CapitalIncreaseXmlParser",
     "BonusSharesXmlParser",
+    "DualIncreaseXmlParser",
     "CapitalIncreaseExcelWriter",
     "BonusSharesExcelWriter",
     "FileEncodingConverter",
+    "GoogleDriveAdapter",
+    "DartHistoryScraper",
 ]
