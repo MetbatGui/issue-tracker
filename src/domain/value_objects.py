@@ -33,14 +33,19 @@ class FundingPurpose:
         facility: 시설자금
         operating: 운영자금
         acquisition: 타법인증권 취득자금
+        debt_repayment: 채무상환자금
+        business_acquisition: 영업양수자금
         other: 기타자금
     """
-    facility: int
-    operating: int
-    acquisition: int
-    other: int
+    facility: int = 0
+    operating: int = 0
+    acquisition: int = 0
+    debt_repayment: int = 0
+    business_acquisition: int = 0
+    other: int = 0
 
     @property
     def total(self) -> int:
         """전체 자금 규모를 반환합니다."""
-        return self.facility + self.operating + self.acquisition + self.other
+        return (self.facility + self.operating + self.acquisition +
+                self.debt_repayment + self.business_acquisition + self.other)
