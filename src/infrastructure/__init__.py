@@ -6,8 +6,10 @@ from .dart_api import DartApiClient
 from .capital_increase_xml_parser import CapitalIncreaseXmlParser
 from .bonus_xml_parser import BonusSharesXmlParser
 from .dual_increase_xml_parser import DualIncreaseXmlParser
+from .convertible_bond_xml_parser import ConvertibleBondXmlParser
 from .capital_increase_excel_writer import CapitalIncreaseExcelWriter
 from .bonus_excel_writer import BonusSharesExcelWriter
+from .convertible_bond_excel_writer import ConvertibleBondExcelWriter
 from .file_converter import FileEncodingConverter
 from .google_drive_adapter import GoogleDriveAdapter
 from .dart_history_scraper import DartHistoryScraper
@@ -17,8 +19,10 @@ __all__ = [
     "CapitalIncreaseXmlParser",
     "BonusSharesXmlParser",
     "DualIncreaseXmlParser",
+    "ConvertibleBondXmlParser",
     "CapitalIncreaseExcelWriter",
     "BonusSharesExcelWriter",
+    "ConvertibleBondExcelWriter",
     "FileEncodingConverter",
     "GoogleDriveAdapter",
     "DartHistoryScraper",

@@ -6,11 +6,16 @@ import sys
 import argparse
 from datetime import datetime
 
-from .application import CapitalIncreaseService, BonusSharesService
+from .application import CapitalIncreaseService, BonusSharesService, ConvertibleBondService, BondWithWarrantService
+from .logger import setup_logger, get_logger
 
 
 def main():
     """CLI 메인 함수"""
+    # 로거 초기화 (Root Logger 설정)
+    setup_logger()
+    logger = get_logger("CLI")
+
     parser = argparse.ArgumentParser(
         description="유상증자/무상증자 데이터 수집 및 처리 도구",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -42,7 +47,7 @@ def main():
 
     # daily
     ci_daily = ci_subparsers.add_parser("daily", help="유상증자 일일 업데이트")
-    ci_daily.add_argument("--days", type=int, default=1, help="과거 며칠까지 (기본: 1)")
+    ci_daily.add_argument("--days", type=int, default=7, help="과거 며칠까지 (기본: 7)")
 
     # full
     ci_full = ci_subparsers.add_parser("full", help="유상증자 전체 업데이트")
@@ -68,7 +73,7 @@ def main():
     
     # daily
     bonus_daily = bonus_subparsers.add_parser("daily", help="무상증자 일일 업데이트")
-    bonus_daily.add_argument("--days", type=int, default=1, help="과거 며칠까지 (기본: 1)")
+    bonus_daily.add_argument("--days", type=int, default=7, help="과거 며칠까지 (기본: 7)")
     
     # full
     bonus_full = bonus_subparsers.add_parser("full", help="무상증자 전체 업데이트")
@@ -83,15 +88,52 @@ def main():
     bonus_download.add_argument("--end", default=None, help="종료 날짜")
 
 
+
     # ==========================================
-    # 3. all 명령 (전체)
+    # 3. cb 명령 (전환사채)
     # ==========================================
-    all_parser = subparsers.add_parser("all", help="전체(유상+무상) 데이터 처리")
+    cb_parser = subparsers.add_parser("cb", help="전환사채 데이터 처리")
+    cb_subparsers = cb_parser.add_subparsers(dest="cb_command", help="전환사채 하위 명령")
+
+    # daily
+    cb_daily = cb_subparsers.add_parser("daily", help="전환사채 일일 업데이트")
+    cb_daily.add_argument("--days", type=int, default=7, help="과거 며칠까지 (기본: 7)")
+
+    # full
+    cb_full = cb_subparsers.add_parser("full", help="전환사채 전체 업데이트")
+    cb_full.add_argument("--start", default="20200101", help="시작 날짜")
+
+    # export
+    cb_subparsers.add_parser("export", help="전환사채 엑셀 생성")
+
+
+    # ==========================================
+    # 5. bw 명령 (신주인수권부사채)
+    # ==========================================
+    bw_parser = subparsers.add_parser("bw", help="신주인수권부사채 데이터 처리")
+    bw_subparsers = bw_parser.add_subparsers(dest="bw_command", help="신주인수권부사채 하위 명령")
+
+    # daily
+    bw_daily = bw_subparsers.add_parser("daily", help="신주인수권부사채 일일 업데이트")
+    bw_daily.add_argument("--days", type=int, default=7, help="과거 며칠까지 (기본: 7)")
+
+    # full
+    bw_full = bw_subparsers.add_parser("full", help="신주인수권부사채 전체 업데이트")
+    bw_full.add_argument("--start", default="20200101", help="시작 날짜")
+
+    # export
+    bw_subparsers.add_parser("export", help="신주인수권부사채 엑셀 생성")
+
+
+    # ==========================================
+    # 6. all 명령 (전체)
+    # ==========================================
+    all_parser = subparsers.add_parser("all", help="전체(유상+무상+전환+신주) 데이터 처리")
     all_subparsers = all_parser.add_subparsers(dest="all_command", help="전체 하위 명령")
 
     # daily
-    all_daily = all_subparsers.add_parser("daily", help="유상/무상 일일 업데이트 일괄 실행")
-    all_daily.add_argument("--days", type=int, default=None, help="과거 며칠까지 (기본: 1)")
+    all_daily = all_subparsers.add_parser("daily", help="전체 일일 업데이트 일괄 실행")
+    all_daily.add_argument("--days", type=int, default=7, help="과거 며칠까지 (기본: 7)")
     all_daily.add_argument("--start", default=None, help="시작 날짜 (YYYYMMDD 형식, 오늘까지 자동 계산)")
 
 
@@ -120,8 +162,10 @@ def main():
                 service.download_reports(args.start, getattr(args, 'end', None))
             elif args.ci_command == "convert":
                 service.convert_xml_encoding()
+            elif args.ci_command == "convert":
+                service.convert_xml_encoding()
             else:
-                print("capital-increase 하위 명령어를 지정하세요.")
+                logger.warning("capital-increase 하위 명령어를 지정하세요.")
 
         # ----------------------------------
         # Bonus Shares
@@ -137,8 +181,43 @@ def main():
                 bonus_service.parse_and_export_to_excel()
             elif args.bonus_command == "download":
                 bonus_service.download_reports(args.start, getattr(args, 'end', None))
+            elif args.bonus_command == "download":
+                bonus_service.download_reports(args.start, getattr(args, 'end', None))
             else:
-                print("bonus 하위 명령어를 지정하세요.")
+                logger.warning("bonus 하위 명령어를 지정하세요.")
+
+        # ----------------------------------
+        # Convertible Bond
+        # ----------------------------------
+        elif args.command == "cb":
+            service = ConvertibleBondService()
+            
+            if args.cb_command == "daily":
+                service.daily_update(getattr(args, 'days', 1))
+            elif args.cb_command == "full":
+                service.full_update(getattr(args, 'start', '20200101'))
+            elif args.cb_command == "export":
+                service.parse_and_export_to_excel()
+            elif args.cb_command == "export":
+                service.parse_and_export_to_excel()
+            else:
+                logger.warning("cb 하위 명령어를 지정하세요.")
+
+        # ----------------------------------
+        # Bond with Warrant (BW)
+        # ----------------------------------
+        elif args.command == "bw":
+            service = BondWithWarrantService(dart_api_key=None)  # API 키는 .env에서 로드
+            
+            if args.bw_command == "daily":
+                service.daily_update(getattr(args, 'days', 1))
+            elif args.bw_command == "full":
+                service.full_update(getattr(args, 'start', '20200101'))
+            elif args.bw_command == "export":
+                # 기간 지정이 필요할 수 있으나 기본 동작은 전체
+                service.parse_and_export_to_excel(start_date="20200101") 
+            else:
+                logger.warning("bw 하위 명령어를 지정하세요.")
 
         # ----------------------------------
         # All (Combined)
@@ -158,36 +237,46 @@ def main():
                         sys.exit(1)
                 else:
                     # --days가 주어진 경우 또는 기본값 사용
-                    days = args.days if args.days else 1
+                    days = args.days if args.days else 7
                 
-                print("\n" + "="*60)
-                print(f"🚀 [ALL] 유상증자 & 무상증자 일일 업데이트 시작 (최근 {days}일)")
-                print("="*60)
+                logger.info("="*60)
+                logger.info(f"🚀 [ALL] 유상/무상/전환사채/신주인수권부사채 일일 업데이트 시작 (최근 {days}일)")
+                logger.info("="*60)
 
                 # 1. 유상증자
-                print("\n>>> [1/3] 유상증자 업데이트 시작")
+                logger.info(">>> [1/5] 유상증자 업데이트 시작")
                 ci_service = CapitalIncreaseService()
                 ci_service.daily_update(days)
 
                 # 2. 무상증자
-                print("\n\n>>> [2/3] 무상증자 업데이트 시작")
+                logger.info(">>> [2/5] 무상증자 업데이트 시작")
                 bonus_service = BonusSharesService()
                 bonus_service.daily_update(days)
                 
                 # 3. 유무상증자 (Dual Increase)
-                print("\n\n>>> [3/3] 유무상증자 업데이트 시작")
+                logger.info(">>> [3/5] 유무상증자 업데이트 시작")
                 from .application import DualIncreaseService
                 dual_service = DualIncreaseService()
                 dual_service.daily_update(days)
 
-                print("\n" + "="*60)
-                print("✅ [ALL] 모든 업데이트가 완료되었습니다.")
-                print("="*60)
+                # 4. 전환사채 (Convertible Bond)
+                logger.info(">>> [4/5] 전환사채 업데이트 시작")
+                cb_service = ConvertibleBondService()
+                cb_service.daily_update(days)
+
+                # 5. 신주인수권부사채 (Bond with Warrant)
+                logger.info(">>> [5/5] 신주인수권부사채 업데이트 시작")
+                bw_service = BondWithWarrantService(dart_api_key=None)
+                bw_service.daily_update(days)
+
+                logger.info("="*60)
+                logger.info("✅ [ALL] 모든 업데이트가 완료되었습니다.")
+                logger.info("="*60)
             else:
-                print("all 하위 명령어를 지정하세요.")
+                logger.warning("all 하위 명령어를 지정하세요.")
 
     except Exception as e:
-        print(f"\n❌ 오류 발생: {e}", file=sys.stderr)
+        logger.error(f"오류 발생: {e}", exc_info=True)
         sys.exit(1)
 
 
