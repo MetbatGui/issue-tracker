@@ -19,9 +19,36 @@ class DartHistoryScraper:
             관련 접수번호(rcp_no) 목록 (오름차순 정렬)
         """
         url = f"https://dart.fss.or.kr/dsaf001/main.do?rcpNo={rcp_no}"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
         
         try:
-            response = requests.get(url, timeout=10)
+            import time
+            import random
+            import http.client
+            from requests.adapters import HTTPAdapter
+            from urllib3.util.retry import Retry
+
+            # 재시도 로직 설정
+            session = requests.Session()
+            retry = Retry(
+                total=5,
+                connect=5,
+                read=5,
+                backoff_factor=1.0,
+                allowed_methods=["HEAD", "GET", "OPTIONS"],
+                status_forcelist=[429, 500, 502, 503, 504]
+            )
+            adapter = HTTPAdapter(max_retries=retry)
+            session.mount('http://', adapter)
+            session.mount('https://', adapter)
+
+            # 랜덤 지연 (1.0 ~ 2.0초) - 차단 회피 강화
+            sleep_time = random.uniform(1.0, 2.0)
+            time.sleep(sleep_time)
+
+            response = session.get(url, headers=headers, timeout=15)
             response.raise_for_status()
             html = response.text
             
@@ -45,6 +72,9 @@ class DartHistoryScraper:
             # 정렬하여 반환
             return sorted(list(found_ids))
             
+        except (requests.exceptions.ConnectionError, http.client.RemoteDisconnected) as e:
+            print(f"  └ [Warning] 이력 추출 연결 실패 (재시도 소진, {rcp_no}): {e}")
+            return [rcp_no]
         except Exception as e:
-            print(f"[Warning] 이력 추출 실패 ({rcp_no}): {e}")
-            return [rcp_no] # 실패 시 요청한 rcp_no만 반환
+            print(f"  └ [Warning] 이력 추출 실패 ({rcp_no}): {e}")
+            return [rcp_no]

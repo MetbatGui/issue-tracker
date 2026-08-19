@@ -13,6 +13,7 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
+from ..logger import get_logger
 from ..domain.ports import StoragePort
 
 
@@ -43,6 +44,7 @@ class GoogleDriveAdapter(StoragePort):
             credentials_path: OAuth2 클라이언트 시크릿 파일 경로
             token_path: 토큰 저장 경로
         """
+        self.logger = get_logger(self.__class__.__name__)
         self.credentials_path = credentials_path
         self.token_path = token_path
         self.service = self._authenticate()
@@ -64,10 +66,10 @@ class GoogleDriveAdapter(StoragePort):
         # 토큰 갱신 또는 새로 생성
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
-                print("🔄 토큰 갱신 중...")
+                self.logger.info("🔄 토큰 갱신 중...")
                 creds.refresh(Request())
             else:
-                print("🔐 구글 드라이브 인증 시작...")
+                self.logger.info("🔐 구글 드라이브 인증 시작...")
                 print("브라우저에서 인증을 완료해주세요.")
                 flow = InstalledAppFlow.from_client_secrets_file(
                     self.credentials_path, self.SCOPES
@@ -77,7 +79,7 @@ class GoogleDriveAdapter(StoragePort):
             # 토큰 저장
             with open(self.token_path, 'w') as token:
                 token.write(creds.to_json())
-            print("✅ 인증 완료!")
+            self.logger.info("✅ 인증 완료!")
         
         return build('drive', 'v3', credentials=creds)
     
@@ -128,7 +130,7 @@ class GoogleDriveAdapter(StoragePort):
                 fileId=existing_file_id,
                 media_body=media
             ).execute()
-            print(f"  ✅ 파일 업데이트: {file_name}")
+            self.logger.info(f"  ✅ 파일 업데이트: {file_name}")
         else:
             # 새 파일 생성
             file = self.service.files().create(
@@ -136,7 +138,7 @@ class GoogleDriveAdapter(StoragePort):
                 media_body=media,
                 fields='id, webViewLink'
             ).execute()
-            print(f"  ✅ 새 파일 업로드: {file_name}")
+            self.logger.info(f"  ✅ 새 파일 업로드: {file_name}")
         
         return file.get('id')
     
@@ -164,7 +166,7 @@ class GoogleDriveAdapter(StoragePort):
             files = results.get('files', [])
             return files[0]['id'] if files else None
         except Exception as e:
-            print(f"  ⚠️ 파일 검색 중 오류: {e}")
+            self.logger.warning(f"  ⚠️ 파일 검색 중 오류: {e}")
             return None
     
     def delete_file(self, file_id: str) -> bool:
@@ -178,10 +180,10 @@ class GoogleDriveAdapter(StoragePort):
         """
         try:
             self.service.files().delete(fileId=file_id).execute()
-            print(f"  ✅ 파일 삭제 완료 (ID: {file_id})")
+            self.logger.info(f"  ✅ 파일 삭제 완료 (ID: {file_id})")
             return True
         except Exception as e:
-            print(f"  ❌ 파일 삭제 실패: {e}")
+            self.logger.error(f"  ❌ 파일 삭제 실패: {e}")
             return False
     
     def list_files(self, folder_id: str) -> List[Dict[str, Any]]:
@@ -204,6 +206,7 @@ class GoogleDriveAdapter(StoragePort):
             ).execute()
             
             return results.get('files', [])
+            return results.get('files', [])
         except Exception as e:
-            print(f"  ❌ 파일 목록 조회 실패: {e}")
+            self.logger.error(f"  ❌ 파일 목록 조회 실패: {e}")
             return []

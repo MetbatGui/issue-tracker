@@ -14,6 +14,8 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
+from ..logger import get_logger
+
 
 __all__ = ["DartApiClient"]
 
@@ -40,6 +42,8 @@ class DartApiClient:
         self.api_key = api_key
         self.save_path = Path(save_directory)
         self.xml_save_path = self.save_path / "xml"
+        
+        self.logger = get_logger(self.__class__.__name__)
 
         # 디렉토리 생성
         self.xml_save_path.mkdir(parents=True, exist_ok=True)
@@ -79,7 +83,7 @@ class DartApiClient:
             time.sleep(0.1)  # API 부하 조절
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"[Error] 목록 검색 실패: {e}")
+            self.logger.error(f"목록 검색 실패: {e}")
             return None
 
     def download_document_xml(self, rcept_no: str, corp_name: str) -> Optional[Path]:
@@ -111,6 +115,26 @@ class DartApiClient:
             response = requests.get(url, params=params, timeout=60)
             response.raise_for_status()
 
+            # ZIP 파일 매직 바이트 확인 (PK\x03\x04)
+            if not response.content.startswith(b'PK\x03\x04'):
+                # 에러 메시지 확인 시도
+                try:
+                    error_has_json = response.headers.get('Content-Type', '').startswith('application/json')
+                    if error_has_json:
+                        error_json = response.json()
+                        # 014: 파일이 존재하지 않음 (정상적인 경우일 수 있음)
+                        if error_json.get('status') == '014':
+                            self.logger.warning(f"  └ 원본 파일 없음 (Server: 014): {corp_name} - {error_json.get('message')}")
+                            return None
+                        error_msg = error_json
+                    else:
+                        error_msg = response.text[:200]  # 너무 길면 자름
+                except:
+                    error_msg = response.content[:100]
+
+                self.logger.error(f"  └ 응답이 ZIP 파일이 아닙니다 ({corp_name}): {error_msg}")
+                return None
+
             # ZIP 파일 압축 해제
             with zipfile.ZipFile(io.BytesIO(response.content)) as z:
                 xml_filename_in_zip = z.namelist()[0]
@@ -123,7 +147,7 @@ class DartApiClient:
             return file_path
 
         except Exception as e:
-            print(f"  └ [Error] XML 다운로드 실패 ({corp_name}): {e}")
+            self.logger.error(f"  └ XML 다운로드 실패 ({corp_name}): {e}")
             return None
 
     @staticmethod
@@ -202,6 +226,35 @@ class DartApiClient:
             item for item in data_list
             if "유무상증자" in item.get("report_nm", "")
         ]
+    
+    @staticmethod
+    def filter_convertible_bond_reports(data_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """전환사채권발행결정 보고서를 필터링합니다.
+        
+        수집 대상:
+        - 주요사항보고서(전환사채권발행결정)
+        - [기재정정]주요사항보고서(전환사채권발행결정)
+        
+        제외 대상:
+        - [첨부정정]주요사항보고서(전환사채권발행결정)
+        - 자기전환사채 관련 (매도결정, 만기전취득결정)
+        - 전환사채매수선택권 관련
+        
+        Args:
+            data_list: API 응답의 공시 목록
+            
+        Returns:
+            필터링된 공시 목록
+        """
+        if not data_list:
+            return []
+
+        return [
+            item for item in data_list
+            if "전환사채권발행결정" in item.get("report_nm", "")
+            and "[첨부정정]" not in item.get("report_nm", "")
+        ]
+
 
     def _collect_reports_with_filter(
         self,
@@ -230,8 +283,8 @@ class DartApiClient:
         final_end = datetime.strptime(end_date, "%Y%m%d")
         all_filtered_reports = []
         
-        print(f"[수집 시작] {start_date} ~ {end_date} ({report_type_name})")
-        print(f"[XML 저장] {self.xml_save_path}")
+        self.logger.info(f"[수집 시작] {start_date} ~ {end_date} ({report_type_name})")
+        self.logger.debug(f"[XML 저장] {self.xml_save_path}")
 
         while curr_start <= final_end:
             curr_end = curr_start + timedelta(days=interval_days)
@@ -241,7 +294,7 @@ class DartApiClient:
             bgn_de = curr_start.strftime("%Y%m%d")
             end_de = curr_end.strftime("%Y%m%d")
 
-            print(f"\n[기간 검색] {bgn_de} ~ {end_de}")
+            self.logger.info(f"\n[기간 검색] {bgn_de} ~ {end_de}")
 
             page = 1
             while True:
@@ -251,7 +304,7 @@ class DartApiClient:
                     break
                 if result.get('status') != '000':
                     if result.get('status') != '013':  # 데이터 없음
-                        print(f"  [경고] API 메시지: {result.get('message')}")
+                        self.logger.warning(f"API 메시지: {result.get('message')}")
                     break
 
                 list_data = result.get('list', [])
@@ -276,7 +329,7 @@ class DartApiClient:
 
                 all_filtered_reports.extend(filtered)
 
-                print(f"  - p.{page} 완료: {len(filtered)}건 추가 (누적 {len(all_filtered_reports)}건)", end="\r")
+                self.logger.debug(f"  - p.{page} 완료: {len(filtered)}건 추가 (누적 {len(all_filtered_reports)}건)")
 
                 total_page = int(result.get('total_page', 1))
                 if page >= total_page:
@@ -285,7 +338,7 @@ class DartApiClient:
 
             curr_start = curr_end + timedelta(days=1)
 
-        print("\n\n[완료] 전체 수집 및 XML 다운로드 완료.")
+        self.logger.info("전체 수집 및 XML 다운로드 완료.")
         return all_filtered_reports
 
     def collect_reports(
@@ -414,4 +467,92 @@ class DartApiClient:
             interval_days=interval_days,
             filter_func=self.filter_dual_increase_reports,
             report_type_name="유무상증자"
+        )
+    
+    def collect_convertible_bond_reports(
+        self,
+        start_date: str,
+        end_date: Optional[str] = None,
+        interval_days: int = 90
+    ) -> List[Dict[str, Any]]:
+        """전환사채권발행결정 보고서만 수집합니다.
+        
+        수집 대상:
+        - 주요사항보고서(전환사채권발행결정)
+        - [기재정정]주요사항보고서(전환사채권발행결정)
+        
+        제외 대상:
+        - [첨부정정]주요사항보고서(전환사채권발행결정)
+        - 자기전환사채 관련 (매도결정, 만기전취득결정)
+        - 전환사채매수선택권 관련
+        
+        Args:
+            start_date: 시작일자 (YYYYMMDD)
+            end_date: 종료일자 (YYYYMMDD). None이면 오늘
+            interval_days: API 호출 간격 (일)
+            
+        Returns:
+            전환사채 공시 목록
+        """
+        return self._collect_reports_with_filter(
+            start_date=start_date,
+            end_date=end_date,
+            interval_days=interval_days,
+            filter_func=self.filter_convertible_bond_reports,
+            report_type_name="전환사채"
+        )
+
+    @staticmethod
+    def filter_bond_with_warrant_reports(data_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """신주인수권부사채권발행결정 보고서를 필터링합니다.
+        
+        수집 대상:
+        - 주요사항보고서(신주인수권부사채권발행결정)
+        - [기재정정]주요사항보고서(신주인수권부사채권발행결정)
+        
+        제외 대상:
+        - [첨부정정]주요사항보고서(신주인수권부사채권발행결정)
+        - 철회 보고서
+        
+        Args:
+            data_list: API 응답의 공시 목록
+            
+        Returns:
+            필터링된 공시 목록
+        """
+        if not data_list:
+            return []
+
+        return [
+            item for item in data_list
+            if "신주인수권부사채권발행결정" in item.get("report_nm", "")
+            and "[첨부정정]" not in item.get("report_nm", "")
+            and "철회" not in item.get("report_nm", "")
+        ]
+
+    def collect_bond_with_warrant_reports(
+        self,
+        start_date: str,
+        end_date: Optional[str] = None,
+        interval_days: int = 90
+    ) -> List[Dict[str, Any]]:
+        """신주인수권부사채권발행결정 보고서만 수집합니다.
+        
+        수집 대상:
+        - 주요사항보고서(신주인수권부사채권발행결정)
+        
+        Args:
+            start_date: 시작일자 (YYYYMMDD)
+            end_date: 종료일자 (YYYYMMDD). None이면 오늘
+            interval_days: API 호출 간격 (일)
+            
+        Returns:
+            신주인수권부사채 공시 목록
+        """
+        return self._collect_reports_with_filter(
+            start_date=start_date,
+            end_date=end_date,
+            interval_days=interval_days,
+            filter_func=self.filter_bond_with_warrant_reports,
+            report_type_name="신주인수권부사채"
         )
