@@ -4,6 +4,7 @@
 비즈니스 로직을 조합하여 고수준 워크플로우를 제공합니다.
 유무상증자 데이터는 별도의 파일(유무상_유상분.xlsx, 유무상_무상분.xlsx)로 저장됩니다.
 """
+import os
 import sys
 import glob
 from pathlib import Path
@@ -15,6 +16,7 @@ from ..infrastructure import (
     CapitalIncreaseExcelWriter,
     BonusSharesExcelWriter,
 )
+from ..infrastructure.excel_utils import apply_auto_column_width
 from .base_report_service import BaseReportService
 
 
@@ -45,21 +47,41 @@ class DualIncreaseService(BaseReportService):
             api_key: DART API 키 (None이면 .env에서 로드)
             enable_google_drive: 구글 드라이브 업로드 활성화 여부
         """
+        # Super 클래스에는 '유무상증자' 기본 정보를 전달하되, 
+        # 실제 업로드는 개별 폴더 ID를 사용하여 수행합니다.
         super().__init__(
             data_directory=data_directory,
             api_key=api_key,
             enable_google_drive=enable_google_drive,
             google_folder_id_env_var="DUAL_INCREASE_GOOGLE_FOLDER_ID", 
-            excel_filename="유무상증자.xlsx" 
+            excel_filename="유무상증자_원본.xlsx" 
         )
         self.parser = DualIncreaseXmlParser()
         
-        # 메인 엑셀 파일 경로 (상대 경로 사용)
+        # 메인 엑셀 파일 경로
         self.capital_excel_path = Path("data/유상증자/유상증자.xlsx")
         self.bonus_excel_path = Path("data/무상증자/무상증자.xlsx")
         
         self.capital_writer = CapitalIncreaseExcelWriter(str(self.capital_excel_path))
         self.bonus_writer = BonusSharesExcelWriter(str(self.bonus_excel_path))
+
+        # 개별 구글 드라이브 폴더 ID 로드
+        if enable_google_drive:
+            self.capital_folder_id = os.getenv("CAPITAL_INCREASE_GOOGLE_FOLDER_ID")
+            self.bonus_folder_id = os.getenv("BONUS_SHARES_GOOGLE_FOLDER_ID")
+            
+            # 부모 클래스에서 기본 폴더 ID가 없어 어댑터가 생성되지 않았더라도,
+            # 개별 폴더 ID가 있다면 어댑터를 생성합니다.
+            if not self.google_drive and (self.capital_folder_id or self.bonus_folder_id):
+                from ..infrastructure import GoogleDriveAdapter
+                try:
+                    self.google_drive = GoogleDriveAdapter()
+                    self.logger.info("Google Drive 어댑터가 개별 폴더 설정을 통해 초기화되었습니다.")
+                except Exception as e:
+                    self.logger.error(f"Google Drive 어댑터 수동 초기화 실패: {e}")
+
+            if not self.capital_folder_id or not self.bonus_folder_id:
+                self.logger.warning("유상/무상 개별 Google Drive 폴더 ID가 설정되지 않았습니다.")
 
     def _load_map_from_excel(self) -> dict:
         """유상증자 및 무상증자 메인 엑셀에서 관계 맵을 로드합니다."""
@@ -107,9 +129,9 @@ class DualIncreaseService(BaseReportService):
         """
         import pandas as pd
         
-        print("\n" + "=" * 50)
-        print("📊 유무상증자 XML 파싱 및 엑셀 병합")
-        print("=" * 50)
+        self.logger.info("=" * 50)
+        self.logger.info("📊 유무상증자 XML 파싱 및 엑셀 병합")
+        self.logger.info("=" * 50)
 
         # XML 파일 목록 가져오기
         xml_files = glob.glob(str(self.xml_directory / "*.xml"))
@@ -118,10 +140,10 @@ class DualIncreaseService(BaseReportService):
             print("❌ 처리할 XML 파일이 없습니다.")
             return 0
 
-        print(f"📂 {len(xml_files)}개의 XML 파일을 처리합니다...")
+        self.logger.info(f"📂 {len(xml_files)}개의 XML 파일을 처리합니다...")
 
         # 관계 맵 로드 및 병합
-        relation_map = self._load_map_from_excel()
+        relation_map = self.get_relation_map()
         if external_relation_map:
             relation_map.update(external_relation_map)
             print(f"🔍 로드된 관계 맵: {len(relation_map)}건 (외부: {len(external_relation_map)}건)")
@@ -137,22 +159,19 @@ class DualIncreaseService(BaseReportService):
         
         for xml_file in xml_files:
             # 접수번호 추출
-            rcept_no = None
-            match = re.search(r'_(\d{14})\.xml$', os.path.basename(xml_file))
-            if match:
-                rcept_no = match.group(1)
+            rcept_no = self._extract_rcept_no(xml_file)
             
             # 부모 접수번호 찾기
             parent_rcp = relation_map.get(rcept_no) if rcept_no else None
             
             cap, bonus = self.parser.parse(xml_file, parent_rcp_no=parent_rcp)
             
-            if cap and not cap.is_limited_liability_company():
+            if cap:
                 capital_decisions.append(cap)
-            if bonus and not bonus.is_limited_liability_company():
+            if bonus:
                 bonus_decisions.append(bonus)
 
-        print(f"✅ 파싱 완료: 유상분 {len(capital_decisions)}건, 무상분 {len(bonus_decisions)}건")
+        self.logger.info(f"✅ 파싱 완료: 유상분 {len(capital_decisions)}건, 무상분 {len(bonus_decisions)}건")
 
         # 최초공시일 계산
         self._resolve_original_dates(capital_decisions)
@@ -206,62 +225,23 @@ class DualIncreaseService(BaseReportService):
 
         # 3. 파싱 및 엑셀 병합 저장 (이력 정보 전달)
         count = self.parse_and_export_to_excel(external_relation_map=relation_map)
+        self.logger.info(f"📊 파싱 및 병합 완료 건수: {count}")
         
         # 4. 업로드 (메인 파일 업로드)
         if count > 0 and hasattr(self, 'enable_google_drive') and self.enable_google_drive:
-             self._upload_to_google_drive_path(self.capital_writer.output_path)
-             self._upload_to_google_drive_path(self.bonus_writer.output_path)
+             # 경로가 str일 수 있으므로 Path 객체로 보장
+             self._upload_to_google_drive_path(Path(self.capital_writer.output_path), self.capital_folder_id)
+             self._upload_to_google_drive_path(Path(self.bonus_writer.output_path), self.bonus_folder_id)
 
         print("\n" + "✨" * 25)
         print(" " * 10 + "유무상증자 Daily 업데이트 완료")
         print("✨" * 25 + "\n")
 
-    def _resolve_original_dates(self, decisions: List) -> None:
-        """정정 공시의 최초 원본 공시일을 찾아 설정합니다."""
-        if not decisions:
-            return
-
-        # 1. 접수번호 맵핑 및 Dictionary 변환
-        # 유무상증자의 경우 한 파일에서(한 접수번호에서) 두 개의 객체(유상, 무상)가 나올 수 있음.
-        # rcept_no는 동일함.
-        # 다만 decision_map을 만들 때 rcept_no가 중복되면 덮어씌워지지만, 
-        # parent 찾기용으로는 rcept_no -> 객체(어차피 parent 정보는 rcept_no에 귀속)하므로 상관없음.
-        decision_map = {d.rcept_no: d for d in decisions if d.rcept_no}
-        
-        # 2. 각 결정에 대해 원본 찾기
-        import dataclasses
-        
-        for i, decision in enumerate(decisions):
-            # 이미 설정된 경우 패스 (만약 있다면)
-            if decision.original_disclosure_date:
-                continue
-                
-            current = decision
-            visited = set()
-            root_date = decision.disclosure_date
-            
-            # 상위로 탐색
-            while current.parent_rcp_no and current.parent_rcp_no in decision_map:
-                parent = decision_map[current.parent_rcp_no]
-                
-                # 순환 참조 방지
-                if parent.rcept_no in visited:
-                    break
-                visited.add(parent.rcept_no)
-                
-                current = parent
-                if current.disclosure_date:
-                    root_date = current.disclosure_date
-            
-            # 찾은 root_date를 설정 (불변 객체이므로 교체)
-            if root_date:
-                decisions[i] = dataclasses.replace(decision, original_disclosure_date=root_date)
-
     def _merge_to_main_excel(self, file_path: Path, new_decisions: List, is_capital: bool) -> None:
         """메인 엑셀 파일에 데이터를 병합하여 저장합니다."""
         import pandas as pd
         
-        print(f"\n🔄 병합 중: {file_path}")
+        self.logger.info(f"🔄 병합 중: {file_path}")
         
         # 1. 기존 데이터 로드
         all_dfs = []
@@ -359,7 +339,11 @@ class DualIncreaseService(BaseReportService):
 
                 sheet_name = str(year_val)
                 year_df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=1)
-                print(f"  [{sheet_name}] 시트: {len(year_df)}건")
+                
+                # 열 너비 자동 조정 (Best Fit) 적용
+                apply_auto_column_width(writer.sheets[sheet_name])
+                
+                self.logger.info(f"  [{sheet_name}] 시트: {len(year_df)}건 (Best Fit 적용)")
 
         print(f"✅ 저장 완료: {file_path}")
 
@@ -389,20 +373,23 @@ class DualIncreaseService(BaseReportService):
         # 하지만 다른 서비스(Capital/Bonus)가 나중에 돌면 또 업로드할 것임.
         # 여기서는 업로드 생략하거나 Main 파일 업로드.
         if hasattr(self, 'enable_google_drive') and self.enable_google_drive:
-            self._upload_to_google_drive_path(self.capital_writer.output_path)
-            self._upload_to_google_drive_path(self.bonus_writer.output_path)
+            self._upload_to_google_drive_path(self.capital_writer.output_path, self.capital_folder_id)
+            self._upload_to_google_drive_path(self.bonus_writer.output_path, self.bonus_folder_id)
 
         print("\n" + "🎉" * 25)
         print(" " * 15 + "전체 업데이트 완료!")
         print("🎉" * 25 + "\n")
 
-    def _upload_to_google_drive_path(self, path: Path):
-        """특정 경로 파일 업로드"""
-        if not self.google_drive or not self.google_drive_folder_id:
+    def _upload_to_google_drive_path(self, path: Path, folder_id: str = None):
+        """특정 경로 파일 특정 폴더로 업로드"""
+        # folder_id가 인자로 전달되지 않으면 기본 ID 사용
+        target_folder = folder_id if folder_id else self.google_drive_folder_id
+        
+        if not self.google_drive or not target_folder:
             return
         if path.exists():
             try:
-                self.google_drive.upload_file(path, self.google_drive_folder_id, path.name)
-                print(f"☁️ 구글 드라이브 업로드: {path.name}")
+                self.google_drive.upload_file(path, target_folder, path.name)
+                self.logger.info(f"☁️ 구글 드라이브 업로드: {path.name} (Folder ID: {target_folder})")
             except Exception as e:
-                print(f"❌ 업로드 실패: {e}")
+                self.logger.error(f"❌ 업로드 실패 ({path.name}): {e}")

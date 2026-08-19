@@ -15,6 +15,7 @@ from ..infrastructure import (
     GoogleDriveAdapter,
     DartHistoryScraper
 )
+from ..logger import get_logger
 
 
 class BaseReportService(ABC):
@@ -42,10 +43,15 @@ class BaseReportService(ABC):
         self.excel_path = self.data_directory / excel_filename
         self.enable_google_drive = enable_google_drive
         
+        self.logger = get_logger(self.__class__.__name__)
+        
         # Initialize components
         self.api_client = DartApiClient(api_key=api_key, save_directory=str(self.data_directory))
         self.history_scraper = DartHistoryScraper()
         self.file_converter = FileEncodingConverter()
+        
+        # Relation Map Path
+        self.relation_map_path = self.data_directory / "relation_map.json"
         
         # Initialize Google Drive
         self.google_drive = None
@@ -60,10 +66,50 @@ class BaseReportService(ABC):
                 if self.google_drive_folder_id:
                     self.google_drive = GoogleDriveAdapter()
                 else:
-                    print(f"⚠️ {google_folder_id_env_var} environment variable not set.")
+                    self.logger.warning(f"{google_folder_id_env_var} environment variable not set.")
             except Exception as e:
-                print(f"⚠️ Google Drive initialization failed: {e}")
+                self.logger.error(f"Google Drive initialization failed: {e}")
                 self.google_drive = None
+
+    def get_relation_map(self) -> dict:
+        """관게 맵을 로드합니다. (JSON 우선, 없으면 Excel에서 마이그레이션)"""
+        # 1. JSON 로드 시도
+        relation_map = self._load_relation_map_from_json()
+        
+        
+        # 2. JSON이 없거나 비어있으면 Excel에서 로드 (마이그레이션)
+        if not relation_map:
+            self.logger.info("relation_map.json 없음. Excel에서 관계 맵 추출 시도...")
+            relation_map = self._load_map_from_excel()
+            
+            # 마이그레이션 결과 저장
+            if relation_map:
+                self.logger.info(f"Excel에서 {len(relation_map)}건 관계 발견 및 JSON 저장")
+                self._save_relation_map_to_json(relation_map)
+                
+        return relation_map
+
+    def _load_relation_map_from_json(self) -> dict:
+        """JSON 파일에서 관계 맵을 로드합니다."""
+        import json
+        if not self.relation_map_path.exists():
+            return {}
+            
+        try:
+            with open(self.relation_map_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            self.logger.warning(f"관계 맵 JSON 수정 실패: {e}")
+            return {}
+
+    def _save_relation_map_to_json(self, relation_map: dict) -> None:
+        """관계 맵을 JSON 파일로 저장합니다."""
+        import json
+        try:
+            with open(self.relation_map_path, 'w', encoding='utf-8') as f:
+                json.dump(relation_map, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            self.logger.error(f"관계 맵 JSON 저장 실패: {e}")
 
     def download_reports_with_history(
         self,
@@ -83,9 +129,9 @@ class BaseReportService(ABC):
         """
         import json
         
-        print("=" * 50)
-        print("📥 Report Download & History Tracking")
-        print("=" * 50)
+        self.logger.info("=" * 50)
+        self.logger.info("📥 Report Download & History Tracking")
+        self.logger.info("=" * 50)
         
         # 1. Collect initial reports
         reports = collect_method(start_date, end_date)
@@ -94,12 +140,16 @@ class BaseReportService(ABC):
         downloaded_files = [report['xml_path'] for report in reports if 'xml_path' in report]
         
         # 2. History Tracking (Hybrid Approach)
-        print("\n🔍 Scanning for correction history...")
+        self.logger.info("🔍 Scanning for correction history...")
         
-        # Load existing map
-        relation_map = self._load_map_from_excel()
+        # Load existing map (JSON preferred)
+        relation_map = self.get_relation_map()
+        initial_map_size = len(relation_map)
         
-        for report in reports:
+        for i, report in enumerate(reports, 1):
+            if i % 10 == 0:
+                 self.logger.debug(f"  - Processing report {i}/{len(reports)}...")
+
             # Check for correction indicators in report name
             if "기재정정" in report.get("report_nm", ""):
                 curr_rcp = report.get("rcept_no")
@@ -125,7 +175,13 @@ class BaseReportService(ABC):
                         if path_str not in downloaded_files:
                             downloaded_files.append(path_str)
                             
-        print(f"\n✅ Total {len(reports)} reports (Total files including history: {len(downloaded_files)}) processed.")
+        # Save updated map if changed
+        # Save updated map if changed
+        if len(relation_map) > initial_map_size:
+            self.logger.info(f"💾 관계 맵 업데이트: {initial_map_size} -> {len(relation_map)}건")
+            self._save_relation_map_to_json(relation_map)
+                            
+        self.logger.info(f"Total {len(reports)} reports (Total files including history: {len(downloaded_files)}) processed.")
         return downloaded_files, relation_map
 
     def _convert_downloaded_files(self, file_paths: List[str]) -> dict:
@@ -133,9 +189,9 @@ class BaseReportService(ABC):
         if not file_paths:
             return {"converted": 0, "already_utf8": 0, "errors": 0}
         
-        print("\n" + "=" * 50)
-        print(f"🔄 Converting {len(file_paths)} files to UTF-8")
-        print("=" * 50)
+        self.logger.info("=" * 50)
+        self.logger.info(f"🔄 Converting {len(file_paths)} files to UTF-8")
+        self.logger.info("=" * 50)
         
         converted = 0
         already_utf8 = 0
@@ -155,8 +211,57 @@ class BaseReportService(ABC):
             else:
                 errors += 1
         
-        print(f"\n✅ Converted: {converted} | Already UTF-8: {already_utf8} | Errors: {errors}")
+        self.logger.info(f"Converted: {converted} | Already UTF-8: {already_utf8} | Errors: {errors}")
         return {"converted": converted, "already_utf8": already_utf8, "errors": errors}
+
+    def run_pipeline(
+        self,
+        collect_method: Callable[[str, Optional[str]], List[dict]],
+        start_date: str,
+        end_date: Optional[str] = None
+    ) -> None:
+        """공통 실행 파이프라인
+        
+        1. 다운로드 (이력 추적 포함)
+        2. 인코딩 변환
+        3. 파싱 및 엑셀 저장
+        4. 구글 드라이브 업로드
+        """
+        # 1. 다운로드
+        downloaded_files, relation_map = self.download_reports_with_history(
+            collect_method, start_date, end_date
+        )
+        
+        # 2. 인코딩 변환
+        self._convert_downloaded_files(downloaded_files)
+        
+        # 3. 파싱 및 저장
+        # relation_map을 인자로 전달하여 최신 관계 정보 반영
+        # 하위 클래스의 메서드 시그니처가 다를 수 있으므로 키워드 인자 확인 필요
+        # 하지만 대부분의 하위 클래스는 relation_map을 받거나, 혹은 받지 않더라도 **kwargs로 처리 가능?
+        # 현재는 인자를 맞추는게 좋음. 
+        # CapitalIncreaseService.parse_and_export_to_excel는 인자가 없음 -> 수정 필요!
+        # ConvertibleBondService는 relation_map 받음.
+        # BondWithWarrantService는 start_date, end_date를 받음 -> 시그니처 통일 필요!
+        
+        # 리팩토링 전략: 
+        # 1. BaseReportService.parse_and_export_to_excel(self, relation_map: dict = None) 로 추상 메서드 정의 변경
+        # 2. 하위 클래스들 시그니처 통일
+        
+        # 여기서는 일단 각 구현체의 시그니처에 맞춰 호출하거나,
+        # 아래 단계에서 하위 클래스를 먼저 고치고 여기를 호출하게 해야함.
+        # 일단 가장 일반적인 형태인 relation_map 전달을 가정하고,
+        # 하위 클래스 리팩토링 시 parse_and_export_to_excel 시그니처를 (relation_map: dict = None)으로 통일합니다.
+        
+        # 만약 하위 클래스가 parse_and_export_to_excel에 다른 인자를 요구한다면(예: BW의 start_date), 
+        # run_pipeline 내에서는 이를 알 수 없으므로 제거해야 함.
+        # BW의 parse_and_export_to_excel은 사실상 run_pipeline 역할이었으므로,
+        # BW의 파싱 로직만 남기고 워크플로우 로직은 run_pipeline이 가져감.
+        
+        self.parse_and_export_to_excel(relation_map=relation_map)
+        
+        # 4. 구글 드라이브 업로드
+        self._upload_to_google_drive()
 
     def _load_map_from_excel(self) -> dict:
         """Load (rcept_no -> parent_rcp_no) map from existing Excel file."""
@@ -167,11 +272,32 @@ class BaseReportService(ABC):
             return relation_map
             
         try:
-            # Try loading with header=1 (startrow=1 convention)
+            # Load all sheets
+            existing_data = {}
             try:
-                existing_data = pd.read_excel(self.excel_path, sheet_name=None, header=1)
-            except:
-                existing_data = pd.read_excel(self.excel_path, sheet_name=None, header=0)
+                # 1. 시도: header=1 (기존 서비스 표준)
+                excel_file = pd.ExcelFile(self.excel_path)
+                
+                for sheet_name in excel_file.sheet_names:
+                    # header=1 시도
+                    df = pd.read_excel(excel_file, sheet_name=sheet_name, header=1)
+                    
+                    # 컬럼 확인 ('접수번호'가 없으면 header=0일 수 있음)
+                    if '접수번호' not in df.columns or '상위접수번호' not in df.columns:
+                        try:
+                             # header=0 시도
+                             df_alt = pd.read_excel(excel_file, sheet_name=sheet_name, header=0)
+                             if '접수번호' in df_alt.columns and '상위접수번호' in df_alt.columns:
+                                 df = df_alt
+                        except:
+                             pass
+                             
+                    # 처리할 데이터프레임이 존재하는지 확인 (기존 로직과 통합)
+                    existing_data[sheet_name] = df
+
+            except Exception as load_err:
+                 print(f"⚠️ Failed to open Excel file: {load_err}")
+                 return {}
 
             for sheet_name, df in existing_data.items():
                 if '접수번호' in df.columns and '상위접수번호' in df.columns:
@@ -199,24 +325,76 @@ class BaseReportService(ABC):
             return
         
         if not self.excel_path.exists():
-            print("⚠️ No Excel file to upload.")
+            self.logger.warning("No Excel file to upload.")
             return
         
         try:
-            print("\n" + "=" * 50)
-            print("☁️ Uploading to Google Drive")
-            print("=" * 50)
+            self.logger.info("=" * 50)
+            self.logger.info("☁️ Uploading to Google Drive")
+            self.logger.info("=" * 50)
             
             file_id = self.google_drive.upload_file(
                 self.excel_path,
                 self.google_drive_folder_id,
                 self.excel_path.name
             )
-            print(f"✅ Upload Complete (File ID: {file_id})")
+            self.logger.info(f"Upload Complete (File ID: {file_id})")
         except Exception as e:
-            print(f"❌ Upload Failed: {e}")
+            self.logger.error(f"Upload Failed: {e}")
 
     @abstractmethod
-    def parse_and_export_to_excel(self) -> int:
-        """Abstract method to be implemented by subclasses."""
+    def parse_and_export_to_excel(self, relation_map: dict = None) -> int:
+        """Abstract method to be implemented by subclasses.
+        
+        Args:
+            relation_map: Map of rcept_no -> parent_rcp_no (optional)
+        """
         pass
+
+    def _extract_rcept_no(self, file_path: str) -> Optional[str]:
+        """파일 경로에서 접수번호를 추출합니다."""
+        import re
+        import os
+        match = re.search(r'_(\d{14})\.xml$', os.path.basename(file_path))
+        return match.group(1) if match else None
+
+    def _resolve_original_dates(self, decisions: List[Any]) -> None:
+        """정정 공시의 최초 원본 공시일을 찾아 설정합니다."""
+        if not decisions:
+            return
+
+        # 1. 접수번호 맵핑 및 Dictionary 변환
+        decision_map = {d.rcept_no: d for d in decisions if hasattr(d, 'rcept_no') and d.rcept_no}
+        
+        # 2. 각 결정에 대해 원본 찾기
+        import dataclasses
+        
+        for i, decision in enumerate(decisions):
+            # 이미 설정된 경우 패스 (만약 있다면)
+            if hasattr(decision, 'original_disclosure_date') and decision.original_disclosure_date:
+                continue
+            
+            # parent_rcp_no나 disclosure_date 속성이 없으면 패스
+            if not hasattr(decision, 'parent_rcp_no') or not hasattr(decision, 'disclosure_date'):
+                continue
+                
+            current = decision
+            visited = set()
+            root_date = decision.disclosure_date
+            
+            # 상위로 탐색
+            while current.parent_rcp_no and current.parent_rcp_no in decision_map:
+                parent = decision_map[current.parent_rcp_no]
+                
+                # 순환 참조 방지
+                if parent.rcept_no in visited:
+                    break
+                visited.add(parent.rcept_no)
+                
+                current = parent
+                if hasattr(current, 'disclosure_date') and current.disclosure_date:
+                    root_date = current.disclosure_date
+            
+            # 찾은 root_date를 설정 (불변 객체이므로 교체)
+            if root_date:
+                decisions[i] = dataclasses.replace(decision, original_disclosure_date=root_date)

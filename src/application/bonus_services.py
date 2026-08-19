@@ -53,20 +53,15 @@ class BonusSharesService(BaseReportService):
 
     def _parse_file_with_map(self, file_path: str, relation_map: dict) -> BonusSharesDecision:
         """관계 맵을 사용하여 XML 파일을 파싱합니다."""
-        import re
-        import os
         
         # 접수번호 추출
-        rcept_no = None
-        match_rcp = re.search(r'_(\d{14})\.xml$', os.path.basename(file_path))
-        if match_rcp:
-            rcept_no = match_rcp.group(1)
+        rcept_no = self._extract_rcept_no(file_path)
             
         parent_rcp = relation_map.get(rcept_no) if rcept_no else None
         
         return self.parser.parse(file_path, rcept_no=rcept_no, parent_rcp_no=parent_rcp)
 
-    def parse_and_export_to_excel(self) -> int:
+    def parse_and_export_to_excel(self, relation_map: dict = None) -> int:
         """XML 파일들을 파싱하여 엑셀로 저장합니다."""
         print("\n" + "=" * 50)
         print("📊 XML 파싱 및 엑셀 생성")
@@ -82,13 +77,16 @@ class BonusSharesService(BaseReportService):
         print(f"📂 {len(xml_files)}개의 XML 파일을 처리합니다...")
 
         # 관계 맵 로드
-        relation_map = self._load_map_from_excel()
+        base_map = self.get_relation_map()
+        if relation_map:
+            base_map.update(relation_map)
+        relation_map = base_map
 
         # 파싱
         decisions: List[BonusSharesDecision] = []
         for xml_file in xml_files:
             decision = self._parse_file_with_map(xml_file, relation_map)
-            if decision and not decision.is_limited_liability_company():
+            if decision:
                 decisions.append(decision)
 
         print(f"✅ {len(decisions)}건의 데이터를 파싱했습니다.")
@@ -98,45 +96,20 @@ class BonusSharesService(BaseReportService):
 
         # 엑셀 저장
         if decisions:
-            self.excel_writer.write(decisions)
-            return len(decisions)
+            # 중복 제거 (rcept_no 기준)
+            seen_rcp = set()
+            unique_decisions = []
+            for d in decisions:
+                if d.rcept_no not in seen_rcp:
+                    seen_rcp.add(d.rcept_no)
+                    unique_decisions.append(d)
+            
+            print(f"✅ 중복 제거 완료: {len(decisions)} -> {len(unique_decisions)}건")
+            self.excel_writer.write(unique_decisions)
+            return len(unique_decisions)
         else:
             print("⚠️ 저장할 데이터가 없습니다.")
             return 0
-
-    def _resolve_original_dates(self, decisions: List[BonusSharesDecision]) -> None:
-        """정정 공시의 최초 원본 공시일을 찾아 설정합니다."""
-        # 1. 접수번호 맵핑 및 Dictionary 변환
-        decision_map = {d.rcept_no: d for d in decisions if d.rcept_no}
-        
-        # 2. 각 결정에 대해 원본 찾기
-        import dataclasses
-        
-        for i, decision in enumerate(decisions):
-            # 이미 설정된 경우 패스 (만약 있다면)
-            if decision.original_disclosure_date:
-                continue
-                
-            current = decision
-            visited = set()
-            root_date = decision.disclosure_date
-            
-            # 상위로 탐색
-            while current.parent_rcp_no and current.parent_rcp_no in decision_map:
-                parent = decision_map[current.parent_rcp_no]
-                
-                # 순환 참조 방지
-                if parent.rcept_no in visited:
-                    break
-                visited.add(parent.rcept_no)
-                
-                current = parent
-                if current.disclosure_date:
-                    root_date = current.disclosure_date
-            
-            # 찾은 root_date를 설정 (불변 객체이므로 교체)
-            if root_date:
-                decisions[i] = dataclasses.replace(decision, original_disclosure_date=root_date)
 
     def full_update(self, start_date: str = "20200101", end_date: str = None) -> None:
         """전체 업데이트 워크플로우를 실행합니다."""
@@ -144,21 +117,11 @@ class BonusSharesService(BaseReportService):
         print(" " * 10 + "무상증자 데이터 전체 업데이트")
         print("🎁" * 25 + "\n")
 
-        # 1. 다운로드 (맵 업데이트 포함)
-        downloaded_files, relation_map = self.download_reports_with_history(
+        self.run_pipeline(
             self.api_client.collect_bonus_shares_reports,
             start_date,
             end_date
         )
-
-        # 2. 다운로드한 파일만 인코딩 변환
-        self._convert_downloaded_files(downloaded_files)
-
-        # 3. 파싱 및 엑셀 저장
-        self.parse_and_export_to_excel()
-        
-        # 4. 구글 드라이브 업로드
-        self._upload_to_google_drive()
 
         print("\n" + "🎉" * 25)
         print(" " * 15 + "전체 업데이트 완료!")
@@ -167,7 +130,7 @@ class BonusSharesService(BaseReportService):
     def daily_update(self, days_back: int = 1) -> None:
         """일일 업데이트 워크플로우를 실행합니다.
         
-        최근 N일간의 데이터를 다운로드하고 기존 엑셀에 병합합니다.
+        최근 N일간의 데이터를 다운로드하고 (이전 로직과 달리) 전체 데이터 재구성을 통해 엑셀을 갱신합니다.
         """
         from datetime import datetime, timedelta
         
@@ -178,61 +141,13 @@ class BonusSharesService(BaseReportService):
         # 날짜 계산
         today = datetime.now()
         start_date = (today - timedelta(days=days_back)).strftime("%Y%m%d")
-        end_date = today.strftime("%Y%m%d")
         
-        print(f"📆 수집 기간: {start_date} ~ {end_date}")
+        print(f"📆 수집 기간: {start_date} ~ Today")
 
-        # 1. 최근 데이터 다운로드 (맵 업데이트 포함)
-        downloaded_files, relation_map = self.download_reports_with_history(
+        self.run_pipeline(
             self.api_client.collect_bonus_shares_reports,
-            start_date,
-            end_date
+            start_date
         )
-        
-        if not downloaded_files:
-            print("\n⚠️ 새로운 공시가 없습니다.")
-            return
-
-        # 2. 다운로드한 파일만 인코딩 변환
-        self._convert_downloaded_files(downloaded_files)
-
-        # 3. 전체 데이터 재구성 (CapitalIncrease와 동일한 로직 적용)
-        print("\n" + "=" * 50)
-        print("📊 전체 데이터 재구성")
-        print("=" * 50)
-        
-        xml_files = glob.glob(str(self.xml_directory / "*.xml"))
-        all_decisions: List[BonusSharesDecision] = []
-        
-        # 관계 맵 병합
-        excel_map = self._load_map_from_excel()
-        if relation_map:
-             excel_map.update(relation_map)
-        relation_map = excel_map
-        
-        for xml_file in xml_files:
-            decision = self._parse_file_with_map(xml_file, relation_map)
-            if decision and not decision.is_limited_liability_company():
-                all_decisions.append(decision)
-
-        # 중복 제거
-        seen_filenames = set()
-        unique_decisions = []
-        for decision in all_decisions:
-            if decision.source_filename not in seen_filenames:
-                seen_filenames.add(decision.source_filename)
-                unique_decisions.append(decision)
-        
-        print(f"✅ 총 {len(unique_decisions)}건의 고유 데이터 (중복 {len(all_decisions) - len(unique_decisions)}건 제거)")
-        
-        # 최초공시일 계산
-        self._resolve_original_dates(unique_decisions)
-        
-        # 엑셀 저장
-        self.excel_writer.write(unique_decisions)
-        
-        # 4. 구글 드라이브 업로드
-        self._upload_to_google_drive()
 
         print("\n" + "🎉" * 25)
         print(" " * 15 + "Daily 업데이트 완료!")
