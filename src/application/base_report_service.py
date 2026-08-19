@@ -176,7 +176,6 @@ class BaseReportService(ABC):
                             downloaded_files.append(path_str)
                             
         # Save updated map if changed
-        # Save updated map if changed
         if len(relation_map) > initial_map_size:
             self.logger.info(f"💾 관계 맵 업데이트: {initial_map_size} -> {len(relation_map)}건")
             self._save_relation_map_to_json(relation_map)
@@ -235,29 +234,7 @@ class BaseReportService(ABC):
         # 2. 인코딩 변환
         self._convert_downloaded_files(downloaded_files)
         
-        # 3. 파싱 및 저장
-        # relation_map을 인자로 전달하여 최신 관계 정보 반영
-        # 하위 클래스의 메서드 시그니처가 다를 수 있으므로 키워드 인자 확인 필요
-        # 하지만 대부분의 하위 클래스는 relation_map을 받거나, 혹은 받지 않더라도 **kwargs로 처리 가능?
-        # 현재는 인자를 맞추는게 좋음. 
-        # CapitalIncreaseService.parse_and_export_to_excel는 인자가 없음 -> 수정 필요!
-        # ConvertibleBondService는 relation_map 받음.
-        # BondWithWarrantService는 start_date, end_date를 받음 -> 시그니처 통일 필요!
-        
-        # 리팩토링 전략: 
-        # 1. BaseReportService.parse_and_export_to_excel(self, relation_map: dict = None) 로 추상 메서드 정의 변경
-        # 2. 하위 클래스들 시그니처 통일
-        
-        # 여기서는 일단 각 구현체의 시그니처에 맞춰 호출하거나,
-        # 아래 단계에서 하위 클래스를 먼저 고치고 여기를 호출하게 해야함.
-        # 일단 가장 일반적인 형태인 relation_map 전달을 가정하고,
-        # 하위 클래스 리팩토링 시 parse_and_export_to_excel 시그니처를 (relation_map: dict = None)으로 통일합니다.
-        
-        # 만약 하위 클래스가 parse_and_export_to_excel에 다른 인자를 요구한다면(예: BW의 start_date), 
-        # run_pipeline 내에서는 이를 알 수 없으므로 제거해야 함.
-        # BW의 parse_and_export_to_excel은 사실상 run_pipeline 역할이었으므로,
-        # BW의 파싱 로직만 남기고 워크플로우 로직은 run_pipeline이 가져감.
-        
+        # 3. 파싱 및 저장 (relation_map을 인자로 전달하여 최신 관계 정보 반영)
         self.parse_and_export_to_excel(relation_map=relation_map)
         
         # 4. 구글 드라이브 업로드

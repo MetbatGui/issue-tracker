@@ -162,8 +162,6 @@ def main():
                 service.download_reports(args.start, getattr(args, 'end', None))
             elif args.ci_command == "convert":
                 service.convert_xml_encoding()
-            elif args.ci_command == "convert":
-                service.convert_xml_encoding()
             else:
                 logger.warning("capital-increase 하위 명령어를 지정하세요.")
 
@@ -181,8 +179,6 @@ def main():
                 bonus_service.parse_and_export_to_excel()
             elif args.bonus_command == "download":
                 bonus_service.download_reports(args.start, getattr(args, 'end', None))
-            elif args.bonus_command == "download":
-                bonus_service.download_reports(args.start, getattr(args, 'end', None))
             else:
                 logger.warning("bonus 하위 명령어를 지정하세요.")
 
@@ -196,8 +192,6 @@ def main():
                 service.daily_update(getattr(args, 'days', 1))
             elif args.cb_command == "full":
                 service.full_update(getattr(args, 'start', '20200101'))
-            elif args.cb_command == "export":
-                service.parse_and_export_to_excel()
             elif args.cb_command == "export":
                 service.parse_and_export_to_excel()
             else:

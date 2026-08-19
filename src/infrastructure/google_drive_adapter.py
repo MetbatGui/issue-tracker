@@ -206,7 +206,6 @@ class GoogleDriveAdapter(StoragePort):
             ).execute()
             
             return results.get('files', [])
-            return results.get('files', [])
         except Exception as e:
             self.logger.error(f"  ❌ 파일 목록 조회 실패: {e}")
             return []
