@@ -119,13 +119,13 @@ class DualIncreaseService(BaseReportService):
                 
         return relation_map
 
-    def parse_and_export_to_excel(self, external_relation_map: dict = None) -> int:
+    def parse_and_export_to_excel(self, relation_map: dict = None) -> int:
         """XML 파일들을 파싱하여 유상/무상 엑셀에 각각 병합 저장합니다.
-        
+
         기존 엑셀 파일이 있다면 로드하여 병합(Merge)합니다.
-        
+
         Args:
-            external_relation_map: 외부에서 전달받은 관계 맵 (download_reports_with_history에서 생성)
+            relation_map: 외부에서 전달받은 관계 맵 (download_reports_with_history에서 생성)
         """
         import pandas as pd
         
@@ -143,12 +143,13 @@ class DualIncreaseService(BaseReportService):
         self.logger.info(f"📂 {len(xml_files)}개의 XML 파일을 처리합니다...")
 
         # 관계 맵 로드 및 병합
-        relation_map = self.get_relation_map()
-        if external_relation_map:
-            relation_map.update(external_relation_map)
-            print(f"🔍 로드된 관계 맵: {len(relation_map)}건 (외부: {len(external_relation_map)}건)")
+        base_map = self.get_relation_map()
+        if relation_map:
+            base_map.update(relation_map)
+            print(f"🔍 로드된 관계 맵: {len(base_map)}건 (외부: {len(relation_map)}건)")
         else:
-            print(f"🔍 로드된 관계 맵: {len(relation_map)}건")
+            print(f"🔍 로드된 관계 맵: {len(base_map)}건")
+        relation_map = base_map
 
         # 파싱
         capital_decisions: List[CapitalIncreaseDecision] = []
@@ -165,10 +166,10 @@ class DualIncreaseService(BaseReportService):
             parent_rcp = relation_map.get(rcept_no) if rcept_no else None
             
             cap, bonus = self.parser.parse(xml_file, parent_rcp_no=parent_rcp)
-            
-            if cap:
+
+            if cap and not cap.is_limited_liability_company():
                 capital_decisions.append(cap)
-            if bonus:
+            if bonus and not bonus.is_limited_liability_company():
                 bonus_decisions.append(bonus)
 
         self.logger.info(f"✅ 파싱 완료: 유상분 {len(capital_decisions)}건, 무상분 {len(bonus_decisions)}건")
@@ -224,7 +225,7 @@ class DualIncreaseService(BaseReportService):
         self._convert_downloaded_files(downloaded_files)
 
         # 3. 파싱 및 엑셀 병합 저장 (이력 정보 전달)
-        count = self.parse_and_export_to_excel(external_relation_map=relation_map)
+        count = self.parse_and_export_to_excel(relation_map=relation_map)
         self.logger.info(f"📊 파싱 및 병합 완료 건수: {count}")
         
         # 4. 업로드 (메인 파일 업로드)
@@ -366,7 +367,7 @@ class DualIncreaseService(BaseReportService):
         self._convert_downloaded_files(downloaded_files)
 
         # 3. 파싱 및 엑셀 병합 저장 (이력 정보 전달)
-        self.parse_and_export_to_excel(external_relation_map=relation_map)
+        self.parse_and_export_to_excel(relation_map=relation_map)
         
         # 4. 구글 드라이브 업로드 (Main 파일 업로드)
         # Main 파일을 업로드해야 함.

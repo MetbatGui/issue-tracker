@@ -86,7 +86,7 @@ class CapitalIncreaseService(BaseReportService):
         decisions: List[CapitalIncreaseDecision] = []
         for xml_file in xml_files:
             decision = self._parse_file_with_map(xml_file, relation_map)
-            if decision:
+            if decision and not decision.is_limited_liability_company():
                 decisions.append(decision)
 
         print(f"✅ {len(decisions)}건의 데이터를 파싱했습니다.")
@@ -100,8 +100,9 @@ class CapitalIncreaseService(BaseReportService):
             seen_rcp = set()
             unique_decisions = []
             for d in decisions:
-                if d.rcept_no not in seen_rcp:
-                    seen_rcp.add(d.rcept_no)
+                key = d.rcept_no or d.source_filename
+                if key not in seen_rcp:
+                    seen_rcp.add(key)
                     unique_decisions.append(d)
             
             print(f"✅ 중복 제거 완료: {len(decisions)} -> {len(unique_decisions)}건")
@@ -146,7 +147,8 @@ class CapitalIncreaseService(BaseReportService):
 
         self.run_pipeline(
             self.api_client.collect_capital_increase_reports,
-            start_date
+            start_date,
+            skip_if_no_new_files=True
         )
 
         print("\n" + "🎉" * 25)
@@ -185,15 +187,16 @@ class CapitalIncreaseService(BaseReportService):
         
         for xml_file in xml_files:
             decision = self._parse_file_with_map(xml_file, relation_map)
-            if decision:
+            if decision and not decision.is_limited_liability_company():
                 all_decisions.append(decision)
         
         # 중복 제거 (rcept_no 기준)
         seen_rcp = set()
         unique_decisions = []
         for decision in all_decisions:
-            if decision.rcept_no not in seen_rcp:
-                seen_rcp.add(decision.rcept_no)
+            key = decision.rcept_no or decision.source_filename
+            if key not in seen_rcp:
+                seen_rcp.add(key)
                 unique_decisions.append(decision)
         
         print(f"✅ 총 {len(unique_decisions)}건의 고유 데이터 (중복 {len(all_decisions) - len(unique_decisions)}건 제거)")

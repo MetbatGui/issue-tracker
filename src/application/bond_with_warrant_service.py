@@ -100,8 +100,9 @@ class BondWithWarrantService(BaseReportService):
             seen_rcp = set()
             unique_decisions = []
             for d in decisions:
-                if d.rcept_no not in seen_rcp:
-                    seen_rcp.add(d.rcept_no)
+                key = d.rcept_no or d.source_filename
+                if key not in seen_rcp:
+                    seen_rcp.add(key)
                     unique_decisions.append(d)
             
             print(f"✅ 중복 제거 완료: {len(decisions)} -> {len(unique_decisions)}건")
@@ -121,7 +122,8 @@ class BondWithWarrantService(BaseReportService):
         
         self.run_pipeline(
             self.api_client.collect_bond_with_warrant_reports,
-            start_str
+            start_str,
+            skip_if_no_new_files=True
         )
 
     def full_update(self, start_date: str = "20200101") -> None:

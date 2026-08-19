@@ -105,8 +105,9 @@ class ConvertibleBondService(BaseReportService):
             seen_rcp = set()
             unique_decisions = []
             for d in decisions:
-                if d.rcept_no not in seen_rcp:
-                    seen_rcp.add(d.rcept_no)
+                key = d.rcept_no or d.source_filename
+                if key not in seen_rcp:
+                    seen_rcp.add(key)
                     unique_decisions.append(d)
             
             print(f"✅ 중복 제거 완료: {len(decisions)} -> {len(unique_decisions)}건")
@@ -151,7 +152,8 @@ class ConvertibleBondService(BaseReportService):
 
         self.run_pipeline(
             self.api_client.collect_convertible_bond_reports,
-            start_date
+            start_date,
+            skip_if_no_new_files=True
         )
 
         print("\n" + "🎉" * 25)

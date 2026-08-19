@@ -231,7 +231,7 @@ def main():
                         sys.exit(1)
                 else:
                     # --days가 주어진 경우 또는 기본값 사용
-                    days = args.days if args.days else 7
+                    days = args.days if args.days is not None else 7
                 
                 logger.info("="*60)
                 logger.info(f"🚀 [ALL] 유상/무상/전환사채/신주인수권부사채 일일 업데이트 시작 (최근 {days}일)")

@@ -217,20 +217,29 @@ class BaseReportService(ABC):
         self,
         collect_method: Callable[[str, Optional[str]], List[dict]],
         start_date: str,
-        end_date: Optional[str] = None
+        end_date: Optional[str] = None,
+        skip_if_no_new_files: bool = False
     ) -> None:
         """공통 실행 파이프라인
-        
+
         1. 다운로드 (이력 추적 포함)
         2. 인코딩 변환
         3. 파싱 및 엑셀 저장
         4. 구글 드라이브 업로드
+
+        Args:
+            skip_if_no_new_files: True이면 신규 다운로드 파일이 없을 때 이후 단계를 건너뜁니다.
+                daily_update처럼 매번 재파싱/재업로드가 불필요한 경우 사용합니다.
         """
         # 1. 다운로드
         downloaded_files, relation_map = self.download_reports_with_history(
             collect_method, start_date, end_date
         )
-        
+
+        if skip_if_no_new_files and not downloaded_files:
+            self.logger.info("새로운 공시가 없습니다.")
+            return
+
         # 2. 인코딩 변환
         self._convert_downloaded_files(downloaded_files)
         
@@ -249,33 +258,34 @@ class BaseReportService(ABC):
             return relation_map
             
         try:
-            # Load all sheets
-            existing_data = {}
+            excel_file = pd.ExcelFile(self.excel_path)
+        except Exception as load_err:
+            print(f"⚠️ Failed to open Excel file: {load_err}")
+            return {}
+
+        # Load all sheets (시트 하나가 실패해도 나머지 시트는 계속 처리)
+        existing_data = {}
+        for sheet_name in excel_file.sheet_names:
             try:
-                # 1. 시도: header=1 (기존 서비스 표준)
-                excel_file = pd.ExcelFile(self.excel_path)
-                
-                for sheet_name in excel_file.sheet_names:
-                    # header=1 시도
-                    df = pd.read_excel(excel_file, sheet_name=sheet_name, header=1)
-                    
-                    # 컬럼 확인 ('접수번호'가 없으면 header=0일 수 있음)
-                    if '접수번호' not in df.columns or '상위접수번호' not in df.columns:
-                        try:
-                             # header=0 시도
-                             df_alt = pd.read_excel(excel_file, sheet_name=sheet_name, header=0)
-                             if '접수번호' in df_alt.columns and '상위접수번호' in df_alt.columns:
-                                 df = df_alt
-                        except:
-                             pass
-                             
-                    # 처리할 데이터프레임이 존재하는지 확인 (기존 로직과 통합)
-                    existing_data[sheet_name] = df
+                # header=1 시도 (기존 서비스 표준)
+                df = pd.read_excel(excel_file, sheet_name=sheet_name, header=1)
 
-            except Exception as load_err:
-                 print(f"⚠️ Failed to open Excel file: {load_err}")
-                 return {}
+                # 컬럼 확인 ('접수번호'가 없으면 header=0일 수 있음)
+                if '접수번호' not in df.columns or '상위접수번호' not in df.columns:
+                    try:
+                         # header=0 시도
+                         df_alt = pd.read_excel(excel_file, sheet_name=sheet_name, header=0)
+                         if '접수번호' in df_alt.columns and '상위접수번호' in df_alt.columns:
+                             df = df_alt
+                    except:
+                         pass
 
+                existing_data[sheet_name] = df
+            except Exception as sheet_err:
+                print(f"⚠️ Failed to read sheet '{sheet_name}', skipping: {sheet_err}")
+                continue
+
+        try:
             for sheet_name, df in existing_data.items():
                 if '접수번호' in df.columns and '상위접수번호' in df.columns:
                     valid_rows = df[df['상위접수번호'].notna() & (df['상위접수번호'] != "")]

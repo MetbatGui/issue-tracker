@@ -52,6 +52,10 @@ class CapitalIncreaseDecision:
     parent_rcp_no: Optional[str] = None
     original_disclosure_date: Optional[date] = None
 
+    def is_limited_liability_company(self) -> bool:
+        """유한책임회사 여부를 확인합니다."""
+        return "유한책임회사" in self.company_name
+
     @property
     def year(self) -> Optional[int]:
         """공시일 기준 연도를 반환합니다."""
@@ -89,6 +93,10 @@ class BonusSharesDecision:
     rcept_no: str = ""
     parent_rcp_no: Optional[str] = None
     original_disclosure_date: Optional[date] = None
+
+    def is_limited_liability_company(self) -> bool:
+        """유한책임회사 여부를 확인합니다."""
+        return "유한책임회사" in self.company_name
 
     @property
     def year(self) -> Optional[int]:
