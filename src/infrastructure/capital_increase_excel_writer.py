@@ -9,6 +9,7 @@ from typing import List
 import pandas as pd
 
 from ..domain import CapitalIncreaseDecision
+from .excel_utils import apply_auto_column_width
 
 
 __all__ = ["CapitalIncreaseExcelWriter"]
@@ -127,6 +128,10 @@ class CapitalIncreaseExcelWriter:
                 year_df = df[df["연도"] == year][self.EXCEL_COLUMNS]  # 연도 컬럼 제외
                 sheet_name = str(int(year))
                 year_df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=1)
+                
+                # 컬럼 너비 자동 조정
+                apply_auto_column_width(writer.sheets[sheet_name])
+                
                 print(f"  [{sheet_name}] 시트: {len(year_df)}건")
 
         print(f"\n[SUCCESS] 엑셀 생성 완료: {self.output_path}")
