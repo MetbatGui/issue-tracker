@@ -70,6 +70,53 @@ class BaseXmlParser:
             return ""
         return "".join(node.itertext()).strip()
 
+    @staticmethod
+    def _parse_korean_date(text: str) -> Optional[datetime.date]:
+        """한글/구분자 혼용 날짜 문자열을 파싱합니다.
+
+        지원 형식: 'YYYY년 MM월 DD일', 'YYYY.MM.DD', 'YYYY-MM-DD', 'YYYY/MM/DD', 'YYYYMMDD'
+
+        Args:
+            text: 날짜 문자열
+
+        Returns:
+            파싱된 date 객체. 실패 시 None
+        """
+        if not text or text == '-' or text.strip() == '':
+            return None
+
+        text = text.strip()
+
+        try:
+            match = re.search(r'(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일', text)
+            if match:
+                year, month, day = match.groups()
+                return datetime(int(year), int(month), int(day)).date()
+
+            match = re.search(r'(\d{4})\.(\d{1,2})\.(\d{1,2})', text)
+            if match:
+                year, month, day = match.groups()
+                return datetime(int(year), int(month), int(day)).date()
+
+            match = re.search(r'(\d{4})-(\d{1,2})-(\d{1,2})', text)
+            if match:
+                year, month, day = match.groups()
+                return datetime(int(year), int(month), int(day)).date()
+
+            match = re.search(r'(\d{4})/(\d{1,2})/(\d{1,2})', text)
+            if match:
+                year, month, day = match.groups()
+                return datetime(int(year), int(month), int(day)).date()
+
+            match = re.search(r'^(\d{8})$', text)
+            if match:
+                val = match.group(1)
+                return datetime(int(val[:4]), int(val[4:6]), int(val[6:])).date()
+
+        except (ValueError, TypeError):
+            pass
+        return None
+
     @classmethod
     def _extract_common_info(cls, file_path: str, root: Any) -> dict:
         """Extract common information (Company Name, Report Name, Correction Status).

@@ -2,8 +2,6 @@
 
 DART XML 파일을 파싱하여 전환사채 도메인 모델로 변환합니다.
 """
-import os
-import re
 from datetime import datetime
 from typing import Optional
 from lxml import etree
@@ -183,53 +181,3 @@ class ConvertibleBondXmlParser(BaseXmlParser):
         except Exception as e:
             # print(f"[Parser Error] {file_path}: {e}") # 로그 과다 방지
             return None
-
-    @staticmethod
-    def _parse_korean_date(text: str) -> Optional[datetime.date]:
-        """한글 날짜 파싱: '2029년 01월 07일' -> date 객체
-        
-        Args:
-            text: 한글 날짜 문자열
-            
-        Returns:
-            파싱된 date 객체. 실패 시 None
-        """
-        if not text or text == '-' or text.strip() == '':
-            return None
-        
-        text = text.strip()
-        
-        try:
-            # 1. YYYY년 MM월 DD일
-            match = re.search(r'(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일', text)
-            if match:
-                year, month, day = match.groups()
-                return datetime(int(year), int(month), int(day)).date()
-                
-            # 2. YYYY.MM.DD
-            match = re.search(r'(\d{4})\.(\d{1,2})\.(\d{1,2})', text)
-            if match:
-                year, month, day = match.groups()
-                return datetime(int(year), int(month), int(day)).date()
-                
-            # 3. YYYY-MM-DD
-            match = re.search(r'(\d{4})-(\d{1,2})-(\d{1,2})', text)
-            if match:
-                year, month, day = match.groups()
-                return datetime(int(year), int(month), int(day)).date()
-                
-            # 4. YYYY/MM/DD
-            match = re.search(r'(\d{4})/(\d{1,2})/(\d{1,2})', text)
-            if match:
-                year, month, day = match.groups()
-                return datetime(int(year), int(month), int(day)).date()
-
-            # 5. YYYYMMDD (8자리 숫자)
-            match = re.search(r'^(\d{8})$', text)
-            if match:
-                val = match.group(1)
-                return datetime(int(val[:4]), int(val[4:6]), int(val[6:])).date()
-
-        except:
-            pass
-        return None
