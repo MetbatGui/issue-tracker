@@ -6,7 +6,15 @@ import sys
 import argparse
 from datetime import datetime
 
-from .application import CapitalIncreaseService, BonusSharesService, ConvertibleBondService, BondWithWarrantService
+from .application import (
+    CapitalIncreaseService,
+    BonusSharesService,
+    DualIncreaseService,
+    ConvertibleBondService,
+    BondWithWarrantService,
+    OrchestrationStep,
+    DailyOrchestrationService,
+)
 from .logger import setup_logger, get_logger
 
 
@@ -237,35 +245,25 @@ def main():
                 logger.info(f"🚀 [ALL] 유상/무상/전환사채/신주인수권부사채 일일 업데이트 시작 (최근 {days}일)")
                 logger.info("="*60)
 
-                # 1. 유상증자
-                logger.info(">>> [1/5] 유상증자 업데이트 시작")
-                ci_service = CapitalIncreaseService()
-                ci_service.daily_update(days)
-
-                # 2. 무상증자
-                logger.info(">>> [2/5] 무상증자 업데이트 시작")
-                bonus_service = BonusSharesService()
-                bonus_service.daily_update(days)
-                
-                # 3. 유무상증자 (Dual Increase)
-                logger.info(">>> [3/5] 유무상증자 업데이트 시작")
-                from .application import DualIncreaseService
-                dual_service = DualIncreaseService()
-                dual_service.daily_update(days)
-
-                # 4. 전환사채 (Convertible Bond)
-                logger.info(">>> [4/5] 전환사채 업데이트 시작")
-                cb_service = ConvertibleBondService()
-                cb_service.daily_update(days)
-
-                # 5. 신주인수권부사채 (Bond with Warrant)
-                logger.info(">>> [5/5] 신주인수권부사채 업데이트 시작")
-                bw_service = BondWithWarrantService(dart_api_key=None)
-                bw_service.daily_update(days)
+                orchestrator = DailyOrchestrationService([
+                    OrchestrationStep("유상증자", lambda: CapitalIncreaseService()),
+                    OrchestrationStep("무상증자", lambda: BonusSharesService()),
+                    OrchestrationStep("유무상증자", lambda: DualIncreaseService()),
+                    OrchestrationStep("전환사채", lambda: ConvertibleBondService()),
+                    OrchestrationStep("신주인수권부사채", lambda: BondWithWarrantService(dart_api_key=None)),
+                ])
+                result = orchestrator.run(days)
 
                 logger.info("="*60)
-                logger.info("✅ [ALL] 모든 업데이트가 완료되었습니다.")
+                if result.all_succeeded:
+                    logger.info("✅ [ALL] 모든 업데이트가 완료되었습니다.")
+                else:
+                    failed_names = ", ".join(s.name for s in result.failed_steps)
+                    logger.error(f"⚠️ [ALL] 일부 업데이트 실패: {failed_names}")
                 logger.info("="*60)
+
+                if not result.all_succeeded:
+                    sys.exit(1)
             else:
                 logger.warning("all 하위 명령어를 지정하세요.")
 
