@@ -1,6 +1,9 @@
 """무상증자 데이터 처리 서비스
 
 비즈니스 로직을 조합하여 고수준 워크플로우를 제공합니다.
+
+DB(SQLite)가 SSOT입니다: XML 파싱 결과는 BonusSharesSqliteRepository에 upsert되고,
+Excel은 매 실행마다 DB 전체를 읽어 재구성되는 산출물입니다.
 """
 import sys
 import glob
@@ -11,6 +14,7 @@ from ..infrastructure import (
     BonusSharesXmlParser,
     BonusSharesExcelWriter,
 )
+from ..infrastructure.bonus_shares_sqlite_repository import BonusSharesSqliteRepository
 from .base_report_service import BaseReportService
 
 
@@ -24,8 +28,8 @@ __all__ = ["BonusSharesService"]
 
 class BonusSharesService(BaseReportService):
     """무상증자 데이터 처리 서비스
-    
-    다운로드, 파싱, 엑셀 저장 등의 워크플로우를 조합합니다.
+
+    다운로드, 파싱, DB 저장, 엑셀 재구성 워크플로우를 조합합니다.
     """
 
     def __init__(
@@ -35,7 +39,7 @@ class BonusSharesService(BaseReportService):
         enable_google_drive: bool = True
     ):
         """서비스를 초기화합니다.
-        
+
         Args:
             data_directory: 데이터 저장 디렉토리
             api_key: DART API 키 (None이면 .env에서 로드)
@@ -50,21 +54,33 @@ class BonusSharesService(BaseReportService):
         )
         self.parser = BonusSharesXmlParser()
         self.excel_writer = BonusSharesExcelWriter(output_path=str(self.excel_path))
+        self.repository = BonusSharesSqliteRepository(str(self.data_directory / "무상증자.db"))
+
+    def get_relation_map(self) -> dict:
+        """DB에 저장된 parent_rcp_no 관계를 관계맵으로 반환합니다.
+
+        DB가 SSOT이므로 relation_map.json/Excel 폴백(BaseReportService의 기본 구현)은 쓰지 않습니다.
+        """
+        return {
+            d.rcept_no: d.parent_rcp_no
+            for d in self.repository.get_all()
+            if d.parent_rcp_no
+        }
 
     def _parse_file_with_map(self, file_path: str, relation_map: dict) -> BonusSharesDecision:
         """관계 맵을 사용하여 XML 파일을 파싱합니다."""
-        
+
         # 접수번호 추출
         rcept_no = self._extract_rcept_no(file_path)
-            
+
         parent_rcp = relation_map.get(rcept_no) if rcept_no else None
-        
+
         return self.parser.parse(file_path, rcept_no=rcept_no, parent_rcp_no=parent_rcp)
 
     def parse_and_export_to_excel(self, relation_map: dict = None) -> int:
-        """XML 파일들을 파싱하여 엑셀로 저장합니다."""
+        """XML 파일들을 파싱해 DB에 반영한 뒤, DB 전체로 엑셀을 재구성합니다."""
         print("\n" + "=" * 50)
-        print("📊 XML 파싱 및 엑셀 생성")
+        print("📊 XML 파싱 및 DB 반영")
         print("=" * 50)
 
         # XML 파일 목록 가져오기
@@ -76,7 +92,7 @@ class BonusSharesService(BaseReportService):
 
         print(f"📂 {len(xml_files)}개의 XML 파일을 처리합니다...")
 
-        # 관계 맵 로드
+        # 관계 맵 로드 (DB 기준)
         base_map = self.get_relation_map()
         if relation_map:
             base_map.update(relation_map)
@@ -91,26 +107,25 @@ class BonusSharesService(BaseReportService):
 
         print(f"✅ {len(decisions)}건의 데이터를 파싱했습니다.")
 
-        # 최초공시일 계산
-        self._resolve_original_dates(decisions)
-
-        # 엑셀 저장
         if decisions:
-            # 중복 제거 (rcept_no 기준)
-            seen_rcp = set()
-            unique_decisions = []
-            for d in decisions:
-                key = d.rcept_no or d.source_filename
-                if key not in seen_rcp:
-                    seen_rcp.add(key)
-                    unique_decisions.append(d)
-            
-            print(f"✅ 중복 제거 완료: {len(decisions)} -> {len(unique_decisions)}건")
-            self.excel_writer.write(unique_decisions)
-            return len(unique_decisions)
-        else:
+            self.repository.upsert(decisions)
+            print(f"💾 DB 반영 완료: {len(decisions)}건")
+
+        return self.export_to_excel()
+
+    def export_to_excel(self) -> int:
+        """DB에 저장된 전체 데이터를 엑셀로 재구성합니다."""
+        decisions = self.repository.get_all()
+
+        if not decisions:
             print("⚠️ 저장할 데이터가 없습니다.")
             return 0
+
+        # 최초공시일 계산 (parent_rcp_no 체인을 따라가는 파생값이라 DB에는 저장하지 않고 매번 계산)
+        self._resolve_original_dates(decisions)
+
+        self.excel_writer.write(decisions)
+        return len(decisions)
 
     def full_update(self, start_date: str = "20200101", end_date: str = None) -> None:
         """전체 업데이트 워크플로우를 실행합니다."""
@@ -130,11 +145,11 @@ class BonusSharesService(BaseReportService):
 
     def daily_update(self, days_back: int = 1) -> None:
         """일일 업데이트 워크플로우를 실행합니다.
-        
+
         최근 N일간의 데이터를 다운로드하고 (이전 로직과 달리) 전체 데이터 재구성을 통해 엑셀을 갱신합니다.
         """
         from datetime import datetime, timedelta
-        
+
         print("\n" + "📅" * 25)
         print(" " * 10 + f"무상증자 데이터 Daily 업데이트")
         print("📅" * 25 + "\n")
@@ -142,7 +157,7 @@ class BonusSharesService(BaseReportService):
         # 날짜 계산
         today = datetime.now()
         start_date = (today - timedelta(days=days_back)).strftime("%Y%m%d")
-        
+
         print(f"📆 수집 기간: {start_date} ~ Today")
 
         self.run_pipeline(
