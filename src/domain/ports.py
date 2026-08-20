@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Optional, List, Dict, Any
 
 
-__all__ = ["StoragePort"]
+__all__ = ["StoragePort", "ReportRepository"]
 
 
 class StoragePort(ABC):
@@ -54,11 +54,39 @@ class StoragePort(ABC):
     @abstractmethod
     def list_files(self, folder_id: str) -> List[Dict[str, Any]]:
         """폴더 내 파일 목록을 조회합니다.
-        
+
         Args:
             folder_id: 조회할 폴더 ID
-        
+
         Returns:
             파일 정보 딕셔너리 리스트
+        """
+        pass
+
+
+class ReportRepository(ABC):
+    """보고서 데이터 저장소 추상 인터페이스 (포트)
+
+    DART 보고서 결정(Decision) 데이터를 SSOT로 저장/조회하기 위한 포트입니다.
+    """
+
+    @abstractmethod
+    def upsert(self, decisions: List[Any]) -> int:
+        """결정 목록을 저장소에 upsert합니다 (rcept_no 기준).
+
+        Args:
+            decisions: 저장할 결정 객체 리스트
+
+        Returns:
+            upsert된 건수
+        """
+        pass
+
+    @abstractmethod
+    def get_all(self) -> List[Any]:
+        """저장된 모든 결정을 조회합니다.
+
+        Returns:
+            결정 객체 리스트
         """
         pass
