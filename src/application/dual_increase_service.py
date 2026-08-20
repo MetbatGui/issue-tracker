@@ -241,72 +241,93 @@ class DualIncreaseService(BaseReportService):
     def _merge_to_main_excel(self, file_path: Path, new_decisions: List, is_capital: bool) -> None:
         """메인 엑셀 파일에 데이터를 병합하여 저장합니다."""
         import pandas as pd
-        
+
         self.logger.info(f"🔄 병합 중: {file_path}")
-        
-        # 1. 기존 데이터 로드
-        all_dfs = []
-        existing_count = 0
-        if file_path.exists():
-            try:
-                # Try header=1 first (CapitalIncreaseExcelWriter uses startrow=1)
-                try:
-                    existing_sheets = pd.read_excel(file_path, sheet_name=None, header=1)
-                    # Check if it looks correct (has key column)
-                    if existing_sheets and not all('접수번호' in df.columns for df in existing_sheets.values() if not df.empty):
-                         raise ValueError("Some sheets missing '접수번호' with header=1")
-                except:
-                    existing_sheets = pd.read_excel(file_path, sheet_name=None, header=0)
 
-                for sheet, df in existing_sheets.items():
-                    if '접수번호' in df.columns:
-                        try:
-                            df['연도'] = int(sheet)
-                        except:
-                            df['연도'] = sheet
-                        existing_count += len(df)
-                        all_dfs.append(df)
-                        
-                print(f"  📂 기존 데이터 로드: {existing_count}건 ({len(existing_sheets)}개 시트)")
-            except Exception as e:
-                print(f"  ⚠️ 기존 파일 로드 실패 (새로 생성합니다): {e}")
+        existing_dfs = self._load_existing_sheets(file_path)
+        new_df = self._new_decisions_to_df(new_decisions, is_capital)
 
-        # 2. 신규 데이터 DF 변환
-        # Writer의 _to_row_dict 로직을 재사용하기 위해 임시 Writer 사용
-        if is_capital:
-            writer = self.capital_writer
-        else:
-            writer = self.bonus_writer
-            
-        new_rows = [writer._to_row_dict(d) for d in new_decisions]
-        # columns 파라미터를 제거하여 딕셔너리의 모든 키를 사용
-        new_df = pd.DataFrame(new_rows)
-        print(f"  ➕ 신규 데이터: {len(new_df)}건")
-        all_dfs.append(new_df)
-        
-        # 3. 병합
+        all_dfs = existing_dfs + ([new_df] if not new_df.empty else [])
         if not all_dfs:
+            print("  ⚠️ 병합할 데이터가 없습니다.")
             return
 
         merged_df = pd.concat(all_dfs, ignore_index=True)
         print(f"  🔗 병합 후: {len(merged_df)}건")
-        
-        # 4. 중복 제거 (접수번호 기준)
-        if '접수번호' in merged_df.columns:
-            before_dedup = len(merged_df)
-            # 접수번호가 있는 행만 대상으로 중복 제거 (빈 행 제외)
-            # 최근 데이터(기존+신규) 중 신규가 뒤에 붙었으므로, keep='last' or 'first'?
-            # 신규가 더 정확할 수 있지만, 기존 데이터에 수동 수정이 있을 수 있음.
-            # 하지만 자동화 관점에서는 재파싱된 데이터(신규)가 우선될 수 있음.
-            # 여기서는 접수번호 중복 시 '기존' 것을 유지하거나 '덮어쓰기' 할지 결정.
-            # 일반적으로 Append 모드에서는 기존 것을 유지하고 신규 중복을 버리는 게 안전할 수 있으나,
-            # 전체 업데이트 관점에서는 덮어쓰기가 맞음.
-            merged_df = merged_df.drop_duplicates(subset=['접수번호'], keep='last')
-            print(f"  🗑️ 중복 제거: {before_dedup - len(merged_df)}건 제거됨 (최종 {len(merged_df)}건)")
-        
-        # 5. 저장 (CapitalIncreaseExcelWriter 로직 재사용 불가 - DataFrame을 직접 저장해야 함)
-        # 연도별 분리 저장 로직 복사
-        
+
+        merged_df = self._dedupe_by_rcept_no(merged_df)
+
+        self._save_year_sheets(merged_df, file_path, is_capital)
+        print(f"✅ 저장 완료: {file_path}")
+
+    def _load_existing_sheets(self, file_path: Path) -> List:
+        """기존 메인 엑셀 파일에서 연도별 시트를 로드합니다.
+
+        파일이 없거나 로드에 실패하면 빈 리스트를 반환합니다.
+        """
+        import pandas as pd
+
+        if not file_path.exists():
+            return []
+
+        try:
+            # Try header=1 first (CapitalIncreaseExcelWriter uses startrow=1)
+            try:
+                existing_sheets = pd.read_excel(file_path, sheet_name=None, header=1)
+                # Check if it looks correct (has key column)
+                if existing_sheets and not all('접수번호' in df.columns for df in existing_sheets.values() if not df.empty):
+                    raise ValueError("Some sheets missing '접수번호' with header=1")
+            except Exception:
+                existing_sheets = pd.read_excel(file_path, sheet_name=None, header=0)
+
+            dfs = []
+            existing_count = 0
+            for sheet, df in existing_sheets.items():
+                if '접수번호' in df.columns:
+                    try:
+                        df['연도'] = int(sheet)
+                    except (TypeError, ValueError):
+                        df['연도'] = sheet
+                    existing_count += len(df)
+                    dfs.append(df)
+
+            print(f"  📂 기존 데이터 로드: {existing_count}건 ({len(existing_sheets)}개 시트)")
+            return dfs
+        except Exception as e:
+            print(f"  ⚠️ 기존 파일 로드 실패 (새로 생성합니다): {e}")
+            return []
+
+    def _new_decisions_to_df(self, new_decisions: List, is_capital: bool):
+        """신규 결정 목록을 DataFrame으로 변환합니다.
+
+        Writer의 _to_row_dict 로직을 재사용하기 위해 기존 Writer 인스턴스를 사용합니다.
+        """
+        import pandas as pd
+
+        writer = self.capital_writer if is_capital else self.bonus_writer
+        new_rows = [writer._to_row_dict(d) for d in new_decisions]
+        new_df = pd.DataFrame(new_rows)
+        print(f"  ➕ 신규 데이터: {len(new_df)}건")
+        return new_df
+
+    def _dedupe_by_rcept_no(self, merged_df):
+        """접수번호 기준 중복을 제거합니다 (뒤에 병합된 데이터를 우선 유지).
+
+        기존 시트는 Excel에서 숫자로, 신규 데이터는 문자열로 읽혀 접수번호의 dtype이
+        섞일 수 있어(예: 20240101000001 vs "20240101000001") 비교 전에 문자열로 정규화합니다.
+        """
+        if '접수번호' not in merged_df.columns:
+            return merged_df
+
+        before_dedup = len(merged_df)
+        merged_df = merged_df.copy()
+        merged_df['접수번호'] = merged_df['접수번호'].astype(str).str.replace(r'\.0$', '', regex=True)
+        merged_df = merged_df.drop_duplicates(subset=['접수번호'], keep='last')
+        print(f"  🗑️ 중복 제거: {before_dedup - len(merged_df)}건 제거됨 (최종 {len(merged_df)}건)")
+        return merged_df
+
+    def _save_year_sheets(self, merged_df, file_path: Path, is_capital: bool) -> None:
+        """병합된 DataFrame을 연도별 시트로 분리하여 엑셀 파일로 저장합니다."""
         # 연도 없는 데이터 필터링
         merged_df = merged_df[merged_df["연도"].notna()]
 
@@ -316,37 +337,36 @@ class DualIncreaseService(BaseReportService):
 
         # 연도별로 그룹화
         years = sorted(merged_df["연도"].unique())
-        
+
         # 디렉토리 생성
         file_path.parent.mkdir(parents=True, exist_ok=True)
 
         # 컬럼 순서 선택 (is_capital에 따라)
         cols = self.capital_writer.EXCEL_COLUMNS if is_capital else self.bonus_writer.EXCEL_COLUMNS
-        
+
+        import pandas as pd
         with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
             for year in years:
                 # 연도 컬럼이 float일 수 있으므로 int 변환 안전하게
                 try:
                     year_val = int(year)
-                except:
+                except (TypeError, ValueError):
                     year_val = str(year)
-                    
+
                 # 해당 연도 데이터 추출
                 year_df = merged_df[merged_df["연도"] == year]
-                
+
                 # 컬럼이 존재하는지 확인 후 선택
                 available_cols = [c for c in cols if c in year_df.columns]
                 year_df = year_df[available_cols]
 
                 sheet_name = str(year_val)
                 year_df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=1)
-                
+
                 # 열 너비 자동 조정 (Best Fit) 적용
                 apply_auto_column_width(writer.sheets[sheet_name])
-                
-                self.logger.info(f"  [{sheet_name}] 시트: {len(year_df)}건 (Best Fit 적용)")
 
-        print(f"✅ 저장 완료: {file_path}")
+                self.logger.info(f"  [{sheet_name}] 시트: {len(year_df)}건 (Best Fit 적용)")
 
     def full_update(self, start_date: str = "20200101", end_date: str = None) -> None:
         """전체 업데이트 워크플로우를 실행합니다."""

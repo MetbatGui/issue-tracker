@@ -6,7 +6,7 @@ Shared parsing logic for DART XML reports (Capital Increase, Bonus Shares, etc.)
 import os
 import re
 from datetime import datetime
-from typing import Optional, Any
+from typing import Optional, Any, Callable, Iterable, Tuple
 from lxml import etree
 
 __all__ = ["BaseXmlParser"]
@@ -116,6 +116,35 @@ class BaseXmlParser:
         except (ValueError, TypeError):
             pass
         return None
+
+    @classmethod
+    def _extract_fields(
+        cls,
+        root: Any,
+        tag: str,
+        attr: str,
+        field_specs: Iterable[Tuple[str, str, Callable[[str], Any]]]
+    ) -> dict:
+        """`tag[@attr='code']` 형태의 노드들을 필드명 -> 값 딕셔너리로 일괄 추출합니다.
+
+        예: `_extract_fields(root, "TE", "ACODE", [("bond_type", "PL_KND", str), ...])`
+        DART 사채형 보고서(TE/ACODE, TU/AUNIT)처럼 같은 패턴이 반복되는 필드 추출에서
+        if/else 나열 대신 매핑 테이블 + 루프로 처리하기 위한 헬퍼입니다.
+
+        Args:
+            root: XML 루트 엘리먼트
+            tag: 노드 태그명 (예: "TE", "TU")
+            attr: 코드가 담긴 속성명 (예: "ACODE", "AUNIT")
+            field_specs: (필드명, 코드값, 텍스트 -> 값 변환 함수) 튜플 목록
+
+        Returns:
+            필드명 -> 변환된 값 (노드가 없으면 None) 딕셔너리
+        """
+        result = {}
+        for field_name, code, caster in field_specs:
+            node = root.find(f".//{tag}[@{attr}='{code}']")
+            result[field_name] = caster(cls._get_text(node)) if node is not None else None
+        return result
 
     @classmethod
     def _extract_common_info(cls, file_path: str, root: Any) -> dict:

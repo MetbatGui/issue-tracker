@@ -41,96 +41,43 @@ class ConvertibleBondXmlParser(BaseXmlParser):
             # 공통 정보 추출 (회사명, 보고서명, 정정여부, 파일명 기반 rcept_no)
             common_info = cls._extract_common_info(file_path, root)
 
-            # 1. 회차
-            seq_node = root.find(".//TE[@ACODE='SEQ_NO']")
-            sequence_number = cls._get_text(seq_node) if seq_node is not None else None
-            
-            # 2. 종류
-            kind_node = root.find(".//TE[@ACODE='PL_KND']")
-            bond_type = cls._get_text(kind_node) if kind_node is not None else None
-            
-            # 3. 사채의 권면(전자등록)총액
-            dnm_node = root.find(".//TE[@ACODE='DNM_SUM']")
-            face_value_total = cls._clean_int(cls._get_text(dnm_node)) if dnm_node is not None else None
-            
-            # 4. 자금조달 목적 (4개 필드로 분리)
-            # 시설자금
-            facility_node = root.find(".//TE[@ACODE='FND_USE1']")
-            facility_fund = cls._clean_int(cls._get_text(facility_node)) if facility_node is not None else None
-            
-            # 운영자금
-            operating_node = root.find(".//TE[@ACODE='FND_USE2']")
-            operating_fund = cls._clean_int(cls._get_text(operating_node)) if operating_node is not None else None
-            
-            # 영업양수자금
-            business_acq_node = root.find(".//TE[@ACODE='FND_USE_SQ']")
-            business_acquisition_fund = cls._clean_int(cls._get_text(business_acq_node)) if business_acq_node is not None else None
-            
-            # 타법인증권 취득자금
-            acquisition_node = root.find(".//TE[@ACODE='ANC_ACQ_PRC']")
-            acquisition_fund = cls._clean_int(cls._get_text(acquisition_node)) if acquisition_node is not None else None
-            
-            # 채무상환자금
-            debt_node = root.find(".//TE[@ACODE='FND_USE_RD']")
-            debt_repayment_fund = cls._clean_int(cls._get_text(debt_node)) if debt_node is not None else None
-            
-            # 기타자금
-            other_node = root.find(".//TE[@ACODE='FND_USE3']")
-            other_fund = cls._clean_int(cls._get_text(other_node)) if other_node is not None else None
-            
-            # 5. 사채의 만기일
-            exp_node = root.find(".//TU[@AUNIT='EXP_DT']")
-            maturity_date = cls._parse_korean_date(cls._get_text(exp_node)) if exp_node is not None else None
-            
-            # 6. 사채발행방법
-            method_node = root.find(".//TU[@AUNIT='ISSU_MTH']")
-            issue_method = cls._get_text(method_node) if method_node is not None else None
-            
-            # 7. 전환비율
-            exe_rt_node = root.find(".//TE[@ACODE='EXE_RT']")
-            conversion_ratio = cls._clean_float(cls._get_text(exe_rt_node)) if exe_rt_node is not None else None
-            
-            # 8. 전환가액
-            exe_prc_node = root.find(".//TE[@ACODE='EXE_PRC']")
-            conversion_price = cls._clean_int(cls._get_text(exe_prc_node)) if exe_prc_node is not None else None
-            
-            # 9. 전환에 따라 발행할 주식수
-            stk_cnt_node = root.find(".//TE[@ACODE='STK_CNT']")
-            conversion_shares = cls._clean_int(cls._get_text(stk_cnt_node)) if stk_cnt_node is not None else None
-            
-            # 10. 주식총수 대비 비율
-            stk_rt_node = root.find(".//TE[@ACODE='STK_RT']")
-            shares_ratio = cls._clean_float(cls._get_text(stk_rt_node)) if stk_rt_node is not None else None
-            
-            # 11. 전환청구기간시작일
-            sb_bgn_node = root.find(".//TU[@AUNIT='SB_BGN_DT']")
-            conversion_start_date = cls._parse_korean_date(cls._get_text(sb_bgn_node)) if sb_bgn_node is not None else None
-            
-            # 12. 전환청구기간종료일
-            sb_end_node = root.find(".//TU[@AUNIT='SB_END_DT']")
-            conversion_end_date = cls._parse_korean_date(cls._get_text(sb_end_node)) if sb_end_node is not None else None
-            
-            # 13. 청약일
-            sbsc_node = root.find(".//TU[@AUNIT='SBSC_DT']")
-            subscription_date = cls._parse_korean_date(cls._get_text(sbsc_node)) if sbsc_node is not None else None
-            
-            # 14. 납입일
-            pym_node = root.find(".//TU[@AUNIT='PYM_DT']")
-            payment_date = cls._parse_korean_date(cls._get_text(pym_node)) if pym_node is not None else None
-            
-            # 15. 이사회결의일
-            drc_node = root.find(".//TU[@AUNIT='DRC_DT']")
-            board_resolution_date = cls._parse_korean_date(cls._get_text(drc_node)) if drc_node is not None else None
+            # ACODE 기반 필드 (TE 노드)
+            te_fields = cls._extract_fields(root, "TE", "ACODE", [
+                ("sequence_number", "SEQ_NO", str),
+                ("bond_type", "PL_KND", str),
+                ("face_value_total", "DNM_SUM", cls._clean_int),
+                ("facility_fund", "FND_USE1", cls._clean_int),
+                ("operating_fund", "FND_USE2", cls._clean_int),
+                ("business_acquisition_fund", "FND_USE_SQ", cls._clean_int),
+                ("acquisition_fund", "ANC_ACQ_PRC", cls._clean_int),
+                ("debt_repayment_fund", "FND_USE_RD", cls._clean_int),
+                ("other_fund", "FND_USE3", cls._clean_int),
+                ("conversion_ratio", "EXE_RT", cls._clean_float),
+                ("conversion_price", "EXE_PRC", cls._clean_int),
+                ("conversion_shares", "STK_CNT", cls._clean_int),
+                ("shares_ratio", "STK_RT", cls._clean_float),
+            ])
 
-            # 16. 자금조달 목적 (FundingPurpose 객체 생성)
+            # AUNIT 기반 필드 (TU 노드: 날짜/방법)
+            tu_fields = cls._extract_fields(root, "TU", "AUNIT", [
+                ("maturity_date", "EXP_DT", cls._parse_korean_date),
+                ("issue_method", "ISSU_MTH", str),
+                ("conversion_start_date", "SB_BGN_DT", cls._parse_korean_date),
+                ("conversion_end_date", "SB_END_DT", cls._parse_korean_date),
+                ("subscription_date", "SBSC_DT", cls._parse_korean_date),
+                ("payment_date", "PYM_DT", cls._parse_korean_date),
+                ("board_resolution_date", "DRC_DT", cls._parse_korean_date),
+            ])
+
+            # 자금조달 목적 (FundingPurpose 객체 생성)
             from ..domain.value_objects import FundingPurpose
             funding = FundingPurpose(
-                facility=facility_fund or 0,
-                operating=operating_fund or 0,
-                acquisition=acquisition_fund or 0,
-                debt_repayment=debt_repayment_fund or 0,
-                business_acquisition=business_acquisition_fund or 0,
-                other=other_fund or 0
+                facility=te_fields["facility_fund"] or 0,
+                operating=te_fields["operating_fund"] or 0,
+                acquisition=te_fields["acquisition_fund"] or 0,
+                debt_repayment=te_fields["debt_repayment_fund"] or 0,
+                business_acquisition=te_fields["business_acquisition_fund"] or 0,
+                other=te_fields["other_fund"] or 0
             )
 
             # rcept_no 처리 Priority: 
@@ -141,22 +88,22 @@ class ConvertibleBondXmlParser(BaseXmlParser):
             decision = ConvertibleBondDecision(
                 source_filename=common_info["source_filename"],
                 company_name=common_info["company_name"],
-                sequence_number=sequence_number,
-                bond_type=bond_type,
-                face_value_total=face_value_total,
+                sequence_number=te_fields["sequence_number"],
+                bond_type=te_fields["bond_type"],
+                face_value_total=te_fields["face_value_total"],
                 funding=funding,
                 interest_rate=None,  # XML 파싱 로직에 이율 추출이 없음
-                maturity_date=maturity_date,
-                issue_method=issue_method,
-                conversion_ratio=conversion_ratio,
-                conversion_price=conversion_price,
-                conversion_shares=conversion_shares,
-                shares_ratio=shares_ratio,
-                conversion_start_date=conversion_start_date,
-                conversion_end_date=conversion_end_date,
-                subscription_date=subscription_date,
-                payment_date=payment_date,
-                board_resolution_date=board_resolution_date,
+                maturity_date=tu_fields["maturity_date"],
+                issue_method=tu_fields["issue_method"],
+                conversion_ratio=te_fields["conversion_ratio"],
+                conversion_price=te_fields["conversion_price"],
+                conversion_shares=te_fields["conversion_shares"],
+                shares_ratio=te_fields["shares_ratio"],
+                conversion_start_date=tu_fields["conversion_start_date"],
+                conversion_end_date=tu_fields["conversion_end_date"],
+                subscription_date=tu_fields["subscription_date"],
+                payment_date=tu_fields["payment_date"],
+                board_resolution_date=tu_fields["board_resolution_date"],
                 report_name=common_info["report_name"],
                 is_correction=common_info["is_correction"],
                 rcept_no=final_rcept_no,
