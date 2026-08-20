@@ -216,8 +216,7 @@ def main():
             elif args.bw_command == "full":
                 service.full_update(getattr(args, 'start', '20200101'))
             elif args.bw_command == "export":
-                # 기간 지정이 필요할 수 있으나 기본 동작은 전체
-                service.parse_and_export_to_excel(start_date="20200101") 
+                service.parse_and_export_to_excel()
             else:
                 logger.warning("bw 하위 명령어를 지정하세요.")
 
