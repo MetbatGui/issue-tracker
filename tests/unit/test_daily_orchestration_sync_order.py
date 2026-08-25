@@ -106,6 +106,30 @@ def test_orchestrator_runs_full_update_before_exporting_and_uploading():
     ]
 
 
+def test_orchestrator_runs_db_based_export_through_sync_flow():
+    events = []
+
+    class _ExportService:
+        def export_update(self):
+            events.append("select-db")
+            return LocalUpdateResult([
+                SyncTarget(
+                    database_path=Path("A.db"),
+                    excel_path=Path("A.xlsx"),
+                    export_excel=lambda: events.append("export:A"),
+                    upload_excel=lambda: events.append("upload-excel:A"),
+                    upload_database=lambda: events.append("upload-db:A"),
+                )
+            ])
+
+    result = DailyOrchestrationService([
+        OrchestrationStep("A", _ExportService),
+    ]).run_export()
+
+    assert result.all_succeeded
+    assert events == ["select-db", "export:A", "upload-excel:A", "upload-db:A"]
+
+
 def test_orchestrator_returns_upload_failure_in_result_without_skipping_db_upload():
     events = []
 

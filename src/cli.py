@@ -30,6 +30,12 @@ def _run_single_full(name, service, start_date: str):
     ]).run_full(start_date)
 
 
+def _run_single_export(name, service):
+    return DailyOrchestrationService([
+        OrchestrationStep(name, lambda: service),
+    ]).run_export()
+
+
 def _raise_if_failed(result) -> None:
     if not result.all_succeeded:
         failed_names = ", ".join(step.name for step in result.failed_steps)
@@ -185,7 +191,7 @@ def main():
             elif args.ci_command == "full":
                 _raise_if_failed(_run_single_full("유상증자", service, getattr(args, 'start', '20200101')))
             elif args.ci_command == "export":
-                service.parse_and_export_to_excel()
+                _raise_if_failed(_run_single_export("유상증자", service))
             elif args.ci_command == "download":
                 service.download_reports(args.start, getattr(args, 'end', None))
             elif args.ci_command == "convert":
@@ -204,7 +210,7 @@ def main():
             elif args.bonus_command == "full":
                 _raise_if_failed(_run_single_full("무상증자", bonus_service, getattr(args, 'start', '20200101')))
             elif args.bonus_command == "export":
-                bonus_service.parse_and_export_to_excel()
+                _raise_if_failed(_run_single_export("무상증자", bonus_service))
             elif args.bonus_command == "download":
                 bonus_service.download_reports(args.start, getattr(args, 'end', None))
             else:
@@ -221,7 +227,7 @@ def main():
             elif args.cb_command == "full":
                 _raise_if_failed(_run_single_full("전환사채", service, getattr(args, 'start', '20200101')))
             elif args.cb_command == "export":
-                service.parse_and_export_to_excel()
+                _raise_if_failed(_run_single_export("전환사채", service))
             else:
                 logger.warning("cb 하위 명령어를 지정하세요.")
 
@@ -236,7 +242,7 @@ def main():
             elif args.bw_command == "full":
                 _raise_if_failed(_run_single_full("신주인수권부사채", service, getattr(args, 'start', '20200101')))
             elif args.bw_command == "export":
-                service.parse_and_export_to_excel()
+                _raise_if_failed(_run_single_export("신주인수권부사채", service))
             else:
                 logger.warning("bw 하위 명령어를 지정하세요.")
 

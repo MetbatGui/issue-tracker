@@ -149,6 +149,10 @@ class BondWithWarrantService(BaseReportService):
         self.excel_writer.write(decisions)
         return len(decisions)
 
+    def export_update(self) -> LocalUpdateResult:
+        """SSOT DB로 Excel을 재생성하고 오케스트레이터에 동기화 대상을 반환한다."""
+        return self._local_update_result() if self.repository.get_all() else LocalUpdateResult.empty()
+
     def daily_update(self, days: int = 30) -> LocalUpdateResult:
         """일일 업데이트 (최근 N일)"""
         end_date = datetime.now()

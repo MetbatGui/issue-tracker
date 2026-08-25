@@ -129,6 +129,10 @@ class DailyOrchestrationService:
         """모든 스텝의 full_update(start_date)를 순차 실행합니다."""
         return self._run_updates(lambda service: service.full_update(start_date))
 
+    def run_export(self) -> DailyOrchestrationResult:
+        """모든 스텝의 DB 기반 산출물 재생성·동기화를 실행합니다."""
+        return self._run_updates(lambda service: service.export_update())
+
     def _run_updates(self, update_service: Callable[[BaseReportService], LocalUpdateResult]) -> DailyOrchestrationResult:
         """수집·DB 반영 후 export와 원격 동기화까지 한 실행 흐름으로 처리한다."""
         results: List[StepResult] = []
