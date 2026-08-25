@@ -27,7 +27,7 @@ def test_daily_update_returns_local_sync_target_without_exporting_or_uploading(t
     assert parsed == [False]
     assert len(result.targets) == 1
     assert result.targets[0].excel_path == service.excel_path
-    assert result.targets[0].database_path == Path(service.repository.db_path)
+    assert result.targets[0].database_path == service.database_session.storage_path
 
 
 def test_daily_update_requests_excel_rebuild_when_db_has_data_but_output_is_missing(tmp_path, monkeypatch):

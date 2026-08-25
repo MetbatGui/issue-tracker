@@ -142,7 +142,14 @@ class DualIncreaseService(BaseReportService):
 
     def _result_after_collection(self, downloaded_files: List[str], relation_map: dict) -> LocalUpdateResult:
         if downloaded_files:
-            return self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
+            changed_count = self.parse_and_export_to_excel(relation_map, export=False)
+            if changed_count:
+                if not self.capital_service.database_session.persist():
+                    raise RuntimeError("유상증자 SQLite SSOT 반영 실패")
+                if not self.bonus_service.database_session.persist():
+                    raise RuntimeError("무상증자 SQLite SSOT 반영 실패")
+                return self._local_update_result()
+            return LocalUpdateResult.empty()
 
         has_missing_output = (
             (not self.capital_service.excel_path.exists() and self.capital_service.repository.get_all())

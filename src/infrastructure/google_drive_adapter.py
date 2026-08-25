@@ -32,6 +32,14 @@ class GoogleDriveAdapter(StoragePort):
     """
     
     SCOPES = ['https://www.googleapis.com/auth/drive']
+
+    def get_file(self, storage_path: Path) -> Optional[Path]:
+        """원격 DB 원본 저장소로는 사용하지 않으므로 작업 사본을 제공하지 않는다."""
+        return None
+
+    def put_file(self, local_path: Path, storage_path: Path) -> bool:
+        """원격 DB 원본 저장소로는 사용하지 않으므로 반영하지 않는다."""
+        return False
     
     def __init__(
         self,
