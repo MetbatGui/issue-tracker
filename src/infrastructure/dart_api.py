@@ -300,8 +300,8 @@ class DartApiClient:
             while True:
                 result = self.fetch_disclosure_list(bgn_de, end_de, page_no=page)
 
-                if not result:
-                    break
+                if result is None:
+                    raise RuntimeError(f"DART 목록 조회 실패: {bgn_de} ~ {end_de}")
                 if result.get('status') != '000':
                     if result.get('status') != '013':  # 데이터 없음
                         self.logger.warning(f"API 메시지: {result.get('message')}")
