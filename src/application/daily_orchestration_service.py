@@ -121,15 +121,19 @@ class DailyOrchestrationService:
         result = DailyOrchestrationResult(results)
         targets = result.sync_targets
 
-        # 모든 로컬 DB 반영이 끝난 뒤 산출물을 생성하고, 산출물→DB 순서로 동기화한다.
+        self.finalize_sync_targets(targets)
+
+        return result
+
+    @staticmethod
+    def finalize_sync_targets(targets: List[SyncTarget]) -> None:
+        """산출물을 생성한 뒤 Excel→DB 순서로 원격 동기화한다."""
         for target in targets:
             target.export_excel()
         for target in targets:
             target.upload_excel()
         for target in targets:
             target.upload_database()
-
-        return result
 
 
 def _demo() -> None:

@@ -140,6 +140,16 @@ class DualIncreaseService(BaseReportService):
             )
         )
 
+    def _result_after_collection(self, downloaded_files: List[str], relation_map: dict) -> LocalUpdateResult:
+        if downloaded_files:
+            return self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
+
+        has_missing_output = (
+            (not self.capital_service.excel_path.exists() and self.capital_service.repository.get_all())
+            or (not self.bonus_service.excel_path.exists() and self.bonus_service.repository.get_all())
+        )
+        return self._local_update_result() if has_missing_output else LocalUpdateResult.empty()
+
     def full_update(self, start_date: str = "20200101", end_date: str = None) -> LocalUpdateResult:
         """전체 업데이트 워크플로우를 실행합니다."""
         print("\n" + "🚀" * 25)
@@ -152,9 +162,7 @@ class DualIncreaseService(BaseReportService):
             end_date
         )
 
-        result = LocalUpdateResult.empty() if not downloaded_files else (
-            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
-        )
+        result = self._result_after_collection(downloaded_files, relation_map)
         print("\n" + "🎉" * 25)
         print(" " * 15 + "전체 업데이트 완료!")
         print("🎉" * 25 + "\n")
@@ -182,9 +190,7 @@ class DualIncreaseService(BaseReportService):
             skip_if_no_new_files=True
         )
 
-        result = LocalUpdateResult.empty() if not downloaded_files else (
-            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
-        )
+        result = self._result_after_collection(downloaded_files, relation_map)
         print("\n" + "✨" * 25)
         print(" " * 10 + "유무상증자 Daily 업데이트 완료")
         print("✨" * 25 + "\n")

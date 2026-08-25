@@ -127,6 +127,13 @@ class CapitalIncreaseService(BaseReportService):
             )
         ])
 
+    def _result_after_collection(self, downloaded_files: List[str], relation_map: dict) -> LocalUpdateResult:
+        if downloaded_files:
+            return self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
+        if not self.excel_path.exists() and self.repository.get_all():
+            return self._local_update_result()
+        return LocalUpdateResult.empty()
+
     def export_to_excel(self) -> int:
         """DB에 저장된 전체 데이터를 엑셀로 재구성합니다."""
         decisions = self.repository.get_all()
@@ -153,9 +160,7 @@ class CapitalIncreaseService(BaseReportService):
             end_date
         )
 
-        result = LocalUpdateResult.empty() if not downloaded_files else (
-            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
-        )
+        result = self._result_after_collection(downloaded_files, relation_map)
         print("\n" + "🎉" * 25)
         print(" " * 15 + "전체 업데이트 완료!")
         print("🎉" * 25 + "\n")
@@ -186,8 +191,6 @@ class CapitalIncreaseService(BaseReportService):
 
         print("\n" + "🎉" * 25)
         print(" " * 15 + "Daily 업데이트 완료!")
-        result = LocalUpdateResult.empty() if not downloaded_files else (
-            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
-        )
+        result = self._result_after_collection(downloaded_files, relation_map)
         print("🎉" * 25 + "\n")
         return result
