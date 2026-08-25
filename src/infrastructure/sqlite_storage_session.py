@@ -18,6 +18,8 @@ class SqliteStorageSession:
         downloaded_path = self.storage.get_file(self.storage_path)
         if downloaded_path is not None:
             return downloaded_path
+        if self.storage_path.exists():
+            raise RuntimeError(f"SQLite 작업 사본을 만들지 못했습니다: {self.storage_path}")
         fd, temporary_name = tempfile.mkstemp(suffix=self.storage_path.suffix)
         os.close(fd)
         return Path(temporary_name)
