@@ -3,11 +3,13 @@ import requests
 from typing import List, Set
 from bs4 import BeautifulSoup
 
+from ..logger import get_logger
+
 class DartHistoryScraper:
     """DART 공시 이력 스크래퍼"""
     
     def __init__(self):
-        pass
+        self.logger = get_logger(self.__class__.__name__)
         
     def get_history_rcp_list(self, rcp_no: str) -> List[str]:
         """주어진 공시의 DART 뷰어 페이지에서 관련 공시(이력) 접수번호들을 추출합니다.
@@ -73,8 +75,8 @@ class DartHistoryScraper:
             return sorted(list(found_ids))
             
         except (requests.exceptions.ConnectionError, http.client.RemoteDisconnected) as e:
-            print(f"  └ [Warning] 이력 추출 연결 실패 (재시도 소진, {rcp_no}): {e}")
+            self.logger.warning(f"이력 추출 연결 실패 (재시도 소진, {rcp_no}): {e}")
             return [rcp_no]
         except Exception as e:
-            print(f"  └ [Warning] 이력 추출 실패 ({rcp_no}): {e}")
+            self.logger.warning(f"이력 추출 실패 ({rcp_no}): {e}")
             return [rcp_no]

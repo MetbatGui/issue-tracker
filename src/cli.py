@@ -250,9 +250,9 @@ def main():
                         start_date = datetime.strptime(args.start, "%Y%m%d")
                         today = datetime.now()
                         days = (today - start_date).days + 1  # 시작일 포함
-                        print(f"📅 {args.start}부터 오늘까지: {days}일")
+                        logger.info(f"{args.start}부터 오늘까지: {days}일")
                     except ValueError:
-                        print(f"❌ 잘못된 날짜 형식: {args.start} (YYYYMMDD 형식으로 입력하세요)")
+                        logger.error(f"잘못된 날짜 형식: {args.start} (YYYYMMDD 형식으로 입력하세요)")
                         sys.exit(1)
                 else:
                     # --days가 주어진 경우 또는 기본값 사용

@@ -5,8 +5,12 @@
 from pathlib import Path
 from typing import Optional, Tuple, List
 
+from ..logger import get_logger
+
 
 __all__ = ["FileEncodingConverter"]
+
+logger = get_logger("FileEncodingConverter")
 
 
 class FileEncodingConverter:
@@ -49,22 +53,22 @@ class FileEncodingConverter:
         result = cls.detect_and_read(file_path)
 
         if result is None:
-            print(f"[오류] {file_path.name}: 인코딩을 감지할 수 없습니다")
+            logger.error(f"{file_path.name}: 인코딩을 감지할 수 없습니다")
             return False
 
         current_encoding, content = result
 
         if current_encoding.lower() == 'utf-8':
-            print(f"[건너뜀] {file_path.name}: 이미 UTF-8")
+            logger.info(f"{file_path.name}: 이미 UTF-8")
             return True
 
         try:
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(content)
-            print(f"[변환완료] {file_path.name}: {current_encoding} -> UTF-8")
+            logger.info(f"{file_path.name}: {current_encoding} -> UTF-8 변환 완료")
             return True
         except Exception as e:
-            print(f"[오류] {file_path.name}: {e}")
+            logger.error(f"{file_path.name}: {e}")
             return False
 
     @classmethod
@@ -79,11 +83,11 @@ class FileEncodingConverter:
             변환 결과 통계 딕셔너리
         """
         if not directory.exists():
-            print(f"디렉토리를 찾을 수 없습니다: {directory}")
+            logger.error(f"디렉토리를 찾을 수 없습니다: {directory}")
             return {"converted": 0, "already_utf8": 0, "errors": 0}
 
         files = list(directory.glob(pattern))
-        print(f"총 {len(files)}개의 파일을 처리합니다.\n")
+        logger.info(f"총 {len(files)}개의 파일을 처리합니다.")
 
         converted = 0
         already_utf8 = 0
@@ -97,14 +101,11 @@ class FileEncodingConverter:
                 else:
                     errors += 1
             elif result and result[0].lower() == 'utf-8':
-                print(f"[건너뜀] {file_path.name}: 이미 UTF-8")
+                logger.info(f"{file_path.name}: 이미 UTF-8")
                 already_utf8 += 1
             else:
                 errors += 1
 
-        print(f"\n=== 완료 ===")
-        print(f"변환됨: {converted}개")
-        print(f"이미 UTF-8: {already_utf8}개")
-        print(f"오류: {errors}개")
+        logger.info(f"변환 완료: 변환됨 {converted}개, 이미 UTF-8 {already_utf8}개, 오류 {errors}개")
 
         return {"converted": converted, "already_utf8": already_utf8, "errors": errors}

@@ -255,7 +255,7 @@ class BaseReportService(ABC):
         try:
             excel_file = pd.ExcelFile(self.excel_path)
         except Exception as load_err:
-            print(f"⚠️ Failed to open Excel file: {load_err}")
+            self.logger.warning(f"Failed to open Excel file: {load_err}")
             return {}
 
         # Load all sheets (시트 하나가 실패해도 나머지 시트는 계속 처리)
@@ -277,7 +277,7 @@ class BaseReportService(ABC):
 
                 existing_data[sheet_name] = df
             except Exception as sheet_err:
-                print(f"⚠️ Failed to read sheet '{sheet_name}', skipping: {sheet_err}")
+                self.logger.warning(f"Failed to read sheet '{sheet_name}', skipping: {sheet_err}")
                 continue
 
         try:
@@ -297,7 +297,7 @@ class BaseReportService(ABC):
                         if child and parent:
                             relation_map[child] = parent
         except Exception as e:
-            print(f"⚠️ Error loading relation map from Excel: {e}")
+            self.logger.warning(f"Error loading relation map from Excel: {e}")
             
         return relation_map
 

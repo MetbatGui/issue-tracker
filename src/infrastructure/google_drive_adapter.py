@@ -70,7 +70,7 @@ class GoogleDriveAdapter(StoragePort):
                 creds.refresh(Request())
             else:
                 self.logger.info("🔐 구글 드라이브 인증 시작...")
-                print("브라우저에서 인증을 완료해주세요.")
+                self.logger.info("브라우저에서 인증을 완료해주세요.")
                 flow = InstalledAppFlow.from_client_secrets_file(
                     self.credentials_path, self.SCOPES
                 )
