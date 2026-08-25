@@ -87,17 +87,17 @@ class DualIncreaseService(BaseReportService):
         """XML 파일들을 파싱해 유상/무상 결정으로 분리한 뒤, 각 서비스의 DB에 반영하고
         각 서비스의 엑셀을 재구성합니다.
         """
-        print("\n" + "=" * 50)
-        print("📊 유무상증자 XML 파싱 및 DB 반영")
-        print("=" * 50)
+        self.logger.info("\n" + "=" * 50)
+        self.logger.info("유무상증자 XML 파싱 및 DB 반영")
+        self.logger.info("=" * 50)
 
         xml_files = glob.glob(str(self.xml_directory / "*.xml"))
 
         if not xml_files:
-            print("❌ 처리할 XML 파일이 없습니다.")
+            self.logger.warning("처리할 XML 파일이 없습니다.")
             return 0
 
-        print(f"📂 {len(xml_files)}개의 XML 파일을 처리합니다...")
+        self.logger.info(f"{len(xml_files)}개의 XML 파일을 처리합니다...")
 
         # 관계 맵 로드 (유상/무상 DB 기준)
         base_map = self.get_relation_map()
@@ -119,7 +119,7 @@ class DualIncreaseService(BaseReportService):
             if bonus and not bonus.is_limited_liability_company():
                 bonus_decisions.append(bonus)
 
-        print(f"✅ 파싱 완료: 유상분 {len(capital_decisions)}건, 무상분 {len(bonus_decisions)}건")
+        self.logger.info(f"파싱 완료: 유상분 {len(capital_decisions)}건, 무상분 {len(bonus_decisions)}건")
 
         if capital_decisions:
             self.capital_service.repository.upsert(capital_decisions)
@@ -152,9 +152,7 @@ class DualIncreaseService(BaseReportService):
 
     def full_update(self, start_date: str = "20200101", end_date: str = None) -> LocalUpdateResult:
         """전체 업데이트 워크플로우를 실행합니다."""
-        print("\n" + "🚀" * 25)
-        print(" " * 10 + "유무상증자 데이터 전체 업데이트")
-        print("🚀" * 25 + "\n")
+        self.logger.info("유무상증자 전체 업데이트 시작")
 
         downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_dual_increase_reports,
@@ -163,9 +161,7 @@ class DualIncreaseService(BaseReportService):
         )
 
         result = self._result_after_collection(downloaded_files, relation_map)
-        print("\n" + "🎉" * 25)
-        print(" " * 15 + "전체 업데이트 완료!")
-        print("🎉" * 25 + "\n")
+        self.logger.info("유무상증자 전체 업데이트 완료")
         return result
 
     def daily_update(self, days_back: int = 1) -> LocalUpdateResult:
@@ -175,14 +171,12 @@ class DualIncreaseService(BaseReportService):
         """
         from datetime import datetime, timedelta
 
-        print("\n" + "📅" * 25)
-        print(" " * 10 + f"유무상증자 데이터 Daily 업데이트")
-        print("📅" * 25 + "\n")
+        self.logger.info("유무상증자 일일 업데이트 시작")
 
         today = datetime.now()
         start_date = (today - timedelta(days=days_back)).strftime("%Y%m%d")
 
-        print(f"📆 수집 기간: {start_date} ~ Today")
+        self.logger.info(f"수집 기간: {start_date} ~ Today")
 
         downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_dual_increase_reports,
@@ -191,7 +185,5 @@ class DualIncreaseService(BaseReportService):
         )
 
         result = self._result_after_collection(downloaded_files, relation_map)
-        print("\n" + "✨" * 25)
-        print(" " * 10 + "유무상증자 Daily 업데이트 완료")
-        print("✨" * 25 + "\n")
+        self.logger.info("유무상증자 일일 업데이트 완료")
         return result

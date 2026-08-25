@@ -72,17 +72,17 @@ class BondWithWarrantService(BaseReportService):
 
     def parse_and_export_to_excel(self, relation_map: dict = None, export: bool = True) -> int:
         """XML 파일들을 파싱해 DB에 반영한 뒤, DB 전체로 엑셀을 재구성합니다."""
-        print("\n" + "=" * 50)
-        print("📊 XML 파싱 및 DB 반영")
-        print("=" * 50)
+        self.logger.info("\n" + "=" * 50)
+        self.logger.info("📊 XML 파싱 및 DB 반영")
+        self.logger.info("=" * 50)
 
         xml_files = glob.glob(str(self.xml_directory / "*.xml"))
 
         if not xml_files:
-            print("❌ 처리할 XML 파일이 없습니다.")
+            self.logger.warning("처리할 XML 파일이 없습니다.")
             return 0
 
-        print(f"📂 {len(xml_files)}개의 XML 파일을 처리합니다...")
+        self.logger.info(f"{len(xml_files)}개의 XML 파일을 처리합니다...")
 
         # 관계 맵 로드 (DB 기준)
         base_map = self.get_relation_map()
@@ -96,11 +96,11 @@ class BondWithWarrantService(BaseReportService):
             if decision:
                 decisions.append(decision)
 
-        print(f"✅ {len(decisions)}건의 데이터를 파싱했습니다.")
+        self.logger.info(f"{len(decisions)}건의 데이터를 파싱했습니다.")
 
         if decisions:
             self.repository.upsert(decisions)
-            print(f"💾 DB 반영 완료: {len(decisions)}건")
+            self.logger.info(f"DB 반영 완료: {len(decisions)}건")
 
         return self.export_to_excel() if export else len(decisions)
 
@@ -128,7 +128,7 @@ class BondWithWarrantService(BaseReportService):
         decisions = self.repository.get_all()
 
         if not decisions:
-            print("[*] 저장할 데이터가 없습니다.")
+            self.logger.warning("저장할 데이터가 없습니다.")
             return 0
 
         # 최초공시일 계산 (parent_rcp_no 체인을 따라가는 파생값이라 DB에는 저장하지 않고 매번 계산)
@@ -143,7 +143,7 @@ class BondWithWarrantService(BaseReportService):
         start_date = end_date - timedelta(days=days)
         start_str = start_date.strftime("%Y%m%d")
 
-        print(f"[*] Daily 업데이트 시작: {start_str} ~")
+        self.logger.info(f"신주인수권부사채 일일 업데이트 시작: {start_str} ~")
 
         downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_bond_with_warrant_reports,
@@ -154,7 +154,7 @@ class BondWithWarrantService(BaseReportService):
 
     def full_update(self, start_date: str = "20200101") -> LocalUpdateResult:
         """전체 업데이트"""
-        print(f"[*] 전체 업데이트 시작: {start_date} ~")
+        self.logger.info(f"신주인수권부사채 전체 업데이트 시작: {start_date} ~")
 
         downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_bond_with_warrant_reports,

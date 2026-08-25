@@ -169,7 +169,7 @@ def _demo() -> None:
     assert [s.success for s in result.steps] == [True, False, True]
     assert result.all_succeeded is False
     assert [s.name for s in result.failed_steps] == ["B"]
-    print("OK: daily_orchestration_service self-check passed")
+    logger.info("daily_orchestration_service self-check passed")
 
 
 if __name__ == "__main__":

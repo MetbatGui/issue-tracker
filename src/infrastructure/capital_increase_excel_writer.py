@@ -10,6 +10,7 @@ import pandas as pd
 
 from ..domain import CapitalIncreaseDecision
 from .excel_utils import apply_auto_column_width
+from ..logger import get_logger
 
 
 __all__ = ["CapitalIncreaseExcelWriter"]
@@ -54,6 +55,7 @@ class CapitalIncreaseExcelWriter:
             output_path: 엑셀 파일 저장 경로
         """
         self.output_path = Path(output_path)
+        self.logger = get_logger(self.__class__.__name__)
 
     @staticmethod
     def _format_date(date_obj) -> str:
@@ -132,9 +134,9 @@ class CapitalIncreaseExcelWriter:
                 # 컬럼 너비 자동 조정
                 apply_auto_column_width(writer.sheets[sheet_name])
                 
-                print(f"  [{sheet_name}] 시트: {len(year_df)}건")
+                self.logger.info(f"[{sheet_name}] 시트: {len(year_df)}건")
 
-        print(f"\n[SUCCESS] 엑셀 생성 완료: {self.output_path}")
-        print(f"[INFO] 총 {len(df)}건의 데이터가 {len(years)}개 시트에 저장되었습니다.")
-        print(f"[INFO] 생성된 시트: {', '.join([str(int(y)) for y in years])}")
+        self.logger.info(f"엑셀 생성 완료: {self.output_path}")
+        self.logger.info(f"총 {len(df)}건의 데이터가 {len(years)}개 시트에 저장되었습니다.")
+        self.logger.info(f"생성된 시트: {', '.join([str(int(y)) for y in years])}")
 

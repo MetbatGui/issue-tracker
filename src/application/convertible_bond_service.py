@@ -81,18 +81,18 @@ class ConvertibleBondService(BaseReportService):
 
     def parse_and_export_to_excel(self, relation_map: dict = None, export: bool = True) -> int:
         """XML 파일들을 파싱해 DB에 반영한 뒤, DB 전체로 엑셀을 재구성합니다."""
-        print("\n" + "=" * 50)
-        print("📊 XML 파싱 및 DB 반영")
-        print("=" * 50)
+        self.logger.info("\n" + "=" * 50)
+        self.logger.info("📊 XML 파싱 및 DB 반영")
+        self.logger.info("=" * 50)
 
         # XML 파일 목록 가져오기
         xml_files = glob.glob(str(self.xml_directory / "*.xml"))
 
         if not xml_files:
-            print("❌ 처리할 XML 파일이 없습니다.")
+            self.logger.warning("처리할 XML 파일이 없습니다.")
             return 0
 
-        print(f"📂 {len(xml_files)}개의 XML 파일을 처리합니다...")
+        self.logger.info(f"{len(xml_files)}개의 XML 파일을 처리합니다...")
 
         # 관계 맵 로드 (DB 기준)
         base_map = self.get_relation_map()
@@ -107,11 +107,11 @@ class ConvertibleBondService(BaseReportService):
             if decision:
                 decisions.append(decision)
 
-        print(f"✅ {len(decisions)}건의 데이터를 파싱했습니다.")
+        self.logger.info(f"{len(decisions)}건의 데이터를 파싱했습니다.")
 
         if decisions:
             self.repository.upsert(decisions)
-            print(f"💾 DB 반영 완료: {len(decisions)}건")
+            self.logger.info(f"DB 반영 완료: {len(decisions)}건")
 
         return self.export_to_excel() if export else len(decisions)
 
@@ -139,7 +139,7 @@ class ConvertibleBondService(BaseReportService):
         decisions = self.repository.get_all()
 
         if not decisions:
-            print("⚠️ 저장할 데이터가 없습니다.")
+            self.logger.warning("저장할 데이터가 없습니다.")
             return 0
 
         # 최초공시일 계산 (parent_rcp_no 체인을 따라가는 파생값이라 DB에는 저장하지 않고 매번 계산)
@@ -150,9 +150,7 @@ class ConvertibleBondService(BaseReportService):
 
     def full_update(self, start_date: str = "20200101", end_date: str = None) -> LocalUpdateResult:
         """전체 업데이트 워크플로우를 실행합니다."""
-        print("\n" + "🚀" * 25)
-        print(" " * 10 + "전환사채 데이터 전체 업데이트")
-        print("🚀" * 25 + "\n")
+        self.logger.info("전환사채 전체 업데이트 시작")
 
         downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_convertible_bond_reports,
@@ -161,9 +159,7 @@ class ConvertibleBondService(BaseReportService):
         )
 
         result = self._result_after_collection(downloaded_files, relation_map)
-        print("\n" + "🎉" * 25)
-        print(" " * 15 + "전체 업데이트 완료!")
-        print("🎉" * 25 + "\n")
+        self.logger.info("전환사채 전체 업데이트 완료")
         return result
 
     def daily_update(self, days_back: int = 30) -> LocalUpdateResult:
@@ -173,15 +169,13 @@ class ConvertibleBondService(BaseReportService):
         """
         from datetime import datetime, timedelta
 
-        print("\n" + "📅" * 25)
-        print(" " * 10 + f"전환사채 데이터 Daily 업데이트")
-        print("📅" * 25 + "\n")
+        self.logger.info("전환사채 일일 업데이트 시작")
 
         # 날짜 계산
         today = datetime.now()
         start_date = (today - timedelta(days=days_back)).strftime("%Y%m%d")
 
-        print(f"📆 수집 기간: {start_date} ~ Today")
+        self.logger.info(f"수집 기간: {start_date} ~ Today")
 
         downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_convertible_bond_reports,
@@ -189,8 +183,6 @@ class ConvertibleBondService(BaseReportService):
             skip_if_no_new_files=True
         )
 
-        print("\n" + "🎉" * 25)
-        print(" " * 15 + "Daily 업데이트 완료!")
         result = self._result_after_collection(downloaded_files, relation_map)
-        print("🎉" * 25 + "\n")
+        self.logger.info("전환사채 일일 업데이트 완료")
         return result
