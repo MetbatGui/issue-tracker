@@ -4,6 +4,7 @@
 daily_update()를 순차 실행하되, 한 스텝의 실패가 나머지 스텝을 막지 않도록 격리합니다.
 """
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Callable, List
 
 from .base_report_service import BaseReportService
@@ -12,7 +13,39 @@ from ..logger import get_logger
 logger = get_logger("DailyOrchestrationService")
 
 
-__all__ = ["OrchestrationStep", "StepResult", "DailyOrchestrationResult", "DailyOrchestrationService"]
+__all__ = [
+    "SyncTarget",
+    "LocalUpdateResult",
+    "OrchestrationStep",
+    "StepResult",
+    "DailyOrchestrationResult",
+    "DailyOrchestrationService",
+]
+
+
+@dataclass(frozen=True)
+class SyncTarget:
+    """한 DB SSOT와 여기서 생성되는 Excel 산출물의 동기화 단위."""
+
+    database_path: Path
+    excel_path: Path
+    export_excel: Callable[[], int | None]
+    upload_excel: Callable[[], None]
+    upload_database: Callable[[], None]
+
+
+@dataclass
+class LocalUpdateResult:
+    """서비스의 로컬 수집·DB 반영 결과.
+
+    외부 업로드는 수행하지 않고, 오케스트레이터가 사용할 동기화 대상만 반환한다.
+    """
+
+    targets: List[SyncTarget] = field(default_factory=list)
+
+    @classmethod
+    def empty(cls) -> "LocalUpdateResult":
+        return cls()
 
 
 @dataclass
@@ -32,6 +65,7 @@ class StepResult:
     name: str
     success: bool
     error: str = ""
+    local_update: LocalUpdateResult = field(default_factory=LocalUpdateResult.empty)
 
 
 @dataclass
@@ -46,6 +80,16 @@ class DailyOrchestrationResult:
     @property
     def failed_steps(self) -> List[StepResult]:
         return [s for s in self.steps if not s.success]
+
+    @property
+    def sync_targets(self) -> List[SyncTarget]:
+        """성공한 스텝의 동기화 대상을 DB 경로 기준으로 중복 제거해 반환한다."""
+        targets_by_database = {}
+        for step in self.steps:
+            if step.success:
+                for target in step.local_update.targets:
+                    targets_by_database[target.database_path] = target
+        return list(targets_by_database.values())
 
 
 class DailyOrchestrationService:
@@ -66,13 +110,26 @@ class DailyOrchestrationService:
             logger.info(f">>> [{i}/{total}] {step.name} 업데이트 시작")
             try:
                 service = step.factory()
-                service.daily_update(days)
-                results.append(StepResult(step.name, success=True))
+                local_update = service.daily_update(days)
+                if local_update is None:
+                    local_update = LocalUpdateResult.empty()
+                results.append(StepResult(step.name, success=True, local_update=local_update))
             except Exception as e:
                 logger.error(f"[{step.name}] 실패: {e}", exc_info=True)
                 results.append(StepResult(step.name, success=False, error=str(e)))
 
-        return DailyOrchestrationResult(results)
+        result = DailyOrchestrationResult(results)
+        targets = result.sync_targets
+
+        # 모든 로컬 DB 반영이 끝난 뒤 산출물을 생성하고, 산출물→DB 순서로 동기화한다.
+        for target in targets:
+            target.export_excel()
+        for target in targets:
+            target.upload_excel()
+        for target in targets:
+            target.upload_database()
+
+        return result
 
 
 def _demo() -> None:
