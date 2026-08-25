@@ -26,3 +26,7 @@ class SqliteStorageSession:
 
     def persist(self) -> bool:
         return self.storage.put_file(self.working_path, self.storage_path)
+
+    def close(self) -> None:
+        """작업이 끝난 뒤 임시 SQLite 작업 사본을 제거한다."""
+        self.working_path.unlink(missing_ok=True)

@@ -138,12 +138,14 @@ class DailyOrchestrationService:
     def _run_updates(self, update_service: Callable[[BaseReportService], LocalUpdateResult]) -> DailyOrchestrationResult:
         """수집·DB 반영 후 export와 원격 동기화까지 한 실행 흐름으로 처리한다."""
         results: List[StepResult] = []
+        services_to_close = []
         total = len(self.steps)
 
         for i, step in enumerate(self.steps, 1):
             logger.info(f">>> [{i}/{total}] {step.name} 업데이트 시작")
             try:
                 service = step.factory()
+                services_to_close.append(service)
                 local_update = update_service(service)
                 if local_update is None:
                     local_update = LocalUpdateResult.empty()
@@ -155,7 +157,16 @@ class DailyOrchestrationService:
         result = DailyOrchestrationResult(results)
         targets = result.sync_targets
 
-        result.sync_results = self.finalize_sync_targets(targets)
+        try:
+            result.sync_results = self.finalize_sync_targets(targets)
+        finally:
+            for service in reversed(services_to_close):
+                close = getattr(service, "close", None)
+                if callable(close):
+                    try:
+                        close()
+                    except Exception as error:
+                        logger.error("서비스 리소스 정리 실패: %s", error, exc_info=True)
 
         return result
 

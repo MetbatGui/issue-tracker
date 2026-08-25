@@ -174,3 +174,29 @@ def test_orchestrator_returns_upload_failure_in_result_without_skipping_db_uploa
     assert len(result.failed_sync_results) == 1
     assert result.failed_sync_results[0].excel_upload_error == "Drive unavailable"
     assert events == ["export:A", "upload-excel:A", "upload-db:A"]
+
+
+def test_orchestrator_releases_service_resources_after_sync():
+    events = []
+
+    class _ClosableService:
+        def daily_update(self, days):
+            events.append("collect")
+            return LocalUpdateResult([
+                SyncTarget(
+                    database_path=Path("A.db"),
+                    excel_path=Path("A.xlsx"),
+                    export_excel=lambda: events.append("export"),
+                    upload_excel=lambda: events.append("upload-excel"),
+                    upload_database=lambda: events.append("upload-db"),
+                )
+            ])
+
+        def close(self):
+            events.append("close")
+
+    DailyOrchestrationService([
+        OrchestrationStep("A", _ClosableService),
+    ]).run(days=1)
+
+    assert events == ["collect", "export", "upload-excel", "upload-db", "close"]

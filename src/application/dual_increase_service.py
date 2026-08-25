@@ -148,6 +148,12 @@ class DualIncreaseService(BaseReportService):
             )
         )
 
+    def close(self) -> None:
+        """위임한 유상·무상 서비스의 SQLite 작업 사본도 함께 정리한다."""
+        self.capital_service.close()
+        self.bonus_service.close()
+        super().close()
+
     def _result_after_collection(self, downloaded_files: List[str], relation_map: dict) -> LocalUpdateResult:
         if downloaded_files:
             changed_count = self.parse_and_export_to_excel(relation_map, export=False)

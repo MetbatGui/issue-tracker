@@ -406,3 +406,12 @@ class BaseReportService(ABC):
             # 찾은 root_date를 설정 (불변 객체이므로 교체)
             if root_date:
                 decisions[i] = dataclasses.replace(decision, original_disclosure_date=root_date)
+
+    def close(self) -> None:
+        """열린 SQLite 연결과 임시 작업 사본을 정리한다."""
+        repository = getattr(self, "repository", None)
+        if repository is not None:
+            repository.close()
+        database_session = getattr(self, "database_session", None)
+        if database_session is not None:
+            database_session.close()

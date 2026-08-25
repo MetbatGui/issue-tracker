@@ -25,3 +25,11 @@ def test_docker_artifacts_are_forced_to_lf_checkout():
     assert "docker/*.sh text eol=lf" in attributes
     assert "docker/crontab text eol=lf" in attributes
     assert "docker/Dockerfile text eol=lf" in attributes
+
+
+def test_cron_allows_google_oauth_token_refresh():
+    compose = (ROOT / "docker" / "docker-compose.yml").read_text(encoding="utf-8")
+
+    # OAuth refresh token은 실행 중 갱신되므로 credentials 디렉터리는 쓰기 가능해야 한다.
+    assert "- ../secrets:/app/secrets\n" in compose
+    assert "- ../secrets:/app/secrets:ro" not in compose
