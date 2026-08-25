@@ -160,6 +160,10 @@ class BonusSharesService(BaseReportService):
         self.excel_writer.write(decisions)
         return len(decisions)
 
+    def export_update(self) -> LocalUpdateResult:
+        """SSOT DB로 Excel을 재생성하고 오케스트레이터에 동기화 대상을 반환한다."""
+        return self._local_update_result() if self.repository.get_all() else LocalUpdateResult.empty()
+
     def full_update(self, start_date: str = "20200101", end_date: str = None) -> LocalUpdateResult:
         """전체 업데이트 워크플로우를 실행합니다."""
         self.logger.info("무상증자 전체 업데이트 시작")
