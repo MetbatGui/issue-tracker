@@ -1,5 +1,6 @@
 """일일 오케스트레이션의 로컬 처리·내보내기·동기화 순서를 검증한다."""
 from pathlib import Path
+from datetime import datetime
 
 from src.application.daily_orchestration_service import (
     DailyOrchestrationService,
@@ -128,6 +129,22 @@ def test_orchestrator_runs_db_based_export_through_sync_flow():
 
     assert result.all_succeeded
     assert events == ["select-db", "export:A", "upload-excel:A", "upload-db:A"]
+
+
+def test_orchestrator_passes_injected_clock_to_daily_service():
+    received = []
+
+    class _ClockAwareService:
+        def daily_update(self, days, today=None):
+            received.append((days, today))
+            return LocalUpdateResult.empty()
+
+    today = datetime(2025, 1, 1, 9, 0, 0)
+    DailyOrchestrationService([
+        OrchestrationStep("A", _ClockAwareService),
+    ]).run(days=3, today=today)
+
+    assert received == [(3, today)]
 
 
 def test_orchestrator_returns_upload_failure_in_result_without_skipping_db_upload():

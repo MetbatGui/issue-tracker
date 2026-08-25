@@ -118,12 +118,14 @@ class DailyOrchestrationService:
     def __init__(self, steps: List[OrchestrationStep]):
         self.steps = steps
 
-    def run(self, days: int) -> DailyOrchestrationResult:
+    def run(self, days: int, today=None) -> DailyOrchestrationResult:
         """모든 스텝의 daily_update(days)를 순차 실행합니다.
 
         스텝 하나가 예외를 던져도 나머지 스텝은 계속 실행됩니다.
         """
-        return self._run_updates(lambda service: service.daily_update(days))
+        if today is None:
+            return self._run_updates(lambda service: service.daily_update(days))
+        return self._run_updates(lambda service: service.daily_update(days, today=today))
 
     def run_full(self, start_date: str) -> DailyOrchestrationResult:
         """모든 스텝의 full_update(start_date)를 순차 실행합니다."""

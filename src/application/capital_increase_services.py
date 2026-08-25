@@ -178,7 +178,7 @@ class CapitalIncreaseService(BaseReportService):
         self.logger.info("유상증자 전체 업데이트 완료")
         return result
 
-    def daily_update(self, days_back: int = 1) -> LocalUpdateResult:
+    def daily_update(self, days_back: int = 1, today=None) -> LocalUpdateResult:
         """일일 업데이트 워크플로우를 실행합니다.
 
         최근 N일간의 데이터를 다운로드하고 (이전 로직과 달리) 전체 데이터 재구성을 통해 엑셀을 갱신합니다.
@@ -188,7 +188,7 @@ class CapitalIncreaseService(BaseReportService):
         self.logger.info("유상증자 일일 업데이트 시작")
 
         # 날짜 계산
-        today = datetime.now()
+        today = today or datetime.now()
         start_date = (today - timedelta(days=days_back)).strftime("%Y%m%d")
 
         self.logger.info(f"수집 기간: {start_date} ~ Today")
