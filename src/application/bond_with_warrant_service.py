@@ -6,6 +6,7 @@ DB(SQLite)가 SSOT입니다: XML 파싱 결과는 BondWithWarrantSqliteRepositor
 Excel은 매 실행마다 DB 전체를 읽어 재구성되는 산출물입니다.
 """
 import glob
+from pathlib import Path
 from typing import List, Optional
 from datetime import datetime, timedelta
 
@@ -14,6 +15,7 @@ from ..domain import BondWithWarrantDecision
 from ..infrastructure.bond_with_warrant_xml_parser import BondWithWarrantXmlParser
 from ..infrastructure.bond_with_warrant_excel_writer import BondWithWarrantExcelWriter
 from ..infrastructure.bond_with_warrant_sqlite_repository import BondWithWarrantSqliteRepository
+from .daily_orchestration_service import LocalUpdateResult, SyncTarget
 
 
 __all__ = ["BondWithWarrantService"]
@@ -68,7 +70,7 @@ class BondWithWarrantService(BaseReportService):
 
         return self.xml_parser.parse(file_path, rcept_no=rcept_no, parent_rcp_no=parent_rcp)
 
-    def parse_and_export_to_excel(self, relation_map: dict = None) -> int:
+    def parse_and_export_to_excel(self, relation_map: dict = None, export: bool = True) -> int:
         """XML 파일들을 파싱해 DB에 반영한 뒤, DB 전체로 엑셀을 재구성합니다."""
         print("\n" + "=" * 50)
         print("📊 XML 파싱 및 DB 반영")
@@ -100,7 +102,19 @@ class BondWithWarrantService(BaseReportService):
             self.repository.upsert(decisions)
             print(f"💾 DB 반영 완료: {len(decisions)}건")
 
-        return self.export_to_excel()
+        return self.export_to_excel() if export else len(decisions)
+
+    def _local_update_result(self) -> LocalUpdateResult:
+        database_path = Path(self.repository.db_path)
+        return LocalUpdateResult(targets=[
+            SyncTarget(
+                database_path=database_path,
+                excel_path=self.excel_path,
+                export_excel=self.export_to_excel,
+                upload_excel=lambda: self._upload_file_to_google_drive(self.excel_path),
+                upload_database=lambda: self._upload_file_to_google_drive(database_path),
+            )
+        ])
 
     def export_to_excel(self) -> int:
         """DB에 저장된 전체 데이터를 엑셀로 재구성합니다."""
@@ -116,7 +130,7 @@ class BondWithWarrantService(BaseReportService):
         self.excel_writer.write(decisions)
         return len(decisions)
 
-    def daily_update(self, days: int = 30) -> None:
+    def daily_update(self, days: int = 30) -> LocalUpdateResult:
         """일일 업데이트 (최근 N일)"""
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days)
@@ -124,17 +138,23 @@ class BondWithWarrantService(BaseReportService):
 
         print(f"[*] Daily 업데이트 시작: {start_str} ~")
 
-        self.run_pipeline(
+        downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_bond_with_warrant_reports,
             start_str,
             skip_if_no_new_files=True
         )
+        return LocalUpdateResult.empty() if not downloaded_files else (
+            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
+        )
 
-    def full_update(self, start_date: str = "20200101") -> None:
+    def full_update(self, start_date: str = "20200101") -> LocalUpdateResult:
         """전체 업데이트"""
         print(f"[*] 전체 업데이트 시작: {start_date} ~")
 
-        self.run_pipeline(
+        downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_bond_with_warrant_reports,
             start_date
+        )
+        return LocalUpdateResult.empty() if not downloaded_files else (
+            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
         )

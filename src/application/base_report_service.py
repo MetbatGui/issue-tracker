@@ -219,13 +219,12 @@ class BaseReportService(ABC):
         start_date: str,
         end_date: Optional[str] = None,
         skip_if_no_new_files: bool = False
-    ) -> None:
+    ) -> Tuple[List[str], dict]:
         """공통 실행 파이프라인
 
         1. 다운로드 (이력 추적 포함)
         2. 인코딩 변환
-        3. 파싱 및 엑셀 저장
-        4. 구글 드라이브 업로드
+        3. 로컬 DB 반영을 위해 수집 결과 반환
 
         Args:
             skip_if_no_new_files: True이면 신규 다운로드 파일이 없을 때 이후 단계를 건너뜁니다.
@@ -238,16 +237,12 @@ class BaseReportService(ABC):
 
         if skip_if_no_new_files and not downloaded_files:
             self.logger.info("새로운 공시가 없습니다.")
-            return
+            return downloaded_files, relation_map
 
         # 2. 인코딩 변환
         self._convert_downloaded_files(downloaded_files)
         
-        # 3. 파싱 및 저장 (relation_map을 인자로 전달하여 최신 관계 정보 반영)
-        self.parse_and_export_to_excel(relation_map=relation_map)
-        
-        # 4. 구글 드라이브 업로드
-        self._upload_to_google_drive()
+        return downloaded_files, relation_map
 
     def _load_map_from_excel(self) -> dict:
         """Load (rcept_no -> parent_rcp_no) map from existing Excel file."""
@@ -308,11 +303,15 @@ class BaseReportService(ABC):
 
     def _upload_to_google_drive(self) -> None:
         """Upload Excel file to Google Drive."""
+        self._upload_file_to_google_drive(self.excel_path)
+
+    def _upload_file_to_google_drive(self, file_path: Path) -> None:
+        """지정한 로컬 산출물을 Google Drive에 업로드한다."""
         if not self.google_drive or not self.google_drive_folder_id:
             return
         
-        if not self.excel_path.exists():
-            self.logger.warning("No Excel file to upload.")
+        if not file_path.exists():
+            self.logger.warning(f"No file to upload: {file_path}")
             return
         
         try:
@@ -321,9 +320,9 @@ class BaseReportService(ABC):
             self.logger.info("=" * 50)
             
             file_id = self.google_drive.upload_file(
-                self.excel_path,
+                file_path,
                 self.google_drive_folder_id,
-                self.excel_path.name
+                file_path.name
             )
             self.logger.info(f"Upload Complete (File ID: {file_id})")
         except Exception as e:

@@ -18,6 +18,7 @@ from ..infrastructure import DualIncreaseXmlParser
 from .base_report_service import BaseReportService
 from .capital_increase_services import CapitalIncreaseService
 from .bonus_services import BonusSharesService
+from .daily_orchestration_service import LocalUpdateResult
 
 
 # UTF-8 인코딩 설정 (윈도우 콘솔용)
@@ -82,7 +83,7 @@ class DualIncreaseService(BaseReportService):
         merged.update(self.bonus_service.get_relation_map())
         return merged
 
-    def parse_and_export_to_excel(self, relation_map: dict = None) -> int:
+    def parse_and_export_to_excel(self, relation_map: dict = None, export: bool = True) -> int:
         """XML 파일들을 파싱해 유상/무상 결정으로 분리한 뒤, 각 서비스의 DB에 반영하고
         각 서비스의 엑셀을 재구성합니다.
         """
@@ -125,33 +126,41 @@ class DualIncreaseService(BaseReportService):
         if bonus_decisions:
             self.bonus_service.repository.upsert(bonus_decisions)
 
-        self.capital_service.export_to_excel()
-        self.bonus_service.export_to_excel()
+        if export:
+            self.capital_service.export_to_excel()
+            self.bonus_service.export_to_excel()
 
         return len(capital_decisions) + len(bonus_decisions)
 
-    def _upload_to_google_drive(self) -> None:
-        """유상/무상 각각의 메인 파일 업로드를 해당 서비스에 위임합니다."""
-        self.capital_service._upload_to_google_drive()
-        self.bonus_service._upload_to_google_drive()
+    def _local_update_result(self) -> LocalUpdateResult:
+        return LocalUpdateResult(
+            targets=(
+                self.capital_service._local_update_result().targets
+                + self.bonus_service._local_update_result().targets
+            )
+        )
 
-    def full_update(self, start_date: str = "20200101", end_date: str = None) -> None:
+    def full_update(self, start_date: str = "20200101", end_date: str = None) -> LocalUpdateResult:
         """전체 업데이트 워크플로우를 실행합니다."""
         print("\n" + "🚀" * 25)
         print(" " * 10 + "유무상증자 데이터 전체 업데이트")
         print("🚀" * 25 + "\n")
 
-        self.run_pipeline(
+        downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_dual_increase_reports,
             start_date,
             end_date
         )
 
+        result = LocalUpdateResult.empty() if not downloaded_files else (
+            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
+        )
         print("\n" + "🎉" * 25)
         print(" " * 15 + "전체 업데이트 완료!")
         print("🎉" * 25 + "\n")
+        return result
 
-    def daily_update(self, days_back: int = 1) -> None:
+    def daily_update(self, days_back: int = 1) -> LocalUpdateResult:
         """일일 업데이트 워크플로우를 실행합니다.
 
         최근 N일간의 데이터를 다운로드하고 유상/무상 각 서비스의 DB/엑셀에 반영합니다.
@@ -167,12 +176,16 @@ class DualIncreaseService(BaseReportService):
 
         print(f"📆 수집 기간: {start_date} ~ Today")
 
-        self.run_pipeline(
+        downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_dual_increase_reports,
             start_date,
             skip_if_no_new_files=True
         )
 
+        result = LocalUpdateResult.empty() if not downloaded_files else (
+            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
+        )
         print("\n" + "✨" * 25)
         print(" " * 10 + "유무상증자 Daily 업데이트 완료")
         print("✨" * 25 + "\n")
+        return result
