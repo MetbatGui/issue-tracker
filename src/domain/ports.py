@@ -16,6 +16,16 @@ class StoragePort(ABC):
     외부 스토리지 시스템(구글 드라이브, AWS S3 등)과의 
     상호작용을 위한 포트 인터페이스입니다.
     """
+
+    @abstractmethod
+    def get_file(self, storage_path: Path) -> Optional[Path]:
+        """저장소 파일을 작업 사본으로 내려받습니다. 실패·부재 시 None을 반환합니다."""
+        pass
+
+    @abstractmethod
+    def put_file(self, local_path: Path, storage_path: Path) -> bool:
+        """작업 사본을 저장소에 원자적으로 반영합니다. 실패 시 False를 반환합니다."""
+        pass
     
     @abstractmethod
     def upload_file(

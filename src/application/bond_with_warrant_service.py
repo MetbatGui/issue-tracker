@@ -15,6 +15,7 @@ from ..domain import BondWithWarrantDecision
 from ..infrastructure.bond_with_warrant_xml_parser import BondWithWarrantXmlParser
 from ..infrastructure.bond_with_warrant_excel_writer import BondWithWarrantExcelWriter
 from ..infrastructure.bond_with_warrant_sqlite_repository import BondWithWarrantSqliteRepository
+from ..infrastructure.sqlite_storage_session import SqliteStorageSession
 from .daily_orchestration_service import LocalUpdateResult, SyncTarget
 
 
@@ -50,7 +51,8 @@ class BondWithWarrantService(BaseReportService):
 
         self.xml_parser = BondWithWarrantXmlParser()
         self.excel_writer = BondWithWarrantExcelWriter(str(self.excel_path))
-        self.repository = BondWithWarrantSqliteRepository(str(self.data_directory / "신주인수권부사채.db"))
+        self.database_session = SqliteStorageSession(self.source_storage, self.data_directory / "신주인수권부사채.db")
+        self.repository = BondWithWarrantSqliteRepository(str(self.database_session.working_path))
 
     def get_relation_map(self) -> dict:
         """DB에 저장된 parent_rcp_no 관계를 관계맵으로 반환합니다.
@@ -105,20 +107,30 @@ class BondWithWarrantService(BaseReportService):
         return self.export_to_excel() if export else len(decisions)
 
     def _local_update_result(self) -> LocalUpdateResult:
-        database_path = Path(self.repository.db_path)
+        database_path = self.database_session.storage_path
         return LocalUpdateResult(targets=[
             SyncTarget(
                 database_path=database_path,
                 excel_path=self.excel_path,
                 export_excel=self.export_to_excel,
                 upload_excel=lambda: self._upload_file_to_google_drive(self.excel_path),
-                upload_database=lambda: self._upload_file_to_google_drive(database_path),
+                upload_database=lambda: self._persist_and_upload_database(database_path),
             )
         ])
 
+    def _persist_and_upload_database(self, database_path: Path) -> None:
+        if not self.database_session.persist():
+            raise RuntimeError(f"SQLite SSOT 반영 실패: {database_path}")
+        self._upload_file_to_google_drive(database_path)
+
     def _result_after_collection(self, downloaded_files: List[str], relation_map: dict) -> LocalUpdateResult:
         if downloaded_files:
-            return self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
+            changed_count = self.parse_and_export_to_excel(relation_map, export=False)
+            if changed_count:
+                if not self.database_session.persist():
+                    raise RuntimeError("SQLite SSOT 반영 실패")
+                return self._local_update_result()
+            return LocalUpdateResult.empty()
         if not self.excel_path.exists() and self.repository.get_all():
             return self._local_update_result()
         return LocalUpdateResult.empty()

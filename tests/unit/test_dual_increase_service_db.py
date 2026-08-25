@@ -88,10 +88,14 @@ class TestNoDedicatedStorage:
         dual, standalone_capital, _ = services
 
         dual.capital_service.repository.upsert([_make_capital_decision("20240101000001")])
+        assert dual.capital_service.database_session.persist()
 
-        # dual이 쓴 데이터가 독립적으로 생성한 CapitalIncreaseService에서도 그대로 보여야 함
-        # (같은 DB 파일을 가리키고 있다는 뜻)
-        got = standalone_capital.repository.get_all()
+        refreshed_capital = CapitalIncreaseService(
+            data_directory=str(standalone_capital.data_directory), api_key="dummy-key", enable_google_drive=False,
+        )
+
+        # 새 세션이 source storage의 최신 DB 작업 사본을 읽는다.
+        got = refreshed_capital.repository.get_all()
         assert len(got) == 1
         assert got[0].rcept_no == "20240101000001"
 
@@ -104,10 +108,21 @@ class TestOrderIndependence:
 
         # CI가 자기 몫을 먼저 저장
         standalone_capital.repository.upsert([_make_capital_decision("20240101000001")])
+        assert standalone_capital.database_session.persist()
+        dual = DualIncreaseService(
+            data_directory=str(dual.data_directory),
+            capital_data_directory=str(standalone_capital.data_directory),
+            bonus_data_directory=str(dual.bonus_service.data_directory),
+            api_key="dummy-key", enable_google_drive=False,
+        )
         # Dual이 나중에 자기 몫(유무상증자에서 파생된 유상분)을 저장
         dual.capital_service.repository.upsert([_make_capital_decision("20240102000002")])
+        assert dual.capital_service.database_session.persist()
 
-        all_rows = {d.rcept_no for d in standalone_capital.repository.get_all()}
+        refreshed_capital = CapitalIncreaseService(
+            data_directory=str(standalone_capital.data_directory), api_key="dummy-key", enable_google_drive=False,
+        )
+        all_rows = {d.rcept_no for d in refreshed_capital.repository.get_all()}
         assert all_rows == {"20240101000001", "20240102000002"}
 
 
@@ -119,6 +134,13 @@ class TestGetRelationMap:
             _make_capital_decision("20240101000001"),
             _make_capital_decision("20240102000002", parent_rcp_no="20240101000001"),
         ])
+        assert standalone_capital.database_session.persist()
+        dual = DualIncreaseService(
+            data_directory=str(dual.data_directory),
+            capital_data_directory=str(standalone_capital.data_directory),
+            bonus_data_directory=str(standalone_bonus.data_directory),
+            api_key="dummy-key", enable_google_drive=False,
+        )
 
         relation_map = dual.get_relation_map()
 

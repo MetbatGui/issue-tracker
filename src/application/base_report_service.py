@@ -13,6 +13,7 @@ from ..infrastructure import (
     DartApiClient,
     FileEncodingConverter,
     GoogleDriveAdapter,
+    LocalFileStorageAdapter,
     DartHistoryScraper
 )
 from ..logger import get_logger
@@ -42,6 +43,7 @@ class BaseReportService(ABC):
         self.xml_directory = self.data_directory / "xml"
         self.excel_path = self.data_directory / excel_filename
         self.enable_google_drive = enable_google_drive
+        self.source_storage = LocalFileStorageAdapter()
         
         self.logger = get_logger(self.__class__.__name__)
         
