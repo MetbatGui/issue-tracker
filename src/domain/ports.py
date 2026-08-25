@@ -23,7 +23,7 @@ class StoragePort(ABC):
         file_path: Path, 
         folder_id: str,
         file_name: Optional[str] = None
-    ) -> str:
+    ) -> Optional[str]:
         """파일을 스토리지에 업로드합니다.
         
         Args:
@@ -32,10 +32,7 @@ class StoragePort(ABC):
             file_name: 업로드할 파일명 (None이면 원본 파일명 사용)
         
         Returns:
-            업로드된 파일의 ID 또는 URL
-        
-        Raises:
-            Exception: 업로드 실패 시
+            업로드된 파일의 ID 또는 URL. 실패 시 None.
         """
         pass
     

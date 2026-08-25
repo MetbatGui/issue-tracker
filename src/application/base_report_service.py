@@ -324,6 +324,8 @@ class BaseReportService(ABC):
                 self.google_drive_folder_id,
                 file_path.name
             )
+            if file_id is None:
+                raise RuntimeError(f"Google Drive upload failed: {file_path}")
             self.logger.info(f"Upload Complete (File ID: {file_id})")
         except Exception as e:
             self.logger.error(f"Upload Failed: {e}")
