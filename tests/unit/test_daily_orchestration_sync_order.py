@@ -71,3 +71,36 @@ def test_orchestrator_ignores_unchanged_services_for_export_and_upload():
         "upload-excel:changed",
         "upload-db:changed",
     ]
+
+
+def test_orchestrator_runs_full_update_before_exporting_and_uploading():
+    events = []
+
+    class _FullService(_FakeService):
+        def full_update(self, start_date):
+            self.events.append(f"full:{self.name}:{start_date}")
+            return LocalUpdateResult(
+                targets=[
+                    SyncTarget(
+                        database_path=Path(f"{self.name}.db"),
+                        excel_path=Path(f"{self.name}.xlsx"),
+                        export_excel=lambda: self.events.append(f"export:{self.name}"),
+                        upload_excel=lambda: self.events.append(f"upload-excel:{self.name}"),
+                        upload_database=lambda: self.events.append(f"upload-db:{self.name}"),
+                    )
+                ]
+            )
+
+    orchestrator = DailyOrchestrationService([
+        OrchestrationStep("A", lambda: _FullService("A", events)),
+    ])
+
+    result = orchestrator.run_full("20200101")
+
+    assert result.all_succeeded
+    assert events == [
+        "full:A:20200101",
+        "export:A",
+        "upload-excel:A",
+        "upload-db:A",
+    ]

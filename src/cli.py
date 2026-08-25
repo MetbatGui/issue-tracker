@@ -18,10 +18,22 @@ from .application import (
 from .logger import setup_logger, get_logger
 
 
-def _finalize_single_update(local_update) -> None:
-    """단일 서비스 CLI도 일괄 실행과 같은 export·동기화 순서를 사용한다."""
-    if local_update is not None:
-        DailyOrchestrationService.finalize_sync_targets(local_update.targets)
+def _run_single_daily(name, service, days: int):
+    return DailyOrchestrationService([
+        OrchestrationStep(name, lambda: service),
+    ]).run(days)
+
+
+def _run_single_full(name, service, start_date: str):
+    return DailyOrchestrationService([
+        OrchestrationStep(name, lambda: service),
+    ]).run_full(start_date)
+
+
+def _raise_if_failed(result) -> None:
+    if not result.all_succeeded:
+        failed_names = ", ".join(step.name for step in result.failed_steps)
+        raise RuntimeError(f"업데이트 실패: {failed_names}")
 
 
 def main():
@@ -167,9 +179,9 @@ def main():
             service = CapitalIncreaseService()
             
             if args.ci_command == "daily":
-                _finalize_single_update(service.daily_update(getattr(args, 'days', 1)))
+                _raise_if_failed(_run_single_daily("유상증자", service, getattr(args, 'days', 1)))
             elif args.ci_command == "full":
-                _finalize_single_update(service.full_update(getattr(args, 'start', '20200101')))
+                _raise_if_failed(_run_single_full("유상증자", service, getattr(args, 'start', '20200101')))
             elif args.ci_command == "export":
                 service.parse_and_export_to_excel()
             elif args.ci_command == "download":
@@ -186,9 +198,9 @@ def main():
             bonus_service = BonusSharesService()
             
             if args.bonus_command == "daily":
-                _finalize_single_update(bonus_service.daily_update(getattr(args, 'days', 1)))
+                _raise_if_failed(_run_single_daily("무상증자", bonus_service, getattr(args, 'days', 1)))
             elif args.bonus_command == "full":
-                _finalize_single_update(bonus_service.full_update(getattr(args, 'start', '20200101')))
+                _raise_if_failed(_run_single_full("무상증자", bonus_service, getattr(args, 'start', '20200101')))
             elif args.bonus_command == "export":
                 bonus_service.parse_and_export_to_excel()
             elif args.bonus_command == "download":
@@ -203,9 +215,9 @@ def main():
             service = ConvertibleBondService()
             
             if args.cb_command == "daily":
-                _finalize_single_update(service.daily_update(getattr(args, 'days', 1)))
+                _raise_if_failed(_run_single_daily("전환사채", service, getattr(args, 'days', 1)))
             elif args.cb_command == "full":
-                _finalize_single_update(service.full_update(getattr(args, 'start', '20200101')))
+                _raise_if_failed(_run_single_full("전환사채", service, getattr(args, 'start', '20200101')))
             elif args.cb_command == "export":
                 service.parse_and_export_to_excel()
             else:
@@ -218,9 +230,9 @@ def main():
             service = BondWithWarrantService(dart_api_key=None)  # API 키는 .env에서 로드
             
             if args.bw_command == "daily":
-                _finalize_single_update(service.daily_update(getattr(args, 'days', 1)))
+                _raise_if_failed(_run_single_daily("신주인수권부사채", service, getattr(args, 'days', 1)))
             elif args.bw_command == "full":
-                _finalize_single_update(service.full_update(getattr(args, 'start', '20200101')))
+                _raise_if_failed(_run_single_full("신주인수권부사채", service, getattr(args, 'start', '20200101')))
             elif args.bw_command == "export":
                 service.parse_and_export_to_excel()
             else:

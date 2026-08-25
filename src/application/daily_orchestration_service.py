@@ -103,6 +103,14 @@ class DailyOrchestrationService:
 
         스텝 하나가 예외를 던져도 나머지 스텝은 계속 실행됩니다.
         """
+        return self._run_updates(lambda service: service.daily_update(days))
+
+    def run_full(self, start_date: str) -> DailyOrchestrationResult:
+        """모든 스텝의 full_update(start_date)를 순차 실행합니다."""
+        return self._run_updates(lambda service: service.full_update(start_date))
+
+    def _run_updates(self, update_service: Callable[[BaseReportService], LocalUpdateResult]) -> DailyOrchestrationResult:
+        """수집·DB 반영 후 export와 원격 동기화까지 한 실행 흐름으로 처리한다."""
         results: List[StepResult] = []
         total = len(self.steps)
 
@@ -110,7 +118,7 @@ class DailyOrchestrationService:
             logger.info(f">>> [{i}/{total}] {step.name} 업데이트 시작")
             try:
                 service = step.factory()
-                local_update = service.daily_update(days)
+                local_update = update_service(service)
                 if local_update is None:
                     local_update = LocalUpdateResult.empty()
                 results.append(StepResult(step.name, success=True, local_update=local_update))
