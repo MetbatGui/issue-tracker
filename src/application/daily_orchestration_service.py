@@ -16,6 +16,7 @@ logger = get_logger("DailyOrchestrationService")
 __all__ = [
     "SyncTarget",
     "LocalUpdateResult",
+    "SyncResult",
     "OrchestrationStep",
     "StepResult",
     "DailyOrchestrationResult",
@@ -49,6 +50,20 @@ class LocalUpdateResult:
 
 
 @dataclass
+class SyncResult:
+    """동기화 대상 하나의 export·원격 업로드 실행 결과."""
+
+    target: SyncTarget
+    export_error: str = ""
+    excel_upload_error: str = ""
+    database_upload_error: str = ""
+
+    @property
+    def success(self) -> bool:
+        return not (self.export_error or self.excel_upload_error or self.database_upload_error)
+
+
+@dataclass
 class OrchestrationStep:
     """오케스트레이션 대상 스텝 하나.
 
@@ -72,14 +87,19 @@ class StepResult:
 class DailyOrchestrationResult:
     """DailyOrchestrationService.run()의 전체 실행 결과."""
     steps: List[StepResult] = field(default_factory=list)
+    sync_results: List[SyncResult] = field(default_factory=list)
 
     @property
     def all_succeeded(self) -> bool:
-        return all(s.success for s in self.steps)
+        return all(s.success for s in self.steps) and all(sync.success for sync in self.sync_results)
 
     @property
     def failed_steps(self) -> List[StepResult]:
         return [s for s in self.steps if not s.success]
+
+    @property
+    def failed_sync_results(self) -> List[SyncResult]:
+        return [sync for sync in self.sync_results if not sync.success]
 
     @property
     def sync_targets(self) -> List[SyncTarget]:
@@ -129,19 +149,37 @@ class DailyOrchestrationService:
         result = DailyOrchestrationResult(results)
         targets = result.sync_targets
 
-        self.finalize_sync_targets(targets)
+        result.sync_results = self.finalize_sync_targets(targets)
 
         return result
 
     @staticmethod
-    def finalize_sync_targets(targets: List[SyncTarget]) -> None:
-        """산출물을 생성한 뒤 Excel→DB 순서로 원격 동기화한다."""
-        for target in targets:
-            target.export_excel()
-        for target in targets:
-            target.upload_excel()
-        for target in targets:
-            target.upload_database()
+    def finalize_sync_targets(targets: List[SyncTarget]) -> List[SyncResult]:
+        """산출물 생성 후 Excel→DB 동기화를 수행하고 각 결과를 반환한다."""
+        results = [SyncResult(target) for target in targets]
+
+        for result in results:
+            try:
+                result.target.export_excel()
+            except Exception as error:
+                result.export_error = str(error)
+                logger.error("Excel export failed for %s: %s", result.target.excel_path, error)
+        for result in results:
+            if result.export_error:
+                continue
+            try:
+                result.target.upload_excel()
+            except Exception as error:
+                result.excel_upload_error = str(error)
+                logger.error("Excel upload failed for %s: %s", result.target.excel_path, error)
+        for result in results:
+            try:
+                result.target.upload_database()
+            except Exception as error:
+                result.database_upload_error = str(error)
+                logger.error("Database upload failed for %s: %s", result.target.database_path, error)
+
+        return results
 
 
 def _demo() -> None:

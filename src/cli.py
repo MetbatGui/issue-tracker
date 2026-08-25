@@ -33,6 +33,8 @@ def _run_single_full(name, service, start_date: str):
 def _raise_if_failed(result) -> None:
     if not result.all_succeeded:
         failed_names = ", ".join(step.name for step in result.failed_steps)
+        failed_syncs = ", ".join(str(sync.target.database_path) for sync in result.failed_sync_results)
+        failed_names = ", ".join(name for name in (failed_names, failed_syncs) if name)
         raise RuntimeError(f"업데이트 실패: {failed_names}")
 
 
@@ -276,6 +278,8 @@ def main():
                     logger.info("✅ [ALL] 모든 업데이트가 완료되었습니다.")
                 else:
                     failed_names = ", ".join(s.name for s in result.failed_steps)
+                    failed_syncs = ", ".join(str(sync.target.database_path) for sync in result.failed_sync_results)
+                    failed_names = ", ".join(name for name in (failed_names, failed_syncs) if name)
                     logger.error(f"⚠️ [ALL] 일부 업데이트 실패: {failed_names}")
                 logger.info("="*60)
 
