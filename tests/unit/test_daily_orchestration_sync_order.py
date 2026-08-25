@@ -104,3 +104,32 @@ def test_orchestrator_runs_full_update_before_exporting_and_uploading():
         "upload-excel:A",
         "upload-db:A",
     ]
+
+
+def test_orchestrator_returns_upload_failure_in_result_without_skipping_db_upload():
+    events = []
+
+    def fail_excel_upload():
+        events.append("upload-excel:A")
+        raise OSError("Drive unavailable")
+
+    target = SyncTarget(
+        database_path=Path("A.db"),
+        excel_path=Path("A.xlsx"),
+        export_excel=lambda: events.append("export:A"),
+        upload_excel=fail_excel_upload,
+        upload_database=lambda: events.append("upload-db:A"),
+    )
+
+    class _Service:
+        def daily_update(self, days):
+            return LocalUpdateResult([target])
+
+    result = DailyOrchestrationService([
+        OrchestrationStep("A", _Service),
+    ]).run(days=1)
+
+    assert not result.all_succeeded
+    assert len(result.failed_sync_results) == 1
+    assert result.failed_sync_results[0].excel_upload_error == "Drive unavailable"
+    assert events == ["export:A", "upload-excel:A", "upload-db:A"]
