@@ -27,19 +27,23 @@ def setup_logger(name: str = None) -> logging.Logger:
     logger.addHandler(console_handler)
 
     # 2. File Handler (DEBUG)
-    log_dir = Path("logs")
-    log_dir.mkdir(exist_ok=True)
-    
-    filename = f"issue_tracker_{datetime.now().strftime('%Y%m%d')}.log"
-    file_path = log_dir / filename
-    
-    # 매일 자정에 로그 파일 회전, 최대 30일 보관
-    file_handler = TimedRotatingFileHandler(
-        file_path, when="midnight", interval=1, backupCount=30, encoding='utf-8'
-    )
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(file_format)
-    logger.addHandler(file_handler)
+    try:
+        log_dir = Path("logs")
+        log_dir.mkdir(exist_ok=True)
+
+        filename = f"issue_tracker_{datetime.now().strftime('%Y%m%d')}.log"
+        file_path = log_dir / filename
+
+        # 매일 자정에 로그 파일 회전, 최대 30일 보관
+        file_handler = TimedRotatingFileHandler(
+            file_path, when="midnight", interval=1, backupCount=30, encoding='utf-8'
+        )
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(file_format)
+        logger.addHandler(file_handler)
+    except OSError as error:
+        # Docker bind mount 등의 권한 문제에서도 콘솔 로그와 작업 실행은 유지한다.
+        logger.warning("파일 로그를 초기화하지 못했습니다: %s", error)
 
     return logger
 
