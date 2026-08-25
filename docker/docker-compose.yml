@@ -1,0 +1,36 @@
+name: issue-tracker
+
+services:
+  issue-tracker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: issue-tracker:latest
+    volumes:
+      - ../data:/app/data
+      - ../logs:/app/logs
+      - ../secrets:/app/secrets:ro
+      - ../.env:/app/.env:ro
+    environment:
+      TZ: Asia/Seoul
+
+  issue-tracker-cron:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: issue-tracker:latest
+    entrypoint: ["/app/docker/cron-entrypoint.sh"]
+    user: root
+    restart: unless-stopped
+    volumes:
+      - ../data:/app/data
+      - ../logs:/app/logs
+      - ../secrets:/app/secrets:ro
+      - ../.env:/app/.env:ro
+    environment:
+      TZ: Asia/Seoul
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
