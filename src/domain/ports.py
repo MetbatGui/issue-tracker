@@ -102,3 +102,8 @@ class ReportRepository(ABC):
     def existing_rcept_nos(self, rcept_nos: List[str]) -> Set[str]:
         """주어진 접수번호 중 SSOT에 이미 반영된 번호를 일괄 반환합니다."""
         pass
+
+    @abstractmethod
+    def close(self) -> None:
+        """저장소 연결을 닫아 작업 사본을 안전하게 정리할 수 있게 합니다."""
+        pass

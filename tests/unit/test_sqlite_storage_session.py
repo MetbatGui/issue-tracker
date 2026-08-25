@@ -30,3 +30,13 @@ def test_session_does_not_replace_existing_ssot_when_working_copy_cannot_be_crea
         SqliteStorageSession(storage, storage_path)
 
     assert storage_path.read_bytes() == b"original"
+
+
+def test_session_close_removes_temporary_working_copy(tmp_path):
+    storage_path = tmp_path / "ssot.db"
+    storage_path.write_bytes(b"before")
+    session = SqliteStorageSession(LocalFileStorageAdapter(), storage_path)
+
+    session.close()
+
+    assert not session.working_path.exists()

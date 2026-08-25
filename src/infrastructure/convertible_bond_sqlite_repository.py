@@ -132,6 +132,9 @@ class ConvertibleBondSqliteRepository(ReportRepository):
         ).fetchall()
         return {row[0] for row in rows}
 
+    def close(self) -> None:
+        self._conn.close()
+
     def _to_row_params(self, decision: ConvertibleBondDecision) -> dict:
         return {
             "rcept_no": decision.rcept_no,
