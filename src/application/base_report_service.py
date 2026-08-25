@@ -6,7 +6,7 @@ Common logic for DART report processing, including history tracking, file manage
 import os
 import glob
 from pathlib import Path
-from typing import List, Optional, Tuple, Any, Callable
+from typing import List, Optional, Tuple, Any, Callable, Set
 from abc import ABC, abstractmethod
 
 from ..infrastructure import (
@@ -117,7 +117,8 @@ class BaseReportService(ABC):
         self,
         collect_method: Callable[[str, Optional[str]], List[dict]],
         start_date: str,
-        end_date: Optional[str] = None
+        end_date: Optional[str] = None,
+        existing_rcept_nos: Optional[Callable[[List[str]], Set[str]]] = None,
     ) -> Tuple[List[str], dict]:
         """Download reports and track correction history.
         
@@ -136,7 +137,7 @@ class BaseReportService(ABC):
         self.logger.info("=" * 50)
         
         # 1. Collect initial reports
-        reports = collect_method(start_date, end_date)
+        reports = collect_method(start_date, end_date, existing_rcept_nos=existing_rcept_nos)
         
         # Extract downloaded paths
         downloaded_files = [report['xml_path'] for report in reports if 'xml_path' in report]
@@ -168,9 +169,10 @@ class BaseReportService(ABC):
                     relation_map[child] = parent
                 
                 # Download missing XMLs
+                existing_history = existing_rcept_nos(history_ids) if existing_rcept_nos else set()
                 for hist_rcp in history_ids:
-                    # Check if we already have it is hard without exact filename, 
-                    # but download_document_xml checks efficiently.
+                    if hist_rcp in existing_history:
+                        continue
                     xml_path = self.api_client.download_document_xml(hist_rcp, report.get("corp_name", "Unknown"))
                     if xml_path:
                         path_str = str(xml_path)
@@ -215,12 +217,27 @@ class BaseReportService(ABC):
         self.logger.info(f"Converted: {converted} | Already UTF-8: {already_utf8} | Errors: {errors}")
         return {"converted": converted, "already_utf8": already_utf8, "errors": errors}
 
+    def _pending_xml_files(self, existing_rcept_nos: Callable[[List[str]], Set[str]]) -> List[str]:
+        """로컬 XML 중 DB SSOT에 아직 반영되지 않은 공시 파일만 반환한다."""
+        xml_files = glob.glob(str(self.xml_directory / "*.xml"))
+        rcept_nos_by_path = {
+            xml_file: self._extract_rcept_no(xml_file)
+            for xml_file in xml_files
+        }
+        existing = existing_rcept_nos([rcept_no for rcept_no in rcept_nos_by_path.values() if rcept_no])
+        return [
+            xml_file
+            for xml_file, rcept_no in rcept_nos_by_path.items()
+            if not rcept_no or rcept_no not in existing
+        ]
+
     def run_pipeline(
         self,
         collect_method: Callable[[str, Optional[str]], List[dict]],
         start_date: str,
         end_date: Optional[str] = None,
-        skip_if_no_new_files: bool = False
+        skip_if_no_new_files: bool = False,
+        existing_rcept_nos: Optional[Callable[[List[str]], Set[str]]] = None,
     ) -> Tuple[List[str], dict]:
         """공통 실행 파이프라인
 
@@ -234,7 +251,7 @@ class BaseReportService(ABC):
         """
         # 1. 다운로드
         downloaded_files, relation_map = self.download_reports_with_history(
-            collect_method, start_date, end_date
+            collect_method, start_date, end_date, existing_rcept_nos
         )
 
         if skip_if_no_new_files and not downloaded_files:

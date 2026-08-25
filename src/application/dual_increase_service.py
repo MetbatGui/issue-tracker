@@ -83,6 +83,12 @@ class DualIncreaseService(BaseReportService):
         merged.update(self.bonus_service.get_relation_map())
         return merged
 
+    def _existing_rcept_nos(self, rcept_nos: List[str]) -> set[str]:
+        """유무상 공시는 유상·무상 DB 양쪽에 모두 있을 때만 완료로 판단한다."""
+        capital_existing = self.capital_service.repository.existing_rcept_nos(rcept_nos)
+        bonus_existing = self.bonus_service.repository.existing_rcept_nos(rcept_nos)
+        return capital_existing & bonus_existing
+
     def parse_and_export_to_excel(self, relation_map: dict = None, export: bool = True) -> int:
         """XML 파일들을 파싱해 유상/무상 결정으로 분리한 뒤, 각 서비스의 DB에 반영하고
         각 서비스의 엑셀을 재구성합니다.
@@ -91,10 +97,12 @@ class DualIncreaseService(BaseReportService):
         self.logger.info("유무상증자 XML 파싱 및 DB 반영")
         self.logger.info("=" * 50)
 
-        xml_files = glob.glob(str(self.xml_directory / "*.xml"))
+        xml_files = self._pending_xml_files(self._existing_rcept_nos)
 
         if not xml_files:
             self.logger.warning("처리할 XML 파일이 없습니다.")
+            if export:
+                return self.capital_service.export_to_excel() + self.bonus_service.export_to_excel()
             return 0
 
         self.logger.info(f"{len(xml_files)}개의 XML 파일을 처리합니다...")
@@ -164,7 +172,8 @@ class DualIncreaseService(BaseReportService):
         downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_dual_increase_reports,
             start_date,
-            end_date
+            end_date,
+            existing_rcept_nos=self._existing_rcept_nos,
         )
 
         result = self._result_after_collection(downloaded_files, relation_map)
@@ -188,7 +197,8 @@ class DualIncreaseService(BaseReportService):
         downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_dual_increase_reports,
             start_date,
-            skip_if_no_new_files=True
+            skip_if_no_new_files=True,
+            existing_rcept_nos=self._existing_rcept_nos,
         )
 
         result = self._result_after_collection(downloaded_files, relation_map)
