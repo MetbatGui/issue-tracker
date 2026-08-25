@@ -7,6 +7,7 @@ Excel은 매 실행마다 DB 전체를 읽어 재구성되는 산출물입니다
 """
 import sys
 import glob
+from pathlib import Path
 from typing import List
 
 from ..domain import CapitalIncreaseDecision
@@ -16,6 +17,7 @@ from ..infrastructure import (
 )
 from ..infrastructure.capital_increase_sqlite_repository import CapitalIncreaseSqliteRepository
 from .base_report_service import BaseReportService
+from .daily_orchestration_service import LocalUpdateResult, SyncTarget
 
 
 # UTF-8 인코딩 설정 (윈도우 콘솔용)
@@ -77,7 +79,7 @@ class CapitalIncreaseService(BaseReportService):
 
         return self.parser.parse(file_path, rcept_no=rcept_no, parent_rcp_no=parent_rcp)
 
-    def parse_and_export_to_excel(self, relation_map: dict = None) -> int:
+    def parse_and_export_to_excel(self, relation_map: dict = None, export: bool = True) -> int:
         """XML 파일들을 파싱해 DB에 반영한 뒤, DB 전체로 엑셀을 재구성합니다."""
         print("\n" + "=" * 50)
         print("📊 XML 파싱 및 DB 반영")
@@ -111,7 +113,19 @@ class CapitalIncreaseService(BaseReportService):
             self.repository.upsert(decisions)
             print(f"💾 DB 반영 완료: {len(decisions)}건")
 
-        return self.export_to_excel()
+        return self.export_to_excel() if export else len(decisions)
+
+    def _local_update_result(self) -> LocalUpdateResult:
+        database_path = Path(self.repository.db_path)
+        return LocalUpdateResult(targets=[
+            SyncTarget(
+                database_path=database_path,
+                excel_path=self.excel_path,
+                export_excel=self.export_to_excel,
+                upload_excel=lambda: self._upload_file_to_google_drive(self.excel_path),
+                upload_database=lambda: self._upload_file_to_google_drive(database_path),
+            )
+        ])
 
     def export_to_excel(self) -> int:
         """DB에 저장된 전체 데이터를 엑셀로 재구성합니다."""
@@ -127,23 +141,27 @@ class CapitalIncreaseService(BaseReportService):
         self.excel_writer.write(decisions)
         return len(decisions)
 
-    def full_update(self, start_date: str = "20200101", end_date: str = None) -> None:
+    def full_update(self, start_date: str = "20200101", end_date: str = None) -> LocalUpdateResult:
         """전체 업데이트 워크플로우를 실행합니다."""
         print("\n" + "🚀" * 25)
         print(" " * 10 + "유상증자 데이터 전체 업데이트")
         print("🚀" * 25 + "\n")
 
-        self.run_pipeline(
+        downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_capital_increase_reports,
             start_date,
             end_date
         )
 
+        result = LocalUpdateResult.empty() if not downloaded_files else (
+            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
+        )
         print("\n" + "🎉" * 25)
         print(" " * 15 + "전체 업데이트 완료!")
         print("🎉" * 25 + "\n")
+        return result
 
-    def daily_update(self, days_back: int = 1) -> None:
+    def daily_update(self, days_back: int = 1) -> LocalUpdateResult:
         """일일 업데이트 워크플로우를 실행합니다.
 
         최근 N일간의 데이터를 다운로드하고 (이전 로직과 달리) 전체 데이터 재구성을 통해 엑셀을 갱신합니다.
@@ -160,7 +178,7 @@ class CapitalIncreaseService(BaseReportService):
 
         print(f"📆 수집 기간: {start_date} ~ Today")
 
-        self.run_pipeline(
+        downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_capital_increase_reports,
             start_date,
             skip_if_no_new_files=True
@@ -168,4 +186,8 @@ class CapitalIncreaseService(BaseReportService):
 
         print("\n" + "🎉" * 25)
         print(" " * 15 + "Daily 업데이트 완료!")
+        result = LocalUpdateResult.empty() if not downloaded_files else (
+            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
+        )
         print("🎉" * 25 + "\n")
+        return result
