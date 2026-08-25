@@ -106,11 +106,14 @@ class CapitalIncreaseSqliteRepository(ReportRepository):
             ON CONFLICT(rcept_no) DO UPDATE SET {update_clause}
         """
 
-        for decision in decisions:
-            self._conn.execute(sql, self._to_row_params(decision))
-            self._upsert_funding_purposes(decision.rcept_no, decision.funding)
-
-        self._conn.commit()
+        try:
+            for decision in decisions:
+                self._conn.execute(sql, self._to_row_params(decision))
+                self._upsert_funding_purposes(decision.rcept_no, decision.funding)
+            self._conn.commit()
+        except Exception:
+            self._conn.rollback()
+            raise
         return len(decisions)
 
     def get_all(self) -> List[CapitalIncreaseDecision]:
