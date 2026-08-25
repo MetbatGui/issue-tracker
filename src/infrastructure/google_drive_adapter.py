@@ -117,9 +117,14 @@ class GoogleDriveAdapter(StoragePort):
         }
         
         # 3. 미디어 업로드
+        mime_type = (
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            if file_path.suffix.lower() == '.xlsx'
+            else 'application/octet-stream'
+        )
         media = MediaFileUpload(
             str(file_path),
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            mimetype=mime_type,
             resumable=True
         )
         

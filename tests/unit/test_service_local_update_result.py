@@ -28,3 +28,23 @@ def test_daily_update_returns_local_sync_target_without_exporting_or_uploading(t
     assert len(result.targets) == 1
     assert result.targets[0].excel_path == service.excel_path
     assert result.targets[0].database_path == Path(service.repository.db_path)
+
+
+def test_daily_update_requests_excel_rebuild_when_db_has_data_but_output_is_missing(tmp_path, monkeypatch):
+    service = CapitalIncreaseService(
+        data_directory=str(tmp_path / "capital"),
+        api_key="test-key",
+        enable_google_drive=False,
+    )
+    monkeypatch.setattr(service, "download_reports_with_history", lambda *args, **kwargs: ([], {}))
+    monkeypatch.setattr(service.repository, "get_all", lambda: [object()])
+    monkeypatch.setattr(
+        service,
+        "parse_and_export_to_excel",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("재파싱하면 안 됩니다")),
+    )
+
+    result = service.daily_update(days_back=1)
+
+    assert len(result.targets) == 1
+    assert not service.excel_path.exists()

@@ -116,6 +116,13 @@ class BondWithWarrantService(BaseReportService):
             )
         ])
 
+    def _result_after_collection(self, downloaded_files: List[str], relation_map: dict) -> LocalUpdateResult:
+        if downloaded_files:
+            return self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
+        if not self.excel_path.exists() and self.repository.get_all():
+            return self._local_update_result()
+        return LocalUpdateResult.empty()
+
     def export_to_excel(self) -> int:
         """DB에 저장된 전체 데이터를 엑셀로 재구성합니다."""
         decisions = self.repository.get_all()
@@ -143,9 +150,7 @@ class BondWithWarrantService(BaseReportService):
             start_str,
             skip_if_no_new_files=True
         )
-        return LocalUpdateResult.empty() if not downloaded_files else (
-            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
-        )
+        return self._result_after_collection(downloaded_files, relation_map)
 
     def full_update(self, start_date: str = "20200101") -> LocalUpdateResult:
         """전체 업데이트"""
@@ -155,6 +160,4 @@ class BondWithWarrantService(BaseReportService):
             self.api_client.collect_bond_with_warrant_reports,
             start_date
         )
-        return LocalUpdateResult.empty() if not downloaded_files else (
-            self._local_update_result() if self.parse_and_export_to_excel(relation_map, export=False) else LocalUpdateResult.empty()
-        )
+        return self._result_after_collection(downloaded_files, relation_map)
