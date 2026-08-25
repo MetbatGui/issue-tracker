@@ -100,6 +100,12 @@ class TestUpsertAndGetAll:
         count = repo.upsert([_make_decision("20241209000001"), _make_decision("20241209000002")])
         assert count == 2
 
+    def test_upsert_rolls_back_every_write_when_later_item_fails(self, repo):
+        with pytest.raises(AttributeError):
+            repo.upsert([_make_decision("20241209000001"), None])
+
+        assert repo.get_all() == []
+
 
 class TestDedupeByRceptNo:
     def test_reupsert_same_rcept_no_updates_in_place(self, repo):
