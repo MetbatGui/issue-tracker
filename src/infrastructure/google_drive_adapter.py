@@ -88,6 +88,19 @@ class GoogleDriveAdapter(StoragePort):
         file_path: Path,
         folder_id: str,
         file_name: Optional[str] = None
+    ) -> Optional[str]:
+        """파일을 업로드하고, 인프라 실패는 None으로 반환합니다."""
+        try:
+            return self._upload_file(file_path, folder_id, file_name)
+        except Exception as e:
+            self.logger.error(f"  ❌ 파일 업로드 실패: {e}")
+            return None
+
+    def _upload_file(
+        self,
+        file_path: Path,
+        folder_id: str,
+        file_name: Optional[str] = None
     ) -> str:
         """파일을 구글 드라이브에 업로드합니다.
         
@@ -161,18 +174,14 @@ class GoogleDriveAdapter(StoragePort):
         escaped_name = file_name.replace("'", "\\'")
         query = f"name='{escaped_name}' and '{folder_id}' in parents and trashed=false"
         
-        try:
-            results = self.service.files().list(
-                q=query,
-                fields="files(id, name)",
-                pageSize=10
-            ).execute()
-            
-            files = results.get('files', [])
-            return files[0]['id'] if files else None
-        except Exception as e:
-            self.logger.warning(f"  ⚠️ 파일 검색 중 오류: {e}")
-            return None
+        results = self.service.files().list(
+            q=query,
+            fields="files(id, name)",
+            pageSize=10
+        ).execute()
+
+        files = results.get('files', [])
+        return files[0]['id'] if files else None
     
     def delete_file(self, file_id: str) -> bool:
         """파일을 삭제합니다.
