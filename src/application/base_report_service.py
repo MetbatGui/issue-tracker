@@ -328,6 +328,7 @@ class BaseReportService(ABC):
             self.logger.info(f"Upload Complete (File ID: {file_id})")
         except Exception as e:
             self.logger.error(f"Upload Failed: {e}")
+            raise
 
     @abstractmethod
     def parse_and_export_to_excel(self, relation_map: dict = None) -> int:
