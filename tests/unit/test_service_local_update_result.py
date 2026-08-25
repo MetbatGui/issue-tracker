@@ -2,7 +2,13 @@
 from pathlib import Path
 
 from src.application.capital_increase_services import CapitalIncreaseService
+from src.application.base_report_service import BaseReportService
 from src.application.daily_orchestration_service import LocalUpdateResult
+
+
+class _PendingFileService(BaseReportService):
+    def parse_and_export_to_excel(self, relation_map=None) -> int:
+        return 0
 
 
 def test_daily_update_returns_local_sync_target_without_exporting_or_uploading(tmp_path, monkeypatch):
@@ -48,3 +54,14 @@ def test_daily_update_requests_excel_rebuild_when_db_has_data_but_output_is_miss
 
     assert len(result.targets) == 1
     assert not service.excel_path.exists()
+
+
+def test_pending_xml_files_excludes_receipt_numbers_already_in_db(tmp_path):
+    service = object.__new__(_PendingFileService)
+    service.xml_directory = tmp_path
+    (tmp_path / "existing_20260101000001.xml").write_text("x", encoding="utf-8")
+    (tmp_path / "pending_20260101000002.xml").write_text("x", encoding="utf-8")
+
+    files = service._pending_xml_files(lambda rcept_nos: {"20260101000001"})
+
+    assert files == [str(tmp_path / "pending_20260101000002.xml")]

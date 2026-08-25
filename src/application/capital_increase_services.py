@@ -88,11 +88,11 @@ class CapitalIncreaseService(BaseReportService):
         self.logger.info("=" * 50)
 
         # XML 파일 목록 가져오기
-        xml_files = glob.glob(str(self.xml_directory / "*.xml"))
+        xml_files = self._pending_xml_files(self.repository.existing_rcept_nos)
 
         if not xml_files:
             self.logger.warning("처리할 XML 파일이 없습니다.")
-            return 0
+            return self.export_to_excel() if export else 0
 
         self.logger.info(f"{len(xml_files)}개의 XML 파일을 처리합니다...")
 
@@ -171,7 +171,8 @@ class CapitalIncreaseService(BaseReportService):
         downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_capital_increase_reports,
             start_date,
-            end_date
+            end_date,
+            existing_rcept_nos=self.repository.existing_rcept_nos,
         )
 
         result = self._result_after_collection(downloaded_files, relation_map)
@@ -196,7 +197,8 @@ class CapitalIncreaseService(BaseReportService):
         downloaded_files, relation_map = self.run_pipeline(
             self.api_client.collect_capital_increase_reports,
             start_date,
-            skip_if_no_new_files=True
+            skip_if_no_new_files=True,
+            existing_rcept_nos=self.repository.existing_rcept_nos,
         )
 
         result = self._result_after_collection(downloaded_files, relation_map)

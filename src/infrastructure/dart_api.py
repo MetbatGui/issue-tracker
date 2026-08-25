@@ -8,7 +8,7 @@ import time
 import zipfile
 import io
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from typing import Callable, Dict, List, Optional, Any, Set
 from pathlib import Path
 
 import requests
@@ -262,7 +262,8 @@ class DartApiClient:
         end_date: Optional[str],
         interval_days: int,
         filter_func,
-        report_type_name: str
+        report_type_name: str,
+        existing_rcept_nos: Optional[Callable[[List[str]], Set[str]]] = None,
     ) -> List[Dict[str, Any]]:
         """필터 함수를 사용하여 보고서를 수집하는 공통 로직
         
@@ -319,7 +320,11 @@ class DartApiClient:
                 ]
 
                 filtered = filter_func(list_data)
-                for item in filtered:
+                existing = existing_rcept_nos([item["rcept_no"] for item in filtered]) if existing_rcept_nos else set()
+                pending = [item for item in filtered if item["rcept_no"] not in existing]
+                if existing:
+                    self.logger.info("  - DB 반영 공시 %d건 건너뜀", len(existing))
+                for item in pending:
                     xml_path = self.download_document_xml(
                         item['rcept_no'],
                         item['corp_name']
@@ -327,9 +332,9 @@ class DartApiClient:
                     if xml_path:
                         item['xml_path'] = str(xml_path)
 
-                all_filtered_reports.extend(filtered)
+                all_filtered_reports.extend(pending)
 
-                self.logger.debug(f"  - p.{page} 완료: {len(filtered)}건 추가 (누적 {len(all_filtered_reports)}건)")
+                self.logger.debug(f"  - p.{page} 완료: {len(pending)}건 추가 (누적 {len(all_filtered_reports)}건)")
 
                 total_page = int(result.get('total_page', 1))
                 if page >= total_page:
@@ -346,7 +351,8 @@ class DartApiClient:
         start_date: str,
         end_date: Optional[str] = None,
         interval_days: int = 90,
-        report_type: str = "capital_increase"
+        report_type: str = "capital_increase",
+        existing_rcept_nos: Optional[Callable[[List[str]], Set[str]]] = None,
     ) -> List[Dict[str, Any]]:
         """기간 내 공시를 수집하고 XML을 다운로드합니다 (하위 호환용).
         
@@ -375,14 +381,16 @@ class DartApiClient:
             end_date=end_date,
             interval_days=interval_days,
             filter_func=filter_func,
-            report_type_name=report_type_name
+            report_type_name=report_type_name,
+            existing_rcept_nos=existing_rcept_nos,
         )
     
     def collect_capital_increase_reports(
         self,
         start_date: str,
         end_date: Optional[str] = None,
-        interval_days: int = 90
+        interval_days: int = 90,
+        existing_rcept_nos: Optional[Callable[[List[str]], Set[str]]] = None,
     ) -> List[Dict[str, Any]]:
         """유상증자 보고서만 수집합니다.
         
@@ -402,14 +410,16 @@ class DartApiClient:
             end_date=end_date,
             interval_days=interval_days,
             filter_func=self.filter_capital_increase_reports,
-            report_type_name="유상증자"
+            report_type_name="유상증자",
+            existing_rcept_nos=existing_rcept_nos,
         )
     
     def collect_bonus_shares_reports(
         self,
         start_date: str,
         end_date: Optional[str] = None,
-        interval_days: int = 90
+        interval_days: int = 90,
+        existing_rcept_nos: Optional[Callable[[List[str]], Set[str]]] = None,
     ) -> List[Dict[str, Any]]:
         """무상증자 보고서만 수집합니다 (유무상증자 제외).
         
@@ -435,14 +445,16 @@ class DartApiClient:
             end_date=end_date,
             interval_days=interval_days,
             filter_func=self.filter_bonus_shares_reports,
-            report_type_name="무상증자"
+            report_type_name="무상증자",
+            existing_rcept_nos=existing_rcept_nos,
         )
     
     def collect_dual_increase_reports(
         self,
         start_date: str,
         end_date: Optional[str] = None,
-        interval_days: int = 90
+        interval_days: int = 90,
+        existing_rcept_nos: Optional[Callable[[List[str]], Set[str]]] = None,
     ) -> List[Dict[str, Any]]:
         """유무상증자 보고서만 수집합니다.
         
@@ -466,14 +478,16 @@ class DartApiClient:
             end_date=end_date,
             interval_days=interval_days,
             filter_func=self.filter_dual_increase_reports,
-            report_type_name="유무상증자"
+            report_type_name="유무상증자",
+            existing_rcept_nos=existing_rcept_nos,
         )
     
     def collect_convertible_bond_reports(
         self,
         start_date: str,
         end_date: Optional[str] = None,
-        interval_days: int = 90
+        interval_days: int = 90,
+        existing_rcept_nos: Optional[Callable[[List[str]], Set[str]]] = None,
     ) -> List[Dict[str, Any]]:
         """전환사채권발행결정 보고서만 수집합니다.
         
@@ -499,7 +513,8 @@ class DartApiClient:
             end_date=end_date,
             interval_days=interval_days,
             filter_func=self.filter_convertible_bond_reports,
-            report_type_name="전환사채"
+            report_type_name="전환사채",
+            existing_rcept_nos=existing_rcept_nos,
         )
 
     @staticmethod
@@ -534,7 +549,8 @@ class DartApiClient:
         self,
         start_date: str,
         end_date: Optional[str] = None,
-        interval_days: int = 90
+        interval_days: int = 90,
+        existing_rcept_nos: Optional[Callable[[List[str]], Set[str]]] = None,
     ) -> List[Dict[str, Any]]:
         """신주인수권부사채권발행결정 보고서만 수집합니다.
         
@@ -554,5 +570,6 @@ class DartApiClient:
             end_date=end_date,
             interval_days=interval_days,
             filter_func=self.filter_bond_with_warrant_reports,
-            report_type_name="신주인수권부사채"
+            report_type_name="신주인수권부사채",
+            existing_rcept_nos=existing_rcept_nos,
         )

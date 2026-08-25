@@ -4,7 +4,7 @@
 """
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Set
 
 
 __all__ = ["StoragePort", "ReportRepository"]
@@ -96,4 +96,9 @@ class ReportRepository(ABC):
         Returns:
             결정 객체 리스트
         """
+        pass
+
+    @abstractmethod
+    def existing_rcept_nos(self, rcept_nos: List[str]) -> Set[str]:
+        """주어진 접수번호 중 SSOT에 이미 반영된 번호를 일괄 반환합니다."""
         pass

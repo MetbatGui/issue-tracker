@@ -7,7 +7,7 @@
 import sqlite3
 from datetime import date, datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from ..domain import BonusSharesDecision
 from ..domain.ports import ReportRepository
@@ -104,6 +104,15 @@ class BonusSharesSqliteRepository(ReportRepository):
         ).fetchall()
 
         return [self._row_to_decision(row) for row in rows]
+
+    def existing_rcept_nos(self, rcept_nos: List[str]) -> Set[str]:
+        if not rcept_nos:
+            return set()
+        placeholders = ", ".join("?" for _ in rcept_nos)
+        rows = self._conn.execute(
+            f"SELECT rcept_no FROM bonus_shares_decisions WHERE rcept_no IN ({placeholders})", rcept_nos
+        ).fetchall()
+        return {row[0] for row in rows}
 
     def _to_row_params(self, decision: BonusSharesDecision) -> dict:
         return {
