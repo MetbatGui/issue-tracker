@@ -53,7 +53,7 @@ def service(tmp_path):
 @pytest.fixture
 def service_with_real_xml_samples(tmp_path):
     """실제 BW XML 바이트로 파서 연동까지 실제로 태운다."""
-    src_dir = Path("data/신주인수권부사채/xml")
+    src_dir = Path("tests/fixtures/xml/신주인수권부사채")
     sample_files = list(src_dir.glob("*.xml"))[:2]
     if not sample_files:
         pytest.skip("신주인수권부사채 XML 샘플이 없습니다")

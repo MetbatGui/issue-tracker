@@ -7,7 +7,7 @@ from src.infrastructure.dual_increase_xml_parser import DualIncreaseXmlParser
 def test_dual_increase_parser():
     """유무상증자 파서가 유상증자와 무상증자 객체를 모두 반환하는지 테스트"""
     # 유무상증자 XML 디렉토리에서 첫 번째 파일 선택
-    xml_dir = Path("data/유무상증자/xml")
+    xml_dir = Path("tests/fixtures/xml/유무상증자")
     xml_files = sorted(xml_dir.glob("*.xml"))
     
     assert len(xml_files) > 0, "유무상증자 XML 파일이 없습니다"
@@ -44,7 +44,7 @@ def test_dual_increase_parser():
 
 def test_multiple_dual_increase_files():
     """여러 유무상증자 파일들이 정상적으로 파싱되는지 테스트"""
-    xml_dir = Path("data/유무상증자/xml")
+    xml_dir = Path("tests/fixtures/xml/유무상증자")
     xml_files = sorted(xml_dir.glob("*.xml"))
     
     success_count = 0
