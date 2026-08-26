@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone \
     && chmod 0644 /app/docker/crontab \
-    && chmod +x /app/docker/cron-entrypoint.sh /app/docker/run-daily.sh \
+    && chmod +x /app/docker/*.sh \
     && chown -R nonroot:nonroot /app
 
 COPY docker/crontab /etc/cron.d/issue-tracker
