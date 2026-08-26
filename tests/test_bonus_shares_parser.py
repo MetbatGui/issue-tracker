@@ -66,13 +66,13 @@ class TestBonusSharesParsing:
     
     @pytest.fixture
     def data_dir(self):
-        """실제 데이터 디렉토리 경로"""
-        return Path("c:/Users/user/Documents/최지석/Projects/issue-tracker/data/test_무상증자")
+        """저장소에 포함된 XML fixture 디렉토리 경로"""
+        return Path("tests/fixtures/xml/무상증자")
     
     def test_xml_files_exist(self, data_dir):
         """XML 파일이 존재하는지 확인"""
         # Given: 데이터 디렉토리
-        xml_dir = data_dir / "xml"
+        xml_dir = data_dir
         
         # When: XML 파일 검색
         xml_files = list(xml_dir.glob("*.xml"))
@@ -85,7 +85,7 @@ class TestBonusSharesParsing:
     def test_parse_single_xml(self, data_dir):
         """단일 XML 파일 파싱 테스트"""
         # Given: XML 파일 하나 선택
-        xml_dir = data_dir / "xml"
+        xml_dir = data_dir
         xml_files = list(xml_dir.glob("*.xml"))
         
         if not xml_files:
@@ -105,7 +105,7 @@ class TestBonusSharesParsing:
     def test_parse_all_xml_files(self, data_dir):
         """모든 XML 파일 파싱 및 통계"""
         # Given: 모든 XML 파일
-        xml_dir = data_dir / "xml"
+        xml_dir = data_dir
         xml_files = list(xml_dir.glob("*.xml"))
         
         if not xml_files:
@@ -140,7 +140,7 @@ class TestBonusSharesParsing:
     def test_parsed_data_validation(self, data_dir):
         """파싱된 데이터의 필드 검증"""
         # Given: 모든 XML 파일 파싱
-        xml_dir = data_dir / "xml"
+        xml_dir = data_dir
         xml_files = list(xml_dir.glob("*.xml"))
         
         if not xml_files:
