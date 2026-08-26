@@ -95,10 +95,6 @@ def main():
     ci_download.add_argument("--start", default="20200101", help="시작 날짜")
     ci_download.add_argument("--end", default=None, help="종료 날짜")
 
-    # convert
-    ci_subparsers.add_parser("convert", help="XML 파일들 UTF-8 인코딩 변환")
-
-
     # ==========================================
     # 2. bonus 명령 (무상증자)
     # ==========================================
@@ -194,8 +190,6 @@ def main():
                 _raise_if_failed(_run_single_export("유상증자", service))
             elif args.ci_command == "download":
                 service.download_reports(args.start, getattr(args, 'end', None))
-            elif args.ci_command == "convert":
-                service.convert_xml_encoding()
             else:
                 logger.warning("capital-increase 하위 명령어를 지정하세요.")
 

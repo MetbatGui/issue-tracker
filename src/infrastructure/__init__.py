@@ -2,7 +2,7 @@
 
 외부 시스템과의 통신 및 데이터 변환을 담당합니다.
 """
-from .dart_api import DartApiClient
+from .dart_api import DartApiClient, DownloadedXml
 from .capital_increase_xml_parser import CapitalIncreaseXmlParser
 from .bonus_xml_parser import BonusSharesXmlParser
 from .dual_increase_xml_parser import DualIncreaseXmlParser
@@ -18,6 +18,7 @@ from .sqlite_storage_session import SqliteStorageSession
 
 __all__ = [
     "DartApiClient",
+    "DownloadedXml",
     "CapitalIncreaseXmlParser",
     "BonusSharesXmlParser",
     "DualIncreaseXmlParser",

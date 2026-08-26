@@ -6,7 +6,7 @@ DB(SQLite)가 SSOT입니다: XML 파싱 결과는 BonusSharesSqliteRepository에
 Excel은 매 실행마다 DB 전체를 읽어 재구성되는 산출물입니다.
 """
 import sys
-import glob
+import io
 from pathlib import Path
 from typing import List
 
@@ -14,6 +14,7 @@ from ..domain import BonusSharesDecision
 from ..infrastructure import (
     BonusSharesXmlParser,
     BonusSharesExcelWriter,
+    DownloadedXml,
 )
 from ..infrastructure.bonus_shares_sqlite_repository import BonusSharesSqliteRepository
 from ..infrastructure.sqlite_storage_session import SqliteStorageSession
@@ -71,30 +72,24 @@ class BonusSharesService(BaseReportService):
             if d.parent_rcp_no
         }
 
-    def _parse_file_with_map(self, file_path: str, relation_map: dict) -> BonusSharesDecision:
-        """관계 맵을 사용하여 XML 파일을 파싱합니다."""
+    def _parse_document_with_map(self, document: DownloadedXml, relation_map: dict) -> BonusSharesDecision:
+        """메모리 XML과 관계 맵으로 결정 객체를 만든다."""
+        return self.parser.parse(
+            io.BytesIO(document.content), rcept_no=document.rcept_no,
+            parent_rcp_no=relation_map.get(document.rcept_no), source_filename=document.source_filename,
+        )
 
-        # 접수번호 추출
-        rcept_no = self._extract_rcept_no(file_path)
-
-        parent_rcp = relation_map.get(rcept_no) if rcept_no else None
-
-        return self.parser.parse(file_path, rcept_no=rcept_no, parent_rcp_no=parent_rcp)
-
-    def parse_and_export_to_excel(self, relation_map: dict = None, export: bool = True) -> int:
+    def parse_and_export_to_excel(self, documents: List[DownloadedXml], relation_map: dict = None, export: bool = True) -> int:
         """XML 파일들을 파싱해 DB에 반영한 뒤, DB 전체로 엑셀을 재구성합니다."""
         self.logger.info("\n" + "=" * 50)
         self.logger.info("📊 XML 파싱 및 DB 반영")
         self.logger.info("=" * 50)
 
-        # XML 파일 목록 가져오기
-        xml_files = self._pending_xml_files(self.repository.existing_rcept_nos)
-
-        if not xml_files:
-            self.logger.warning("처리할 XML 파일이 없습니다.")
+        if not documents:
+            self.logger.warning("처리할 메모리 XML이 없습니다.")
             return self.export_to_excel() if export else 0
 
-        self.logger.info(f"{len(xml_files)}개의 XML 파일을 처리합니다...")
+        self.logger.info(f"{len(documents)}개의 메모리 XML을 처리합니다...")
 
         # 관계 맵 로드 (DB 기준)
         base_map = self.get_relation_map()
@@ -104,8 +99,8 @@ class BonusSharesService(BaseReportService):
 
         # 파싱
         decisions: List[BonusSharesDecision] = []
-        for xml_file in xml_files:
-            decision = self._parse_file_with_map(xml_file, relation_map)
+        for document in documents:
+            decision = self._parse_document_with_map(document, relation_map)
             if decision and not decision.is_limited_liability_company():
                 decisions.append(decision)
 
@@ -134,9 +129,9 @@ class BonusSharesService(BaseReportService):
             raise RuntimeError(f"SQLite SSOT 반영 실패: {database_path}")
         self._upload_file_to_google_drive(database_path)
 
-    def _result_after_collection(self, downloaded_files: List[str], relation_map: dict) -> LocalUpdateResult:
-        if downloaded_files:
-            changed_count = self.parse_and_export_to_excel(relation_map, export=False)
+    def _result_after_collection(self, documents: List[DownloadedXml], relation_map: dict) -> LocalUpdateResult:
+        if documents:
+            changed_count = self.parse_and_export_to_excel(documents, relation_map, export=False)
             if changed_count:
                 if not self.database_session.persist():
                     raise RuntimeError("SQLite SSOT 반영 실패")
@@ -168,14 +163,14 @@ class BonusSharesService(BaseReportService):
         """전체 업데이트 워크플로우를 실행합니다."""
         self.logger.info("무상증자 전체 업데이트 시작")
 
-        downloaded_files, relation_map = self.run_pipeline(
+        documents, relation_map = self.run_pipeline(
             self.api_client.collect_bonus_shares_reports,
             start_date,
             end_date,
             existing_rcept_nos=self.repository.existing_rcept_nos,
         )
 
-        result = self._result_after_collection(downloaded_files, relation_map)
+        result = self._result_after_collection(documents, relation_map)
         self.logger.info("무상증자 전체 업데이트 완료")
         return result
 
@@ -194,13 +189,13 @@ class BonusSharesService(BaseReportService):
 
         self.logger.info(f"수집 기간: {start_date} ~ Today")
 
-        downloaded_files, relation_map = self.run_pipeline(
+        documents, relation_map = self.run_pipeline(
             self.api_client.collect_bonus_shares_reports,
             start_date,
             skip_if_no_new_files=True,
             existing_rcept_nos=self.repository.existing_rcept_nos,
         )
 
-        result = self._result_after_collection(downloaded_files, relation_map)
+        result = self._result_after_collection(documents, relation_map)
         self.logger.info("무상증자 일일 업데이트 완료")
         return result

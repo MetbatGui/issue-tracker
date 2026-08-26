@@ -10,11 +10,11 @@ CapitalIncreaseDecision/BonusSharesDecision과 동일한 엔티티이므로 별�
 직접 병합 방식의 약점)도 함께 사라집니다.
 """
 import sys
-import glob
+import io
 from typing import List
 
 from ..domain import CapitalIncreaseDecision, BonusSharesDecision
-from ..infrastructure import DualIncreaseXmlParser
+from ..infrastructure import DualIncreaseXmlParser, DownloadedXml
 from .base_report_service import BaseReportService
 from .capital_increase_services import CapitalIncreaseService
 from .bonus_services import BonusSharesService
@@ -89,7 +89,7 @@ class DualIncreaseService(BaseReportService):
         bonus_existing = self.bonus_service.repository.existing_rcept_nos(rcept_nos)
         return capital_existing & bonus_existing
 
-    def parse_and_export_to_excel(self, relation_map: dict = None, export: bool = True) -> int:
+    def parse_and_export_to_excel(self, documents: List[DownloadedXml], relation_map: dict = None, export: bool = True) -> int:
         """XML 파일들을 파싱해 유상/무상 결정으로 분리한 뒤, 각 서비스의 DB에 반영하고
         각 서비스의 엑셀을 재구성합니다.
         """
@@ -97,15 +97,13 @@ class DualIncreaseService(BaseReportService):
         self.logger.info("유무상증자 XML 파싱 및 DB 반영")
         self.logger.info("=" * 50)
 
-        xml_files = self._pending_xml_files(self._existing_rcept_nos)
-
-        if not xml_files:
-            self.logger.warning("처리할 XML 파일이 없습니다.")
+        if not documents:
+            self.logger.warning("처리할 메모리 XML이 없습니다.")
             if export:
                 return self.capital_service.export_to_excel() + self.bonus_service.export_to_excel()
             return 0
 
-        self.logger.info(f"{len(xml_files)}개의 XML 파일을 처리합니다...")
+        self.logger.info(f"{len(documents)}개의 메모리 XML을 처리합니다...")
 
         # 관계 맵 로드 (유상/무상 DB 기준)
         base_map = self.get_relation_map()
@@ -116,11 +114,11 @@ class DualIncreaseService(BaseReportService):
         capital_decisions: List[CapitalIncreaseDecision] = []
         bonus_decisions: List[BonusSharesDecision] = []
 
-        for xml_file in xml_files:
-            rcept_no = self._extract_rcept_no(xml_file)
-            parent_rcp = relation_map.get(rcept_no) if rcept_no else None
-
-            cap, bonus = self.parser.parse(xml_file, parent_rcp_no=parent_rcp)
+        for document in documents:
+            cap, bonus = self.parser.parse(
+                io.BytesIO(document.content), rcept_no=document.rcept_no,
+                parent_rcp_no=relation_map.get(document.rcept_no), source_filename=document.source_filename,
+            )
 
             if cap and not cap.is_limited_liability_company():
                 capital_decisions.append(cap)
@@ -154,9 +152,9 @@ class DualIncreaseService(BaseReportService):
         self.bonus_service.close()
         super().close()
 
-    def _result_after_collection(self, downloaded_files: List[str], relation_map: dict) -> LocalUpdateResult:
-        if downloaded_files:
-            changed_count = self.parse_and_export_to_excel(relation_map, export=False)
+    def _result_after_collection(self, documents: List[DownloadedXml], relation_map: dict) -> LocalUpdateResult:
+        if documents:
+            changed_count = self.parse_and_export_to_excel(documents, relation_map, export=False)
             if changed_count:
                 if not self.capital_service.database_session.persist():
                     raise RuntimeError("유상증자 SQLite SSOT 반영 실패")
@@ -175,14 +173,14 @@ class DualIncreaseService(BaseReportService):
         """전체 업데이트 워크플로우를 실행합니다."""
         self.logger.info("유무상증자 전체 업데이트 시작")
 
-        downloaded_files, relation_map = self.run_pipeline(
+        documents, relation_map = self.run_pipeline(
             self.api_client.collect_dual_increase_reports,
             start_date,
             end_date,
             existing_rcept_nos=self._existing_rcept_nos,
         )
 
-        result = self._result_after_collection(downloaded_files, relation_map)
+        result = self._result_after_collection(documents, relation_map)
         self.logger.info("유무상증자 전체 업데이트 완료")
         return result
 
@@ -200,13 +198,13 @@ class DualIncreaseService(BaseReportService):
 
         self.logger.info(f"수집 기간: {start_date} ~ Today")
 
-        downloaded_files, relation_map = self.run_pipeline(
+        documents, relation_map = self.run_pipeline(
             self.api_client.collect_dual_increase_reports,
             start_date,
             skip_if_no_new_files=True,
             existing_rcept_nos=self._existing_rcept_nos,
         )
 
-        result = self._result_after_collection(downloaded_files, relation_map)
+        result = self._result_after_collection(documents, relation_map)
         self.logger.info("유무상증자 일일 업데이트 완료")
         return result

@@ -4,14 +4,13 @@
 Common logic for DART report processing, including history tracking, file management, and Google Drive upload.
 """
 import os
-import glob
 from pathlib import Path
 from typing import List, Optional, Tuple, Any, Callable, Set
 from abc import ABC, abstractmethod
 
 from ..infrastructure import (
     DartApiClient,
-    FileEncodingConverter,
+    DownloadedXml,
     GoogleDriveAdapter,
     LocalFileStorageAdapter,
     DartHistoryScraper
@@ -40,7 +39,6 @@ class BaseReportService(ABC):
             excel_filename: Name of the output Excel file.
         """
         self.data_directory = Path(data_directory)
-        self.xml_directory = self.data_directory / "xml"
         self.excel_path = self.data_directory / excel_filename
         self.enable_google_drive = enable_google_drive
         self.source_storage = LocalFileStorageAdapter()
@@ -50,7 +48,6 @@ class BaseReportService(ABC):
         # Initialize components
         self.api_client = DartApiClient(api_key=api_key, save_directory=str(self.data_directory))
         self.history_scraper = DartHistoryScraper()
-        self.file_converter = FileEncodingConverter()
         
         # Relation Map Path
         self.relation_map_path = self.data_directory / "relation_map.json"
@@ -119,7 +116,7 @@ class BaseReportService(ABC):
         start_date: str,
         end_date: Optional[str] = None,
         existing_rcept_nos: Optional[Callable[[List[str]], Set[str]]] = None,
-    ) -> Tuple[List[str], dict]:
+    ) -> Tuple[List[DownloadedXml], dict]:
         """Download reports and track correction history.
         
         Args:
@@ -128,7 +125,7 @@ class BaseReportService(ABC):
             end_date: End date (YYYYMMDD).
             
         Returns:
-            Tuple of (downloaded_file_paths, relation_map).
+            Tuple of (메모리에만 존재하는 XML 목록, relation_map).
         """
         import json
         
@@ -139,8 +136,8 @@ class BaseReportService(ABC):
         # 1. Collect initial reports
         reports = collect_method(start_date, end_date, existing_rcept_nos=existing_rcept_nos)
         
-        # Extract downloaded paths
-        downloaded_files = [report['xml_path'] for report in reports if 'xml_path' in report]
+        documents = [report['xml_document'] for report in reports if 'xml_document' in report]
+        downloaded_rcept_nos = {document.rcept_no for document in documents}
         
         # 2. History Tracking (Hybrid Approach)
         self.logger.info("🔍 Scanning for correction history...")
@@ -173,63 +170,18 @@ class BaseReportService(ABC):
                 for hist_rcp in history_ids:
                     if hist_rcp in existing_history:
                         continue
-                    xml_path = self.api_client.download_document_xml(hist_rcp, report.get("corp_name", "Unknown"))
-                    if xml_path:
-                        path_str = str(xml_path)
-                        if path_str not in downloaded_files:
-                            downloaded_files.append(path_str)
+                    xml_document = self.api_client.download_document_xml(hist_rcp, report.get("corp_name", "Unknown"))
+                    if xml_document and xml_document.rcept_no not in downloaded_rcept_nos:
+                        documents.append(xml_document)
+                        downloaded_rcept_nos.add(xml_document.rcept_no)
                             
         # Save updated map if changed
         if len(relation_map) > initial_map_size:
             self.logger.info(f"💾 관계 맵 업데이트: {initial_map_size} -> {len(relation_map)}건")
             self._save_relation_map_to_json(relation_map)
                             
-        self.logger.info(f"Total {len(reports)} reports (Total files including history: {len(downloaded_files)}) processed.")
-        return downloaded_files, relation_map
-
-    def _convert_downloaded_files(self, file_paths: List[str]) -> dict:
-        """Convert encoding of downloaded files to UTF-8."""
-        if not file_paths:
-            return {"converted": 0, "already_utf8": 0, "errors": 0}
-        
-        self.logger.info("=" * 50)
-        self.logger.info(f"🔄 Converting {len(file_paths)} files to UTF-8")
-        self.logger.info("=" * 50)
-        
-        converted = 0
-        already_utf8 = 0
-        errors = 0
-        
-        for file_path_str in file_paths:
-            file_path = Path(file_path_str)
-            result = self.file_converter.detect_and_read(file_path)
-            
-            if result and result[0].lower() != 'utf-8':
-                if self.file_converter.convert_to_utf8(file_path):
-                    converted += 1
-                else:
-                    errors += 1
-            elif result and result[0].lower() == 'utf-8':
-                already_utf8 += 1
-            else:
-                errors += 1
-        
-        self.logger.info(f"Converted: {converted} | Already UTF-8: {already_utf8} | Errors: {errors}")
-        return {"converted": converted, "already_utf8": already_utf8, "errors": errors}
-
-    def _pending_xml_files(self, existing_rcept_nos: Callable[[List[str]], Set[str]]) -> List[str]:
-        """로컬 XML 중 DB SSOT에 아직 반영되지 않은 공시 파일만 반환한다."""
-        xml_files = glob.glob(str(self.xml_directory / "*.xml"))
-        rcept_nos_by_path = {
-            xml_file: self._extract_rcept_no(xml_file)
-            for xml_file in xml_files
-        }
-        existing = existing_rcept_nos([rcept_no for rcept_no in rcept_nos_by_path.values() if rcept_no])
-        return [
-            xml_file
-            for xml_file, rcept_no in rcept_nos_by_path.items()
-            if not rcept_no or rcept_no not in existing
-        ]
+        self.logger.info(f"Total {len(reports)} reports (in-memory XML including history: {len(documents)}) processed.")
+        return documents, relation_map
 
     def run_pipeline(
         self,
@@ -238,30 +190,26 @@ class BaseReportService(ABC):
         end_date: Optional[str] = None,
         skip_if_no_new_files: bool = False,
         existing_rcept_nos: Optional[Callable[[List[str]], Set[str]]] = None,
-    ) -> Tuple[List[str], dict]:
+    ) -> Tuple[List[DownloadedXml], dict]:
         """공통 실행 파이프라인
 
         1. 다운로드 (이력 추적 포함)
-        2. 인코딩 변환
-        3. 로컬 DB 반영을 위해 수집 결과 반환
+        2. 로컬 DB 반영을 위해 메모리 XML 반환
 
         Args:
             skip_if_no_new_files: True이면 신규 다운로드 파일이 없을 때 이후 단계를 건너뜁니다.
                 daily_update처럼 매번 재파싱/재업로드가 불필요한 경우 사용합니다.
         """
         # 1. 다운로드
-        downloaded_files, relation_map = self.download_reports_with_history(
+        documents, relation_map = self.download_reports_with_history(
             collect_method, start_date, end_date, existing_rcept_nos
         )
 
-        if skip_if_no_new_files and not downloaded_files:
+        if skip_if_no_new_files and not documents:
             self.logger.info("새로운 공시가 없습니다.")
-            return downloaded_files, relation_map
+            return documents, relation_map
 
-        # 2. 인코딩 변환
-        self._convert_downloaded_files(downloaded_files)
-        
-        return downloaded_files, relation_map
+        return documents, relation_map
 
     def _load_map_from_excel(self) -> dict:
         """Load (rcept_no -> parent_rcp_no) map from existing Excel file."""
@@ -351,11 +299,13 @@ class BaseReportService(ABC):
             raise
 
     @abstractmethod
-    def parse_and_export_to_excel(self, relation_map: dict = None) -> int:
+    def parse_and_export_to_excel(self, documents: List[DownloadedXml], relation_map: dict = None, export: bool = True) -> int:
         """Abstract method to be implemented by subclasses.
         
         Args:
+            documents: 이번 실행에서 메모리로 다운로드한 XML 원본
             relation_map: Map of rcept_no -> parent_rcp_no (optional)
+            export: DB 반영 후 Excel을 재생성할지 여부
         """
         pass
 
