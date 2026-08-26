@@ -40,3 +40,29 @@ def test_session_close_removes_temporary_working_copy(tmp_path):
     session.close()
 
     assert not session.working_path.exists()
+
+
+def test_session_does_not_bootstrap_an_empty_db_when_remote_storage_failed(tmp_path):
+    class UnavailableStorage:
+        last_error = OSError("Drive unavailable")
+
+        def get_file(self, storage_path):
+            return None
+
+        def put_file(self, local_path, storage_path):
+            return False
+
+    with pytest.raises(RuntimeError, match="원격 DB"):
+        SqliteStorageSession(UnavailableStorage(), tmp_path / "ssot.db")
+
+
+def test_shared_session_factory_returns_one_working_copy_for_the_same_ssot(tmp_path):
+    storage_path = tmp_path / "ssot.db"
+    storage_path.write_bytes(b"before")
+    storage = LocalFileStorageAdapter()
+
+    first = SqliteStorageSession.get_shared(storage, storage_path)
+    second = SqliteStorageSession.get_shared(storage, storage_path)
+
+    assert first is second
+    first.close()
