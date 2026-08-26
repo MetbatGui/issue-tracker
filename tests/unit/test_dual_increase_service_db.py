@@ -5,7 +5,6 @@ BonusSharesSqliteRepository를 그대로 재사용합니다(유무상증자 공�
 결정으로 쪼갠 뒤, 이미 그 결정 타입을 저장하는 리포지토리에 얹는 구조 - 별도 스토리지를 둘
 이유가 없음). 이 설계의 핵심 이점(오케스트레이션 순서 무관하게 병합됨)까지 검증합니다.
 """
-import shutil
 from datetime import date
 from pathlib import Path
 
@@ -16,6 +15,7 @@ from src.application.capital_increase_services import CapitalIncreaseService
 from src.application.bonus_services import BonusSharesService
 from src.domain import CapitalIncreaseDecision, BonusSharesDecision
 from src.domain.value_objects import StockInfo, FundingPurpose
+from src.infrastructure.dart_api import DownloadedXml
 
 
 def _make_capital_decision(rcept_no: str, parent_rcp_no=None) -> CapitalIncreaseDecision:
@@ -60,25 +60,21 @@ def services(tmp_path):
 
 @pytest.fixture
 def dual_with_real_xml_samples(tmp_path):
-    """실제 유무상증자 XML 샘플 2개로 파서 연동까지 실제로 태운다."""
+    """실제 유무상증자 XML 바이트로 파서 연동까지 실제로 태운다."""
     src_dir = Path("data/유무상증자/xml")
     sample_files = list(src_dir.glob("*.xml"))[:2]
     if not sample_files:
         pytest.skip("유무상증자 XML 샘플이 없습니다")
 
-    dual_dir = tmp_path / "dual"
-    xml_dir = dual_dir / "xml"
-    xml_dir.mkdir(parents=True)
-    for f in sample_files:
-        shutil.copy(f, xml_dir / f.name)
-
-    return DualIncreaseService(
-        data_directory=str(dual_dir),
+    dual = DualIncreaseService(
+        data_directory=str(tmp_path / "dual"),
         capital_data_directory=str(tmp_path / "capital"),
         bonus_data_directory=str(tmp_path / "bonus"),
         api_key="dummy-key",
         enable_google_drive=False,
     )
+    documents = [DownloadedXml(f.stem.rsplit("_", 1)[-1], f.name, f.read_bytes()) for f in sample_files]
+    return dual, documents
 
 
 class TestNoDedicatedStorage:
@@ -149,9 +145,9 @@ class TestGetRelationMap:
 
 class TestParseAndExportToExcelWiredEndToEnd:
     def test_parses_real_samples_into_capital_and_bonus_repositories(self, dual_with_real_xml_samples):
-        dual = dual_with_real_xml_samples
+        dual, documents = dual_with_real_xml_samples
 
-        count = dual.parse_and_export_to_excel()
+        count = dual.parse_and_export_to_excel(documents)
 
         assert count >= 1
         # 유상/무상 어느 한쪽이든 결과가 저장 + 엑셀이 각자 서비스의 파일로 생성돼야 함
@@ -159,9 +155,9 @@ class TestParseAndExportToExcelWiredEndToEnd:
         assert total_db_rows == count
 
     def test_second_run_without_new_xml_is_idempotent(self, dual_with_real_xml_samples):
-        dual = dual_with_real_xml_samples
+        dual, documents = dual_with_real_xml_samples
 
-        first_count = dual.parse_and_export_to_excel()
-        second_count = dual.parse_and_export_to_excel()
+        first_count = dual.parse_and_export_to_excel(documents)
+        second_count = dual.parse_and_export_to_excel(documents)
 
         assert first_count == second_count

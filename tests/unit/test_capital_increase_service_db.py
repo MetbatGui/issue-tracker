@@ -5,7 +5,6 @@
 test_capital_increase_migration.py에서 단위 테스트했지만, 이 둘을 실제로 연결하는
 서비스 계층 메서드는 그동안 수동 검증(실데이터 1회 실행)만 거쳤을 뿐 회귀 테스트가 없었음.
 """
-import shutil
 from datetime import date
 from pathlib import Path
 
@@ -14,6 +13,7 @@ import pytest
 from src.application.capital_increase_services import CapitalIncreaseService
 from src.domain import CapitalIncreaseDecision
 from src.domain.value_objects import StockInfo, FundingPurpose
+from src.infrastructure.dart_api import DownloadedXml
 
 
 def _make_decision(rcept_no: str, parent_rcp_no=None, company_name: str = "테스트회사") -> CapitalIncreaseDecision:
@@ -48,23 +48,22 @@ def service(tmp_path):
 
 @pytest.fixture
 def service_with_real_xml_samples(tmp_path):
-    """실제 유상증자 XML 샘플 2개를 임시 데이터 디렉토리에 복사해 파서 연동까지 실제로 태운다."""
+    """실제 유상증자 XML 바이트로 파서 연동까지 실제로 태운다."""
     src_dir = Path("data/유상증자/xml")
     sample_files = list(src_dir.glob("*.xml"))[:2]
     if not sample_files:
         pytest.skip("유상증자 XML 샘플이 없습니다")
 
-    data_dir = tmp_path / "data"
-    xml_dir = data_dir / "xml"
-    xml_dir.mkdir(parents=True)
-    for f in sample_files:
-        shutil.copy(f, xml_dir / f.name)
-
-    return CapitalIncreaseService(
-        data_directory=str(data_dir),
+    service = CapitalIncreaseService(
+        data_directory=str(tmp_path / "data"),
         api_key="dummy-key",
         enable_google_drive=False,
     )
+    documents = [
+        DownloadedXml(f.stem.rsplit("_", 1)[-1], f.name, f.read_bytes())
+        for f in sample_files
+    ]
+    return service, documents
 
 
 class TestGetRelationMap:
@@ -115,9 +114,9 @@ class TestParseAndExportToExcelWiredEndToEnd:
     """실제 XML 파서 -> repository.upsert -> export_to_excel 전체 배선을 실제 샘플 파일로 검증."""
 
     def test_parses_real_samples_into_db_and_excel(self, service_with_real_xml_samples):
-        service = service_with_real_xml_samples
+        service, documents = service_with_real_xml_samples
 
-        count = service.parse_and_export_to_excel()
+        count = service.parse_and_export_to_excel(documents)
 
         assert count >= 1
         db_rows = service.repository.get_all()
@@ -125,10 +124,10 @@ class TestParseAndExportToExcelWiredEndToEnd:
         assert service.excel_path.exists()
 
     def test_second_run_without_new_xml_is_idempotent(self, service_with_real_xml_samples):
-        service = service_with_real_xml_samples
+        service, documents = service_with_real_xml_samples
 
-        first_count = service.parse_and_export_to_excel()
-        second_count = service.parse_and_export_to_excel()
+        first_count = service.parse_and_export_to_excel(documents)
+        second_count = service.parse_and_export_to_excel(documents)
 
         assert first_count == second_count
         assert len(service.repository.get_all()) == first_count

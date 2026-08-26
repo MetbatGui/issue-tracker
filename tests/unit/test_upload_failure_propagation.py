@@ -7,7 +7,7 @@ from src.application.base_report_service import BaseReportService
 
 
 class _ServiceForUploadTest(BaseReportService):
-    def parse_and_export_to_excel(self, relation_map=None) -> int:
+    def parse_and_export_to_excel(self, documents, relation_map=None, export=True) -> int:
         return 0
 
 

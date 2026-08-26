@@ -7,9 +7,9 @@ import re
 import time
 import zipfile
 import io
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Callable, Dict, List, Optional, Any, Set
-from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
@@ -17,7 +17,16 @@ from dotenv import load_dotenv
 from ..logger import get_logger
 
 
-__all__ = ["DartApiClient"]
+__all__ = ["DownloadedXml", "DartApiClient"]
+
+
+@dataclass(frozen=True)
+class DownloadedXml:
+    """디스크에 쓰지 않고 수집·파싱 단계 사이에서만 전달하는 DART XML 원본."""
+
+    rcept_no: str
+    source_filename: str
+    content: bytes
 
 
 class DartApiClient:
@@ -31,7 +40,7 @@ class DartApiClient:
         
         Args:
             api_key: DART API 키. None이면 .env에서 로드
-            save_directory: XML 파일을 저장할 디렉토리
+            save_directory: 하위 호환용 인자. XML은 디스크에 저장하지 않습니다.
         """
         if api_key is None:
             load_dotenv()
@@ -40,13 +49,7 @@ class DartApiClient:
                 raise ValueError("DART_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요.")
 
         self.api_key = api_key
-        self.save_path = Path(save_directory)
-        self.xml_save_path = self.save_path / "xml"
-        
         self.logger = get_logger(self.__class__.__name__)
-
-        # 디렉토리 생성
-        self.xml_save_path.mkdir(parents=True, exist_ok=True)
 
     def fetch_disclosure_list(
         self,
@@ -86,15 +89,15 @@ class DartApiClient:
             self.logger.error(f"목록 검색 실패: {e}")
             return None
 
-    def download_document_xml(self, rcept_no: str, corp_name: str) -> Optional[Path]:
-        """상세 원본 파일(document.xml)을 다운로드합니다.
+    def download_document_xml(self, rcept_no: str, corp_name: str) -> Optional[DownloadedXml]:
+        """상세 원본 XML을 메모리에서만 보관한 채 반환합니다.
         
         Args:
             rcept_no: 접수번호
             corp_name: 회사명
             
         Returns:
-            다운로드된 파일 경로. 실패 시 None
+            다운로드된 XML bytes와 식별 정보. 실패 시 None
         """
         url = "https://opendart.fss.or.kr/api/document.xml"
         params = {
@@ -105,12 +108,6 @@ class DartApiClient:
         # 파일명 안전하게 생성
         safe_corp_name = re.sub(r'[\\/*?:"<>|]', "", corp_name)
         filename = f"{safe_corp_name}_{rcept_no}.xml"
-        file_path = self.xml_save_path / filename
-
-        # 이미 다운로드된 경우 건너뛰기
-        if file_path.exists():
-            return file_path
-
         try:
             response = requests.get(url, params=params, timeout=60)
             response.raise_for_status()
@@ -140,11 +137,8 @@ class DartApiClient:
                 xml_filename_in_zip = z.namelist()[0]
                 xml_data = z.read(xml_filename_in_zip)
 
-                with open(file_path, "wb") as f:
-                    f.write(xml_data)
-
             time.sleep(0.2)  # API 과부하 방지
-            return file_path
+            return DownloadedXml(rcept_no=rcept_no, source_filename=filename, content=xml_data)
 
         except Exception as e:
             self.logger.error(f"  └ XML 다운로드 실패 ({corp_name}): {e}")
@@ -275,7 +269,7 @@ class DartApiClient:
             report_type_name: 보고서 유형명 (로그용)
             
         Returns:
-            수집된 공시 목록 (xml_path 추가됨)
+            수집된 공시 목록 (xml_document 추가됨)
         """
         if end_date is None:
             end_date = datetime.now().strftime("%Y%m%d")
@@ -285,7 +279,7 @@ class DartApiClient:
         all_filtered_reports = []
         
         self.logger.info(f"[수집 시작] {start_date} ~ {end_date} ({report_type_name})")
-        self.logger.debug(f"[XML 저장] {self.xml_save_path}")
+        self.logger.debug("[XML 처리] 메모리 내 처리")
 
         while curr_start <= final_end:
             curr_end = curr_start + timedelta(days=interval_days)
@@ -325,12 +319,12 @@ class DartApiClient:
                 if existing:
                     self.logger.info("  - DB 반영 공시 %d건 건너뜀", len(existing))
                 for item in pending:
-                    xml_path = self.download_document_xml(
+                    xml_document = self.download_document_xml(
                         item['rcept_no'],
                         item['corp_name']
                     )
-                    if xml_path:
-                        item['xml_path'] = str(xml_path)
+                    if xml_document:
+                        item['xml_document'] = xml_document
 
                 all_filtered_reports.extend(pending)
 
@@ -363,7 +357,7 @@ class DartApiClient:
             report_type: 보고서 유형 ("capital_increase", "bonus_shares", "dual_increase")
             
         Returns:
-            수집된 공시 목록 (xml_path 추가됨)
+            수집된 공시 목록 (xml_document 추가됨)
         """
         # 필터 함수 및 이름 선택
         if report_type == "bonus_shares":
