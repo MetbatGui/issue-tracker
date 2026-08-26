@@ -33,3 +33,16 @@ def test_cron_allows_google_oauth_token_refresh():
     # OAuth refresh token은 실행 중 갱신되므로 credentials 디렉터리는 쓰기 가능해야 한다.
     assert "- ../secrets:/app/secrets\n" in compose
     assert "- ../secrets:/app/secrets:ro" not in compose
+
+
+def test_bind_mounts_are_prepared_for_the_nonroot_payload_on_linux():
+    compose = (ROOT / "docker" / "docker-compose.yml").read_text(encoding="utf-8")
+    cron_entrypoint = (ROOT / "docker" / "cron-entrypoint.sh").read_text(encoding="utf-8")
+    app_entrypoint = (ROOT / "docker" / "app-entrypoint.sh").read_text(encoding="utf-8")
+    permissions = (ROOT / "docker" / "prepare-bind-mounts.sh").read_text(encoding="utf-8")
+
+    assert 'entrypoint: ["/app/docker/app-entrypoint.sh"]' in compose
+    assert "user: root" in compose
+    assert "/app/docker/prepare-bind-mounts.sh" in cron_entrypoint
+    assert "chown -R nonroot:nonroot" in permissions
+    assert "exec runuser -u nonroot -- \"$@\"" in app_entrypoint

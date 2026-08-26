@@ -6,6 +6,8 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     image: issue-tracker:latest
+    entrypoint: ["/app/docker/app-entrypoint.sh"]
+    user: root
     volumes:
       - ../data:/app/data
       - ../logs:/app/logs
