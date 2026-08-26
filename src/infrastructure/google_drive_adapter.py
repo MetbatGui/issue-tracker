@@ -4,6 +4,7 @@ Google Drive API를 사용하여 파일을 업로드/관리하는 어댑터입�
 """
 import sys
 import os.path
+import tempfile
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
@@ -11,7 +12,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 
 from ..logger import get_logger
 from ..domain.ports import StoragePort
@@ -34,17 +35,44 @@ class GoogleDriveAdapter(StoragePort):
     SCOPES = ['https://www.googleapis.com/auth/drive']
 
     def get_file(self, storage_path: Path) -> Optional[Path]:
-        """원격 DB 원본 저장소로는 사용하지 않으므로 작업 사본을 제공하지 않는다."""
-        return None
+        """설정된 Drive 폴더의 DB를 독립적인 임시 작업 사본으로 내려받는다."""
+        self.last_error = None
+        if not self.database_folder_id:
+            return None
+        try:
+            file_id = self._find_file_by_name(self.database_folder_id, storage_path.name)
+            if not file_id:
+                return None
+            fd, temporary_name = tempfile.mkstemp(suffix=storage_path.suffix)
+            os.close(fd)
+            working_path = Path(temporary_name)
+            try:
+                request = self.service.files().get_media(fileId=file_id)
+                with working_path.open("wb") as output:
+                    downloader = MediaIoBaseDownload(output, request)
+                    done = False
+                    while not done:
+                        _, done = downloader.next_chunk()
+                return working_path
+            except Exception:
+                working_path.unlink(missing_ok=True)
+                raise
+        except Exception as error:
+            self.last_error = error
+            self.logger.error("Drive DB 다운로드 실패: %s", error)
+            return None
 
     def put_file(self, local_path: Path, storage_path: Path) -> bool:
-        """원격 DB 원본 저장소로는 사용하지 않으므로 반영하지 않는다."""
-        return False
+        """작업 사본을 설정된 Drive DB 폴더의 같은 파일명으로 반영한다."""
+        if not self.database_folder_id:
+            return False
+        return self.upload_file(local_path, self.database_folder_id, storage_path.name) is not None
     
     def __init__(
         self,
         credentials_path: str = "secrets/client_secret.json",
-        token_path: str = "secrets/token.json"
+        token_path: str = "secrets/token.json",
+        database_folder_id: Optional[str] = None,
     ):
         """구글 드라이브 어댑터를 초기화합니다.
         
@@ -55,6 +83,8 @@ class GoogleDriveAdapter(StoragePort):
         self.logger = get_logger(self.__class__.__name__)
         self.credentials_path = credentials_path
         self.token_path = token_path
+        self.database_folder_id = database_folder_id
+        self.last_error = None
         self.service = self._authenticate()
     
     def _authenticate(self):

@@ -63,7 +63,10 @@ class BaseReportService(ABC):
                     self.google_drive_folder_id = os.getenv(google_folder_id_env_var)
                 
                 if self.google_drive_folder_id:
-                    self.google_drive = GoogleDriveAdapter()
+                    self.google_drive = GoogleDriveAdapter(
+                        database_folder_id=self.google_drive_folder_id,
+                    )
+                    self.source_storage = self.google_drive
                 else:
                     self.logger.warning(f"{google_folder_id_env_var} environment variable not set.")
             except Exception as e:

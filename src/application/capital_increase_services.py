@@ -58,7 +58,7 @@ class CapitalIncreaseService(BaseReportService):
         )
         self.parser = CapitalIncreaseXmlParser()
         self.excel_writer = CapitalIncreaseExcelWriter(output_path=str(self.excel_path))
-        self.database_session = SqliteStorageSession(self.source_storage, self.data_directory / "유상증자.db")
+        self.database_session = SqliteStorageSession.get_shared(self.source_storage, self.data_directory / "유상증자.db")
         self.repository = CapitalIncreaseSqliteRepository(str(self.database_session.working_path))
 
     def get_relation_map(self) -> dict:
@@ -127,7 +127,6 @@ class CapitalIncreaseService(BaseReportService):
     def _persist_and_upload_database(self, database_path: Path) -> None:
         if not self.database_session.persist():
             raise RuntimeError(f"SQLite SSOT 반영 실패: {database_path}")
-        self._upload_file_to_google_drive(database_path)
 
     def _result_after_collection(self, documents: List[DownloadedXml], relation_map: dict) -> LocalUpdateResult:
         if documents:
