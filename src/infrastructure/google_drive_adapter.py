@@ -4,6 +4,7 @@ Google Drive API를 사용하여 파일을 업로드/관리하는 어댑터입�
 """
 import sys
 import os.path
+import tempfile
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
@@ -11,7 +12,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 
 from ..logger import get_logger
 from ..domain.ports import StoragePort
@@ -32,11 +33,46 @@ class GoogleDriveAdapter(StoragePort):
     """
     
     SCOPES = ['https://www.googleapis.com/auth/drive']
+
+    def get_file(self, storage_path: Path) -> Optional[Path]:
+        """설정된 Drive 폴더의 DB를 독립적인 임시 작업 사본으로 내려받는다."""
+        self.last_error = None
+        if not self.database_folder_id:
+            return None
+        try:
+            file_id = self._find_file_by_name(self.database_folder_id, storage_path.name)
+            if not file_id:
+                return None
+            fd, temporary_name = tempfile.mkstemp(suffix=storage_path.suffix)
+            os.close(fd)
+            working_path = Path(temporary_name)
+            try:
+                request = self.service.files().get_media(fileId=file_id)
+                with working_path.open("wb") as output:
+                    downloader = MediaIoBaseDownload(output, request)
+                    done = False
+                    while not done:
+                        _, done = downloader.next_chunk()
+                return working_path
+            except Exception:
+                working_path.unlink(missing_ok=True)
+                raise
+        except Exception as error:
+            self.last_error = error
+            self.logger.error("Drive DB 다운로드 실패: %s", error)
+            return None
+
+    def put_file(self, local_path: Path, storage_path: Path) -> bool:
+        """작업 사본을 설정된 Drive DB 폴더의 같은 파일명으로 반영한다."""
+        if not self.database_folder_id:
+            return False
+        return self.upload_file(local_path, self.database_folder_id, storage_path.name) is not None
     
     def __init__(
         self,
         credentials_path: str = "secrets/client_secret.json",
-        token_path: str = "secrets/token.json"
+        token_path: str = "secrets/token.json",
+        database_folder_id: Optional[str] = None,
     ):
         """구글 드라이브 어댑터를 초기화합니다.
         
@@ -47,6 +83,8 @@ class GoogleDriveAdapter(StoragePort):
         self.logger = get_logger(self.__class__.__name__)
         self.credentials_path = credentials_path
         self.token_path = token_path
+        self.database_folder_id = database_folder_id
+        self.last_error = None
         self.service = self._authenticate()
     
     def _authenticate(self):
@@ -70,7 +108,7 @@ class GoogleDriveAdapter(StoragePort):
                 creds.refresh(Request())
             else:
                 self.logger.info("🔐 구글 드라이브 인증 시작...")
-                print("브라우저에서 인증을 완료해주세요.")
+                self.logger.info("브라우저에서 인증을 완료해주세요.")
                 flow = InstalledAppFlow.from_client_secrets_file(
                     self.credentials_path, self.SCOPES
                 )
@@ -84,6 +122,19 @@ class GoogleDriveAdapter(StoragePort):
         return build('drive', 'v3', credentials=creds)
     
     def upload_file(
+        self,
+        file_path: Path,
+        folder_id: str,
+        file_name: Optional[str] = None
+    ) -> Optional[str]:
+        """파일을 업로드하고, 인프라 실패는 None으로 반환합니다."""
+        try:
+            return self._upload_file(file_path, folder_id, file_name)
+        except Exception as e:
+            self.logger.error(f"  ❌ 파일 업로드 실패: {e}")
+            return None
+
+    def _upload_file(
         self,
         file_path: Path,
         folder_id: str,
@@ -117,9 +168,14 @@ class GoogleDriveAdapter(StoragePort):
         }
         
         # 3. 미디어 업로드
+        mime_type = (
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            if file_path.suffix.lower() == '.xlsx'
+            else 'application/octet-stream'
+        )
         media = MediaFileUpload(
             str(file_path),
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            mimetype=mime_type,
             resumable=True
         )
         
@@ -156,18 +212,14 @@ class GoogleDriveAdapter(StoragePort):
         escaped_name = file_name.replace("'", "\\'")
         query = f"name='{escaped_name}' and '{folder_id}' in parents and trashed=false"
         
-        try:
-            results = self.service.files().list(
-                q=query,
-                fields="files(id, name)",
-                pageSize=10
-            ).execute()
-            
-            files = results.get('files', [])
-            return files[0]['id'] if files else None
-        except Exception as e:
-            self.logger.warning(f"  ⚠️ 파일 검색 중 오류: {e}")
-            return None
+        results = self.service.files().list(
+            q=query,
+            fields="files(id, name)",
+            pageSize=10
+        ).execute()
+
+        files = results.get('files', [])
+        return files[0]['id'] if files else None
     
     def delete_file(self, file_id: str) -> bool:
         """파일을 삭제합니다.

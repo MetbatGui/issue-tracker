@@ -5,7 +5,7 @@
 import sqlite3
 from datetime import date, datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from ..domain import BondWithWarrantDecision
 from ..domain.ports import ReportRepository
@@ -105,11 +105,14 @@ class BondWithWarrantSqliteRepository(ReportRepository):
             ON CONFLICT(rcept_no) DO UPDATE SET {update_clause}
         """
 
-        for decision in decisions:
-            self._conn.execute(sql, self._to_row_params(decision))
-            self._upsert_funding_purposes(decision.rcept_no, decision.funding)
-
-        self._conn.commit()
+        try:
+            for decision in decisions:
+                self._conn.execute(sql, self._to_row_params(decision))
+                self._upsert_funding_purposes(decision.rcept_no, decision.funding)
+            self._conn.commit()
+        except Exception:
+            self._conn.rollback()
+            raise
         return len(decisions)
 
     def get_all(self) -> List[BondWithWarrantDecision]:
@@ -119,6 +122,18 @@ class BondWithWarrantSqliteRepository(ReportRepository):
         ).fetchall()
 
         return [self._row_to_decision(row) for row in rows]
+
+    def existing_rcept_nos(self, rcept_nos: List[str]) -> Set[str]:
+        if not rcept_nos:
+            return set()
+        placeholders = ", ".join("?" for _ in rcept_nos)
+        rows = self._conn.execute(
+            f"SELECT rcept_no FROM bond_with_warrant_decisions WHERE rcept_no IN ({placeholders})", rcept_nos
+        ).fetchall()
+        return {row[0] for row in rows}
+
+    def close(self) -> None:
+        self._conn.close()
 
     def _to_row_params(self, decision: BondWithWarrantDecision) -> dict:
         return {

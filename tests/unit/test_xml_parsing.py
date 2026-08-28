@@ -16,7 +16,7 @@ class TestCapitalIncreaseXmlParsing:
     @pytest.fixture
     def capital_xml_dir(self):
         """유상증자 XML 디렉토리"""
-        return Path("data/유상증자/xml")
+        return Path("tests/fixtures/xml/유상증자")
     
     @pytest.fixture
     def sample_files(self, capital_xml_dir):
@@ -97,7 +97,7 @@ class TestBonusSharesXmlParsing:
     @pytest.fixture
     def bonus_xml_dir(self):
         """무상증자 XML 디렉토리"""
-        return Path("data/무상증자/xml")
+        return Path("tests/fixtures/xml/무상증자")
     
     @pytest.fixture
     def sample_files(self, bonus_xml_dir):
@@ -149,7 +149,7 @@ class TestDualIncreaseXmlParsing:
     @pytest.fixture
     def dual_xml_dir(self):
         """유무상증자 XML 디렉토리"""
-        return Path("data/유무상증자/xml")
+        return Path("tests/fixtures/xml/유무상증자")
     
     @pytest.fixture
     def sample_files(self, dual_xml_dir):

@@ -10,14 +10,15 @@ CapitalIncreaseDecision/BonusSharesDecision과 동일한 엔티티이므로 별�
 직접 병합 방식의 약점)도 함께 사라집니다.
 """
 import sys
-import glob
+import io
 from typing import List
 
 from ..domain import CapitalIncreaseDecision, BonusSharesDecision
-from ..infrastructure import DualIncreaseXmlParser
+from ..infrastructure import DualIncreaseXmlParser, DownloadedXml
 from .base_report_service import BaseReportService
 from .capital_increase_services import CapitalIncreaseService
 from .bonus_services import BonusSharesService
+from .daily_orchestration_service import LocalUpdateResult
 
 
 # UTF-8 인코딩 설정 (윈도우 콘솔용)
@@ -82,21 +83,27 @@ class DualIncreaseService(BaseReportService):
         merged.update(self.bonus_service.get_relation_map())
         return merged
 
-    def parse_and_export_to_excel(self, relation_map: dict = None) -> int:
+    def _existing_rcept_nos(self, rcept_nos: List[str]) -> set[str]:
+        """유무상 공시는 유상·무상 DB 양쪽에 모두 있을 때만 완료로 판단한다."""
+        capital_existing = self.capital_service.repository.existing_rcept_nos(rcept_nos)
+        bonus_existing = self.bonus_service.repository.existing_rcept_nos(rcept_nos)
+        return capital_existing & bonus_existing
+
+    def parse_and_export_to_excel(self, documents: List[DownloadedXml], relation_map: dict = None, export: bool = True) -> int:
         """XML 파일들을 파싱해 유상/무상 결정으로 분리한 뒤, 각 서비스의 DB에 반영하고
         각 서비스의 엑셀을 재구성합니다.
         """
-        print("\n" + "=" * 50)
-        print("📊 유무상증자 XML 파싱 및 DB 반영")
-        print("=" * 50)
+        self.logger.info("\n" + "=" * 50)
+        self.logger.info("유무상증자 XML 파싱 및 DB 반영")
+        self.logger.info("=" * 50)
 
-        xml_files = glob.glob(str(self.xml_directory / "*.xml"))
-
-        if not xml_files:
-            print("❌ 처리할 XML 파일이 없습니다.")
+        if not documents:
+            self.logger.warning("처리할 메모리 XML이 없습니다.")
+            if export:
+                return self.capital_service.export_to_excel() + self.bonus_service.export_to_excel()
             return 0
 
-        print(f"📂 {len(xml_files)}개의 XML 파일을 처리합니다...")
+        self.logger.info(f"{len(documents)}개의 메모리 XML을 처리합니다...")
 
         # 관계 맵 로드 (유상/무상 DB 기준)
         base_map = self.get_relation_map()
@@ -107,72 +114,97 @@ class DualIncreaseService(BaseReportService):
         capital_decisions: List[CapitalIncreaseDecision] = []
         bonus_decisions: List[BonusSharesDecision] = []
 
-        for xml_file in xml_files:
-            rcept_no = self._extract_rcept_no(xml_file)
-            parent_rcp = relation_map.get(rcept_no) if rcept_no else None
-
-            cap, bonus = self.parser.parse(xml_file, parent_rcp_no=parent_rcp)
+        for document in documents:
+            cap, bonus = self.parser.parse(
+                io.BytesIO(document.content), rcept_no=document.rcept_no,
+                parent_rcp_no=relation_map.get(document.rcept_no), source_filename=document.source_filename,
+            )
 
             if cap and not cap.is_limited_liability_company():
                 capital_decisions.append(cap)
             if bonus and not bonus.is_limited_liability_company():
                 bonus_decisions.append(bonus)
 
-        print(f"✅ 파싱 완료: 유상분 {len(capital_decisions)}건, 무상분 {len(bonus_decisions)}건")
+        self.logger.info(f"파싱 완료: 유상분 {len(capital_decisions)}건, 무상분 {len(bonus_decisions)}건")
 
         if capital_decisions:
             self.capital_service.repository.upsert(capital_decisions)
         if bonus_decisions:
             self.bonus_service.repository.upsert(bonus_decisions)
 
-        self.capital_service.export_to_excel()
-        self.bonus_service.export_to_excel()
+        if export:
+            self.capital_service.export_to_excel()
+            self.bonus_service.export_to_excel()
 
         return len(capital_decisions) + len(bonus_decisions)
 
-    def _upload_to_google_drive(self) -> None:
-        """유상/무상 각각의 메인 파일 업로드를 해당 서비스에 위임합니다."""
-        self.capital_service._upload_to_google_drive()
-        self.bonus_service._upload_to_google_drive()
-
-    def full_update(self, start_date: str = "20200101", end_date: str = None) -> None:
-        """전체 업데이트 워크플로우를 실행합니다."""
-        print("\n" + "🚀" * 25)
-        print(" " * 10 + "유무상증자 데이터 전체 업데이트")
-        print("🚀" * 25 + "\n")
-
-        self.run_pipeline(
-            self.api_client.collect_dual_increase_reports,
-            start_date,
-            end_date
+    def _local_update_result(self) -> LocalUpdateResult:
+        return LocalUpdateResult(
+            targets=(
+                self.capital_service._local_update_result().targets
+                + self.bonus_service._local_update_result().targets
+            )
         )
 
-        print("\n" + "🎉" * 25)
-        print(" " * 15 + "전체 업데이트 완료!")
-        print("🎉" * 25 + "\n")
+    def close(self) -> None:
+        """위임한 유상·무상 서비스의 SQLite 작업 사본도 함께 정리한다."""
+        self.capital_service.close()
+        self.bonus_service.close()
+        super().close()
 
-    def daily_update(self, days_back: int = 1) -> None:
+    def _result_after_collection(self, documents: List[DownloadedXml], relation_map: dict) -> LocalUpdateResult:
+        if documents:
+            changed_count = self.parse_and_export_to_excel(documents, relation_map, export=False)
+            if changed_count:
+                if not self.capital_service.database_session.persist():
+                    raise RuntimeError("유상증자 SQLite SSOT 반영 실패")
+                if not self.bonus_service.database_session.persist():
+                    raise RuntimeError("무상증자 SQLite SSOT 반영 실패")
+                return self._local_update_result()
+            return LocalUpdateResult.empty()
+
+        has_missing_output = (
+            (not self.capital_service.excel_path.exists() and self.capital_service.repository.get_all())
+            or (not self.bonus_service.excel_path.exists() and self.bonus_service.repository.get_all())
+        )
+        return self._local_update_result() if has_missing_output else LocalUpdateResult.empty()
+
+    def full_update(self, start_date: str = "20200101", end_date: str = None) -> LocalUpdateResult:
+        """전체 업데이트 워크플로우를 실행합니다."""
+        self.logger.info("유무상증자 전체 업데이트 시작")
+
+        documents, relation_map = self.run_pipeline(
+            self.api_client.collect_dual_increase_reports,
+            start_date,
+            end_date,
+            existing_rcept_nos=self._existing_rcept_nos,
+        )
+
+        result = self._result_after_collection(documents, relation_map)
+        self.logger.info("유무상증자 전체 업데이트 완료")
+        return result
+
+    def daily_update(self, days_back: int = 1, today=None) -> LocalUpdateResult:
         """일일 업데이트 워크플로우를 실행합니다.
 
         최근 N일간의 데이터를 다운로드하고 유상/무상 각 서비스의 DB/엑셀에 반영합니다.
         """
         from datetime import datetime, timedelta
 
-        print("\n" + "📅" * 25)
-        print(" " * 10 + f"유무상증자 데이터 Daily 업데이트")
-        print("📅" * 25 + "\n")
+        self.logger.info("유무상증자 일일 업데이트 시작")
 
-        today = datetime.now()
+        today = today or datetime.now()
         start_date = (today - timedelta(days=days_back)).strftime("%Y%m%d")
 
-        print(f"📆 수집 기간: {start_date} ~ Today")
+        self.logger.info(f"수집 기간: {start_date} ~ Today")
 
-        self.run_pipeline(
+        documents, relation_map = self.run_pipeline(
             self.api_client.collect_dual_increase_reports,
             start_date,
-            skip_if_no_new_files=True
+            skip_if_no_new_files=True,
+            existing_rcept_nos=self._existing_rcept_nos,
         )
 
-        print("\n" + "✨" * 25)
-        print(" " * 10 + "유무상증자 Daily 업데이트 완료")
-        print("✨" * 25 + "\n")
+        result = self._result_after_collection(documents, relation_map)
+        self.logger.info("유무상증자 일일 업데이트 완료")
+        return result

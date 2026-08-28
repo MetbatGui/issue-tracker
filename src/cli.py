@@ -18,6 +18,32 @@ from .application import (
 from .logger import setup_logger, get_logger
 
 
+def _run_single_daily(name, service, days: int):
+    return DailyOrchestrationService([
+        OrchestrationStep(name, lambda: service),
+    ]).run(days)
+
+
+def _run_single_full(name, service, start_date: str):
+    return DailyOrchestrationService([
+        OrchestrationStep(name, lambda: service),
+    ]).run_full(start_date)
+
+
+def _run_single_export(name, service):
+    return DailyOrchestrationService([
+        OrchestrationStep(name, lambda: service),
+    ]).run_export()
+
+
+def _raise_if_failed(result) -> None:
+    if not result.all_succeeded:
+        failed_names = ", ".join(step.name for step in result.failed_steps)
+        failed_syncs = ", ".join(str(sync.target.database_path) for sync in result.failed_sync_results)
+        failed_names = ", ".join(name for name in (failed_names, failed_syncs) if name)
+        raise RuntimeError(f"업데이트 실패: {failed_names}")
+
+
 def main():
     """CLI 메인 함수"""
     # 로거 초기화 (Root Logger 설정)
@@ -68,10 +94,6 @@ def main():
     ci_download = ci_subparsers.add_parser("download", help="유상증자 데이터 다운로드")
     ci_download.add_argument("--start", default="20200101", help="시작 날짜")
     ci_download.add_argument("--end", default=None, help="종료 날짜")
-
-    # convert
-    ci_subparsers.add_parser("convert", help="XML 파일들 UTF-8 인코딩 변환")
-
 
     # ==========================================
     # 2. bonus 명령 (무상증자)
@@ -161,15 +183,13 @@ def main():
             service = CapitalIncreaseService()
             
             if args.ci_command == "daily":
-                service.daily_update(getattr(args, 'days', 1))
+                _raise_if_failed(_run_single_daily("유상증자", service, getattr(args, 'days', 1)))
             elif args.ci_command == "full":
-                service.full_update(getattr(args, 'start', '20200101'))
+                _raise_if_failed(_run_single_full("유상증자", service, getattr(args, 'start', '20200101')))
             elif args.ci_command == "export":
-                service.parse_and_export_to_excel()
+                _raise_if_failed(_run_single_export("유상증자", service))
             elif args.ci_command == "download":
                 service.download_reports(args.start, getattr(args, 'end', None))
-            elif args.ci_command == "convert":
-                service.convert_xml_encoding()
             else:
                 logger.warning("capital-increase 하위 명령어를 지정하세요.")
 
@@ -180,11 +200,11 @@ def main():
             bonus_service = BonusSharesService()
             
             if args.bonus_command == "daily":
-                bonus_service.daily_update(getattr(args, 'days', 1))
+                _raise_if_failed(_run_single_daily("무상증자", bonus_service, getattr(args, 'days', 1)))
             elif args.bonus_command == "full":
-                bonus_service.full_update(getattr(args, 'start', '20200101'))
+                _raise_if_failed(_run_single_full("무상증자", bonus_service, getattr(args, 'start', '20200101')))
             elif args.bonus_command == "export":
-                bonus_service.parse_and_export_to_excel()
+                _raise_if_failed(_run_single_export("무상증자", bonus_service))
             elif args.bonus_command == "download":
                 bonus_service.download_reports(args.start, getattr(args, 'end', None))
             else:
@@ -197,11 +217,11 @@ def main():
             service = ConvertibleBondService()
             
             if args.cb_command == "daily":
-                service.daily_update(getattr(args, 'days', 1))
+                _raise_if_failed(_run_single_daily("전환사채", service, getattr(args, 'days', 1)))
             elif args.cb_command == "full":
-                service.full_update(getattr(args, 'start', '20200101'))
+                _raise_if_failed(_run_single_full("전환사채", service, getattr(args, 'start', '20200101')))
             elif args.cb_command == "export":
-                service.parse_and_export_to_excel()
+                _raise_if_failed(_run_single_export("전환사채", service))
             else:
                 logger.warning("cb 하위 명령어를 지정하세요.")
 
@@ -212,11 +232,11 @@ def main():
             service = BondWithWarrantService(dart_api_key=None)  # API 키는 .env에서 로드
             
             if args.bw_command == "daily":
-                service.daily_update(getattr(args, 'days', 1))
+                _raise_if_failed(_run_single_daily("신주인수권부사채", service, getattr(args, 'days', 1)))
             elif args.bw_command == "full":
-                service.full_update(getattr(args, 'start', '20200101'))
+                _raise_if_failed(_run_single_full("신주인수권부사채", service, getattr(args, 'start', '20200101')))
             elif args.bw_command == "export":
-                service.parse_and_export_to_excel()
+                _raise_if_failed(_run_single_export("신주인수권부사채", service))
             else:
                 logger.warning("bw 하위 명령어를 지정하세요.")
 
@@ -232,9 +252,9 @@ def main():
                         start_date = datetime.strptime(args.start, "%Y%m%d")
                         today = datetime.now()
                         days = (today - start_date).days + 1  # 시작일 포함
-                        print(f"📅 {args.start}부터 오늘까지: {days}일")
+                        logger.info(f"{args.start}부터 오늘까지: {days}일")
                     except ValueError:
-                        print(f"❌ 잘못된 날짜 형식: {args.start} (YYYYMMDD 형식으로 입력하세요)")
+                        logger.error(f"잘못된 날짜 형식: {args.start} (YYYYMMDD 형식으로 입력하세요)")
                         sys.exit(1)
                 else:
                     # --days가 주어진 경우 또는 기본값 사용
@@ -258,6 +278,8 @@ def main():
                     logger.info("✅ [ALL] 모든 업데이트가 완료되었습니다.")
                 else:
                     failed_names = ", ".join(s.name for s in result.failed_steps)
+                    failed_syncs = ", ".join(str(sync.target.database_path) for sync in result.failed_sync_results)
+                    failed_names = ", ".join(name for name in (failed_names, failed_syncs) if name)
                     logger.error(f"⚠️ [ALL] 일부 업데이트 실패: {failed_names}")
                 logger.info("="*60)
 

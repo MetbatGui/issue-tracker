@@ -4,7 +4,7 @@
 """
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Set
 
 
 __all__ = ["StoragePort", "ReportRepository"]
@@ -16,6 +16,16 @@ class StoragePort(ABC):
     외부 스토리지 시스템(구글 드라이브, AWS S3 등)과의 
     상호작용을 위한 포트 인터페이스입니다.
     """
+
+    @abstractmethod
+    def get_file(self, storage_path: Path) -> Optional[Path]:
+        """저장소 파일을 작업 사본으로 내려받습니다. 실패·부재 시 None을 반환합니다."""
+        pass
+
+    @abstractmethod
+    def put_file(self, local_path: Path, storage_path: Path) -> bool:
+        """작업 사본을 저장소에 원자적으로 반영합니다. 실패 시 False를 반환합니다."""
+        pass
     
     @abstractmethod
     def upload_file(
@@ -23,7 +33,7 @@ class StoragePort(ABC):
         file_path: Path, 
         folder_id: str,
         file_name: Optional[str] = None
-    ) -> str:
+    ) -> Optional[str]:
         """파일을 스토리지에 업로드합니다.
         
         Args:
@@ -32,10 +42,7 @@ class StoragePort(ABC):
             file_name: 업로드할 파일명 (None이면 원본 파일명 사용)
         
         Returns:
-            업로드된 파일의 ID 또는 URL
-        
-        Raises:
-            Exception: 업로드 실패 시
+            업로드된 파일의 ID 또는 URL. 실패 시 None.
         """
         pass
     
@@ -89,4 +96,14 @@ class ReportRepository(ABC):
         Returns:
             결정 객체 리스트
         """
+        pass
+
+    @abstractmethod
+    def existing_rcept_nos(self, rcept_nos: List[str]) -> Set[str]:
+        """주어진 접수번호 중 SSOT에 이미 반영된 번호를 일괄 반환합니다."""
+        pass
+
+    @abstractmethod
+    def close(self) -> None:
+        """저장소 연결을 닫아 작업 사본을 안전하게 정리할 수 있게 합니다."""
         pass

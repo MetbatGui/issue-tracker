@@ -1,0 +1,1881 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<DOCUMENT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="dart3.xsd">
+
+<DOCUMENT-NAME ACODE="11325">주요사항보고서(신주인수권부사채 발행결정)</DOCUMENT-NAME>
+<FORMULA-VERSION SUBVER="2" ADATE="20230407">2.6</FORMULA-VERSION>
+<COMPANY-NAME AREGCIK="01136348">나무기술(주)</COMPANY-NAME>
+
+
+<BODY>
+
+<LIBRARY>
+<SECTION-1 ACLASS="MANDATORY" APARTSOURCE="SOURCE">
+<TITLE ATOC="Y" AASSOCNOTE="D-0-0-0-0">주 요 사 항 보 고 서</TITLE>
+
+<TABLE ACLASS="NORMAL" AFIXTABLE="Y" WIDTH="638" BORDER="0">
+
+<COLGROUP>
+<COL WIDTH="129"></COL>
+<COL WIDTH="174"></COL>
+<COL WIDTH="308"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD COLSPAN="3" WIDTH="638" HEIGHT="30"></TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD COLSPAN="3" WIDTH="638" HEIGHT="53"></TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="321" HEIGHT="30">금융위원회 귀중</TD>
+<TD ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="317" HEIGHT="30">  2023년     08월     16일</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD COLSPAN="3" WIDTH="638" HEIGHT="53"></TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD WIDTH="138" HEIGHT="30">회     사     명  :</TD>
+<TD COLSPAN="2" WIDTH="500" HEIGHT="30">나무기술 주식회사</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD WIDTH="138" HEIGHT="30">대  표   이  사  :</TD>
+<TD COLSPAN="2" WIDTH="500" HEIGHT="30">정 철</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD WIDTH="138" HEIGHT="53">본 점  소 재 지 :</TD>
+<TD COLSPAN="2" WIDTH="500" HEIGHT="53">서울특별시 강서구 마곡중앙8로3길 41 (마곡동, 나무기술 마곡R&D센터)</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD WIDTH="138" HEIGHT="30"></TD>
+<TD COLSPAN="2" WIDTH="500" HEIGHT="30">(전  화) 031-8017-3900</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD WIDTH="138" HEIGHT="30"></TD>
+<TD COLSPAN="2" WIDTH="500" HEIGHT="30">(홈페이지)http://namutech.co.kr</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD WIDTH="138" HEIGHT="30"></TD>
+<TD COLSPAN="2" WIDTH="500" HEIGHT="30"></TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD COLSPAN="3" WIDTH="638" HEIGHT="30"></TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD COLSPAN="3" WIDTH="638" HEIGHT="30"></TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD WIDTH="138" HEIGHT="30">작 성 책 임 자 :</TD>
+<TD WIDTH="183" HEIGHT="30">(직  책) 상 무</TD>
+<TD WIDTH="317" HEIGHT="30">(성  명) 정 우 상</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD WIDTH="138" HEIGHT="30"></TD>
+<TD COLSPAN="2" WIDTH="500" HEIGHT="30">(전  화) 02-3288-7900</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD COLSPAN="3" WIDTH="638" HEIGHT="30"></TD>
+</TR>
+</TBODY>
+</TABLE>
+<P></P>
+<PGBRK></PGBRK>
+</SECTION-1>
+</LIBRARY>
+
+
+<SECTION-1 ACLASS="MANDATORY" APARTSOURCE="SOURCE">
+<TITLE ATOC="Y" AASSOCNOTE="D-0-1-0-0">신주인수권부사채권 발행결정</TITLE>
+<P USERMARK="F-GL11"></P>
+
+<TABLE-GROUP ACLASS="BW_PUB" ADELETETABLE="N">
+
+<TABLE ACLASS="EXTRACTION" AFIXTABLE="Y" WIDTH="926" BORDER="1">
+
+<COLGROUP>
+<COL WIDTH="111"></COL>
+<COL WIDTH="80"></COL>
+<COL WIDTH="140"></COL>
+<COL WIDTH="45"></COL>
+<COL WIDTH="44"></COL>
+<COL WIDTH="44"></COL>
+<COL WIDTH="12"></COL>
+<COL WIDTH="378"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">1. 사채의 종류</TD>
+<TD ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="54" HEIGHT="30" AUPDATECONT="N">회차</TD>
+<TE ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="53" HEIGHT="30" ACODE="SEQ_NO">7</TE>
+<TD ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="53" HEIGHT="30" AUPDATECONT="N">종류</TD>
+<TE COLSPAN="2" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="408" HEIGHT="30" ACODE="PL_KND">무기명식 이권부 무보증 사모 신주인수권부사채</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" WIDTH="358" HEIGHT="30" AUPDATECONT="N">2. 사채의 권면(전자등록)총액 (원)</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" WIDTH="568" HEIGHT="30" ACODE="DNM_SUM">10,000,000,000</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" WIDTH="358" HEIGHT="30" AUPDATECONT="N">2-1. 정관상 잔여 발행한도 (원)</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" ALIGN="RIGHT" WIDTH="568" HEIGHT="30" ACODE="ARI_LMT">20,000,000,000</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD ROWSPAN="4" VALIGN="MIDDLE" WIDTH="120" HEIGHT="120" AUPDATECONT="N">2-2. (해외발행)</TD>
+<TD COLSPAN="2" WIDTH="238" HEIGHT="30" AUPDATECONT="N">권면(전자등록)총액(통화단위)</TD>
+<TE COLSPAN="4" ALIGN="RIGHT" WIDTH="181" HEIGHT="30" ACODE="FRN_AMT">-</TE>
+<TU ALIGN="CENTER" WIDTH="387" HEIGHT="30" AUNIT="AMT_UNIT" AUNITVALUE="-">-</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" WIDTH="238" HEIGHT="30" AUPDATECONT="N">기준환율등</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" WIDTH="568" HEIGHT="30" ACODE="EXC_RT">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" WIDTH="238" HEIGHT="30" AUPDATECONT="N">발행지역</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" WIDTH="568" HEIGHT="30" ACODE="ISSU_AREA">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" WIDTH="238" HEIGHT="30" AUPDATECONT="N">해외상장시 시장의 명칭</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" WIDTH="568" HEIGHT="30" ACODE="FRN_NM">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD ROWSPAN="6" VALIGN="MIDDLE" WIDTH="120" HEIGHT="180" AUPDATECONT="N">3. 자금조달의    목적</TD>
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">시설자금 (원)</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="FND_USE1">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">영업양수자금 (원)</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="FND_USE_SQ">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">운영자금 (원)</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="FND_USE2">5,600,000,000</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">채무상환자금 (원)</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="FND_USE_RD">4,400,000,000</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">타법인 증권 취득자금 (원)</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="ANC_ACQ_PRC">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">기타자금 (원)</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="FND_USE3">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD ROWSPAN="2" VALIGN="MIDDLE" WIDTH="120" HEIGHT="60" AUPDATECONT="N">4. 사채의 이율</TD>
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">표면이자율 (%)</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="PRFT_RATE">0.0</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">만기이자율 (%)</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="LST_RTN_RT">2.0</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">5. 사채만기일</TD>
+<TU COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" AUNIT="EXP_DT" AUNITVALUE="20280824">2028년 08월 24일</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">6. 이자지급방법</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="INT_GV_MTH">본 사채의 표면이자는 0.0%이며, 별도의 이자지급기일은 없는 것으로 한다.</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="99" AUPDATECONT="N">7. 원금상환방법</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="99" ACODE="RTN_MTH">만기까지 보유하고 있는 본 사채의 원금에 대하여는2028년 08월 24일("원금 상환기일")에 전자등록금액의 110.4895%에 해당하는 금액을 일시 상환하기로 하되 원미만은 절사한다. 단, 상환기일이 영업일이 아닌 경우에는 그 다음 영업일에 상환하고 원금 상환기일 이후의 이자는 계산하지 아니한다.</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">8. 사채발행방법</TD>
+<TU COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" AUNIT="ISSU_MTH" AUNITVALUE="2">사모</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD ROWSPAN="14" VALIGN="MIDDLE" WIDTH="120" HEIGHT="1850" AUPDATECONT="N">9. 신주인수권에    관한 사항</TD>
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">행사비율 (%)</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="EXE_RT">100</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">행사가액 (원/주)</TD>
+<TE COLSPAN="5" ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="EXE_PRC">2,717</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="122" AUPDATECONT="N">행사가액 결정방법</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="122" ACODE="EXE_FUNC">본 사채 발행을 위한 이사회 결의일 전일을 기산일로 하여 그 기산일로부터 소급하여 산정한1개월 가중산술평균주가, 1주일 가중산술평균주가 및 최근일 가중산술평균주가를 산술평균한 가액과 최근일 가중산술평균주가 및 청약일(청약일이 없는 경우는 납입일) 3거래일 전 가중산술평균주가 중 높은 가액으로서 원단위 미만을 절상한 금액으로 한다.</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">사채와 인수권의 분리여부</TD>
+<TU COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" AUNIT="DIV_YN" AUNITVALUE="N" ALIGN="CENTER">비분리</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">신주대금 납입방법</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="PYM_MTH" ALIGN="CENTER">대용납입</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD VALIGN="MIDDLE" WIDTH="89" HEIGHT="113" AUPDATECONT="N" ROWSPAN="3">신주인수권행사에 따라발행할 주식</TD>
+<TD VALIGN="MIDDLE" WIDTH="149" HEIGHT="30" AUPDATECONT="N" ALIGN="CENTER">종류</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="STK_KND" ALIGN="CENTER">나무기술 주식회사 기명식 보통주</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD VALIGN="MIDDLE" WIDTH="149" HEIGHT="30" AUPDATECONT="N" ALIGN="CENTER">주식수</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="STK_CNT" ALIGN="RIGHT">3,680,529</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD VALIGN="MIDDLE" WIDTH="149" HEIGHT="53" AUPDATECONT="N" ALIGN="CENTER">주식총수 대비비율(%)</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="53" ACODE="STK_RT" ALIGN="RIGHT">10.6</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD ROWSPAN="2" VALIGN="MIDDLE" WIDTH="89" HEIGHT="60" AUPDATECONT="N">권리행사기간</TD>
+<TD ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="149" HEIGHT="30" AUPDATECONT="N">시작일</TD>
+<TU COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" AUNIT="SB_BGN_DT" AUNITVALUE="20240824">2024년 08월 24일</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="149" HEIGHT="30" AUPDATECONT="N">종료일</TD>
+<TU COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" AUNIT="SB_END_DT" AUNITVALUE="20280724">2028년 07월 24일</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" VALIGN="MIDDLE" WIDTH="238" HEIGHT="1276" AUPDATECONT="N">행사가액 조정에 관한 사항</TD>
+
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="1276" ACODE="EXE_REG">
+<P USERMARK="F-GL11">가. 본 사채권을 소유한 자가 행사하기 전에 발행회사가 시가를 하회하는 발행가액으로 유상증자, 무상증자, 주식배당 및 준비금의 자본전입 등을 함으로써 주식을 발행하거나 또는 시가를 하회하는 전환가액 또는 행사가액으로 전환사채 또는 신주인수권부사채를 발행하는 경우에는 아래와 같이 행사가액을 조정한다. 본목에 따른 행사가액의 조정일은 유상증자, 주식배당, 준비금의 자본전입 등으로 인한 신주발행일 또는 전환사채 및 신주인수권부사채의 발행일로 한다.</P>
+<P USERMARK="F-GL11">조정 후 행사가액 = 조정 전 행사가액 × [{A+(B×C/D)} / (A+B)]</P>
+<P USERMARK="F-GL11">A: 기발행주식수</P>
+<P USERMARK="F-GL11">B: 신발행주식수</P>
+<P USERMARK="F-GL11">C: 1주당 발행가격</P>
+<P USERMARK="F-GL11">D: 시가</P>
+<P USERMARK="F-GL11">다만, 위 산식 중 "기발행주식수"는 당해 조정사유가 발생하기 직전일 현재의 발행주식 총수로 하며, 전환사채 또는 신주인수권부사채를 발행할 경우 "신발행주식수"는 당해 사채 발행 시 전환가액으로 전부 주식으로 전환되거나 당해 사채 발행 시 행사가격으로 신주인수권이 전부 행사될 경우 발행될 주식의 수로 한다. 또한, 위 산식 중 "1주당 발행가격"은 주식분할, 무상증자, 주식배당의 경우에는 영(0)으로 하고, 전환사채 또는 신주인수권부사채를 발행할 경우에는 당해 사채 발행 시 전환가액 또는 행사가격으로 하며, 위 산식에서 "시가"라 함은 발행가격 산정의 기준이 되는 기준주가 또는 권리락주가(유상증자 이외의 경우에는 조정사유 발생 전일을 기산일로 하여 계산한 기준주가)로 한다.</P>
+<P USERMARK="F-GL11">나. 합병, 자본의 감소, 주식분할 및 병합 등에 의하여 행사가액의 조정이 필요한 경우에는 당해 사유 발생 직전에 신주인수권이 모두 행사되었더라면 신주인수권부사채권자가 가질 수 있었던 주식수에 따른 가치에 상응하도록 행사가액을 조정한다. 발행회사가 이러한 조치를 하지 못함으로 인하여 신주인수권부사채권자가 손해를 입은 경우 발행회사는 그 손해를 배상하여야 한다. 또한, 발행회사는 신주인수권부사채권자의 권리에 불리한 영향을 미치게 되는 방식으로 합병, 분할 및 영업양수도 행위를 하여서는 아니 되며, 계속 상장을 유지할 의무를 부담한다.</P>
+<P USERMARK="F-GL11">다. 감자 및 주식 병합 등 주식가치 상승사유가 발생하는 경우 감자 및 주식 병합 등으로 인한 조정비율만큼 상향하여 반영하는 조건으로 행사가액을 조정한다. 단, 감자 및 주식병합 등을 위한 주주총회 결의일 전일을 기산일로 하여 “증권의발행및공시등에관한규정” 제 5-22조 제1항 본문의 규정에 의하여 산정(제3호는 제외한다)한 가액(이하 “산정가액”이라 한다)이 액면가액 미만이면서 기산일 전에 행사가액을 액면가액으로 이미 조정한 경우에는 조정 후 행사가액은 산정가액을 기준으로 감자 및 주식병합 등으로 인한 조정비율만큼 상향 조정한 가액 이상으로 조정한다.</P>
+<P USERMARK="F-GL11">라. 위 가목 내지 다목에 의하여 조정된 행사가액이 주식의 액면가 이하일 경우에는 액면가를 행사가액으로 하며, 각 신주인수권부사채의 신주인수권 행사로 인하여 발행할 주식의 발행가액의 합계액은 각 신주인수권부사채의 발행가액을 초과할 수 없다.</P>
+<P USERMARK="F-GL11">마.  위 가목 내지 다목 이외에 별도 사유로 본 건 사채의 행사가액 조정은 없는 것으로 한다.</P>
+<P USERMARK="F-GL11">본호에 의한 조정 후 행사가액 중 원단위 미만은 절상한다.</P>
+</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD VALIGN="MIDDLE" WIDTH="89" HEIGHT="159" AUPDATECONT="N" ROWSPAN="3">시가하락에따른행사가액조정</TD>
+<TD VALIGN="MIDDLE" WIDTH="149" HEIGHT="30" AUPDATECONT="N">최저 조정가액 (원)</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" ALIGN="CENTER" WIDTH="568" HEIGHT="30" ACODE="MIN_PRC">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD VALIGN="MIDDLE" WIDTH="149" HEIGHT="30" AUPDATECONT="N">최저 조정가액 근거</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" ALIGN="CENTER" WIDTH="568" HEIGHT="30" ACODE="MIN_RSN">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD VALIGN="MIDDLE" WIDTH="149" HEIGHT="99" AUPDATECONT="N">발행당시 행사가액의70% 미만으로조정가능한 잔여발행한도 (원)</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" ALIGN="CENTER" WIDTH="568" HEIGHT="99" ACODE="CTR_LMT">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="838" AUPDATECONT="N">9-1. 옵션에 관한 사항</TD>
+
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="838" ACODE="OPT_FCT">
+
+<P>신주인수권부사채는 만기 전 사채권자로부터 본 사채를 매수할 수 있는 권리 (Call Option)가 발행회사 및/또는 발행회사가 지정하는 제3자에게 부여된 사채이며 동시에 채권자가 조기상환을 청구할 수 있는 권리(Put Option)가 부여된 사채이다.
+<SPAN USERMARK=" B">[조기상환청구권(Put Option)에 관한 사항]                                        </SPAN>본 사채의 사채권자는 본 사채의 발행일로부터 24개월 이후인2025년08월 24일 및 이후 매3개월에 해당되는 날(이하 조기상환지급일)에 조기상환을 청구한 전자등록금액에 조기상환율을 곱한 금액의 전부에 대하여 만기 전 조기상환을 청구할 수 있다. 단, 조기상환지급일이 영업일이 아닌 경우에는 그 다음 영업일에 상환하고 조기상환지급일 이후의 이자는 계산하지 아니한다.                                                 
+<SPAN USERMARK=" B">[매도청구권(Call Option)에 관한 사항]</SPAN>발행회사 및/또는 발행회사가 지정하는 자(이하 총칭하여 “매수청구권자”라 한다)는 본 사채의 발행일로부터 12개월이 되는 2024년 08월 24일 이후 2025년 08월 24일까지 매 3개월이 되는 날(이하 “콜옵션 행사일”이라 한다)에 인수인 또는 사채권자가 보유하고 있는 본 사채를 매수할 수 있으며, 그에 따라 매수청구권자는 콜옵션 행사일까지 3개월 단위 연복리 0.1%의 수익률이 보장된 본 계약 제(1)호의 콜옵션 행사금액만큼 인수인에게 조기상환 할 수 있다. 
+</P>
+<P USERMARK="F-GL11">단, 최대주주 및 최대주주의 특수관계인(이하“최대주주 등”)이 매수인이 되는 경우, 각 최대주주 등이 매수할 수 있는 본 사채의 수량은“증권의 발행 및 공시 등에 관한 규정” 제5-21조 제3항에서 정하는 한도로 제한된다.이 외 Put Option 및 Call Option에 관한 세부내용은 "22. 기타 투자판단에 참고할 사항"을 참고 바랍니다.</P>
+</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">10. 합병 관련 사항</TD>
+<TE COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="MRG_FCT">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">11. 청약일</TD>
+<TU COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" AUNIT="SBSC_DT" AUNITVALUE="20230818">2023년 08월 18일</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">12. 납입일</TD>
+<TU COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" AUNIT="PYM_DT" AUNITVALUE="20230824">2023년 08월 24일</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" WIDTH="358" HEIGHT="30" AUPDATECONT="N">13. 납입방법</TD>
+<TU COLSPAN="5" ALIGN="CENTER" WIDTH="568" HEIGHT="30" AUNIT="PYM_DET" AUNITVALUE="1">현금</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">14. 대표주관회사</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="CHF_AGN" ALIGN="CENTER">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">15. 보증기관</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="WTY_ORG" ALIGN="CENTER">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">16. 담보제공에 관한 사항</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="MOR_OFR" ALIGN="CENTER">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">17. 이사회결의일(결정일)</TD>
+<TU COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" AUNIT="DRC_DT" AUNITVALUE="20230816">2023년 08월 16일</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD ROWSPAN="2" VALIGN="MIDDLE" WIDTH="120" HEIGHT="60" AUPDATECONT="N">   - 사외이사      참석여부</TD>
+<TD COLSPAN="2" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">참석 (명)</TD>
+<TE COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="ATD_CNT">1</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="2" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="238" HEIGHT="30" AUPDATECONT="N">불참 (명)</TD>
+<TE COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" ACODE="NATD_CNT">0</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">   - 감사(감사위원) 참석여부</TD>
+<TU COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" AUNIT="ADT_ATD_YN" AUNITVALUE="Y">참석</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">18. 증권신고서 제출대상 여부</TD>
+<TU COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" AUNIT="RPT_SM_YN" AUNITVALUE="N">아니오</TU>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="53" AUPDATECONT="N">19. 제출을 면제받은 경우 그 사유</TD>
+<TE COLSPAN="5" VALIGN="MIDDLE" WIDTH="568" HEIGHT="53" ACODE="RPT_SBM" ALIGN="CENTER">사모 발행으로 증권신고서 제출 면제(사채 발행일로부터 1년간 전환 및 권면분할 금지)</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="122" AUPDATECONT="N">20. 당해 사채의 해외발행과 연계된 대차거래 내역   - 목적, 주식수, 대여자 및 차입자 인적사항, 예정처분시기, 대차조건(기간, 상환조건, 이율),상환방식, 당해 신주인수권부사채 발행과의 연계성, 수수료 등</TD>
+<TE COLSPAN="5" WIDTH="568" HEIGHT="122" ACODE="TRD_BD" VALIGN="MIDDLE" ALIGN="CENTER">해당사항 없음</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD COLSPAN="3" VALIGN="MIDDLE" WIDTH="358" HEIGHT="30" AUPDATECONT="N">21. 공정거래위원회 신고대상 여부</TD>
+<TU COLSPAN="5" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="568" HEIGHT="30" AUNIT="TRD_YN" AUNITVALUE="N">미해당</TU>
+</TR>
+</TBODY>
+</TABLE>
+</TABLE-GROUP>
+<P USERMARK="F-GL11">22. 기타 투자판단에 참고할 사항</P>
+
+<P>
+<SPAN USERMARK="F-GL11 B">가. 사채의 분할 및 병합 금지</SPAN>
+<SPAN USERMARK="F-GL11">본 사채의 거래단위는 발행일로부터 1년 이내에는 그 분할 및 병합은 인정하지 아니한다.</SPAN>
+<SPAN USERMARK="F-GL11 B">나. 조기상환청구권(Put Option)에 관한 사항</SPAN>
+</P>
+<P USERMARK="F-GL11">1. 본 사채의 사채권자는 본 사채의 발행일로부터 24개월 이후인 2025년 08월 24일 및 이후 매 3개월에 해당되는 날(이하 조기상환지급일)에 조기상환을 청구한 전자등록금액에 조기상환율을 곱한 금액의 전부에 대하여 만기 전 조기상환을 청구할 수 있다. 단, 조기상환지급일이 영업일이 아닌 경우에는 그 다음 영업일에 상환하고 조기상환지급일 이후의 이자는 계산하지 아니한다.</P>
+<P USERMARK="F-GL11">(1)  조기상환 청구금액: 전자등록금액의 전부 또는 일부</P>
+<P USERMARK="F-GL11">(2)  조기상환 청구장소: 발행회사의 본점</P>
+<P USERMARK="F-GL11">(3)  조기상환 지급장소: 신한은행 판교테크노밸리 기업금융센터지점</P>
+<P USERMARK="F-GL11">(4) 조기상환 청구기간: 사채권자는 조기상환지급일로부터 60일전부터 30일전까지 한국예탁결제원에 조기상환 청구를 하여야 한다. 단, 조기상환청구기간의 종료일이 영업일이 아닌 경우에는 그 다음 영업일까지로 한다.</P>
+
+<TABLE BORDER="1" WIDTH="461" ACLASS="NORMAL" AFIXTABLE="N">
+
+<COLGROUP>
+<COL WIDTH="40"></COL>
+<COL WIDTH="89"></COL>
+<COL WIDTH="89"></COL>
+<COL WIDTH="114"></COL>
+<COL WIDTH="84"></COL>
+</COLGROUP>
+
+<THEAD ALIGN="LEFT" VALIGN="TOP">
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TH ROWSPAN="3" WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="90">
+<P>구분</P>
+</TH>
+
+<TH COLSPAN="2" WIDTH="196" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="30">
+<P>조기상환 청구기간</P>
+</TH>
+
+<TH ROWSPAN="3" WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="90">
+<P>조기상환지급일</P>
+</TH>
+
+<TH ROWSPAN="3" WIDTH="93" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="90">
+<P>조기상환율</P>
+</TH>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TH WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="30">
+<P>FROM</P>
+</TH>
+
+<TH WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="30">
+<P>TO</P>
+</TH>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TH WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="30">
+<P>60일전</P>
+</TH>
+
+<TH WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="30">
+<P>30일전</P>
+</TH>
+</TR>
+</THEAD>
+
+<TBODY>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>1차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-06-25</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-07-25</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-08-24</P>
+</TD>
+
+<TD WIDTH="93" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>104.0707%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-09-25</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-10-27</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-11-24</P>
+</TD>
+
+<TD WIDTH="93" ALIGN="CENTER" HEIGHT="30">
+<P>104.5910%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>3차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-12-26</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-01-26</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-02-24</P>
+</TD>
+
+<TD WIDTH="93" ALIGN="CENTER" HEIGHT="30">
+<P>105.1140%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>4차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-03-25</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-04-24</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-05-24</P>
+</TD>
+
+<TD WIDTH="93" ALIGN="CENTER" HEIGHT="30">
+<P>105.6395%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>5차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-06-25</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-07-27</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-08-24</P>
+</TD>
+
+<TD WIDTH="93" ALIGN="CENTER" HEIGHT="30">
+<P>106.1677%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>6차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-09-25</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-10-26</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-11-24</P>
+</TD>
+
+<TD WIDTH="93" ALIGN="CENTER" HEIGHT="30">
+<P>106.6986%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>7차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2026-12-26</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-01-25</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-02-24</P>
+</TD>
+
+<TD WIDTH="93" ALIGN="CENTER" HEIGHT="30">
+<P>107.2321%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>8차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-03-25</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-04-26</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-05-24</P>
+</TD>
+
+<TD WIDTH="93" ALIGN="CENTER" HEIGHT="30">
+<P>107.7682%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>9차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-06-25</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-07-26</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-08-24</P>
+</TD>
+
+<TD WIDTH="93" ALIGN="CENTER" HEIGHT="30">
+<P>108.3071%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>10차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-09-25</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-10-25</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-11-24</P>
+</TD>
+
+<TD WIDTH="93" ALIGN="CENTER" HEIGHT="30">
+<P>108.8486%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>11차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2027-12-26</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2028-01-25</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2028-02-24</P>
+</TD>
+
+<TD WIDTH="93" ALIGN="CENTER" HEIGHT="30">
+<P>109.3928%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="49" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>12차</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2028-03-25</P>
+</TD>
+
+<TD WIDTH="98" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2028-04-24</P>
+</TD>
+
+<TD WIDTH="123" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2028-05-24</P>
+</TD>
+
+<TD WIDTH="93" ALIGN="CENTER" HEIGHT="30">
+<P>109.9398%</P>
+</TD>
+</TR>
+</TBODY>
+</TABLE>
+<P USERMARK="F-GL11">(4) 조기상환 청구절차: “사채권자”는 “본 사채”가 고객계좌에 전자등록된 경우에는 거래하는 계좌관리기관을 통하여 한국예탁결제원에 조기상환을 청구하고, 계좌관리기관 자기계좌에 전자등록된 경우에는 한국예탁결제원에 조기상환을 청구하면 한국예탁결제원이 이를 취합하여 청구장소에 조기상환 청구한다.</P>
+
+<P>
+<SPAN USERMARK="F-GL11 B">다. 매도청구권(Call Option)에 관한 사항</SPAN>
+<SPAN USERMARK="F-GL11">발행회사 및/또는 발행회사가 지정하는 자(이하 총칭하여 “매수청구권자”라 한다)는 본 사채의 발행일로부터 12개월이 되는 2024년 08월 24일 이후 2025년 08월 24일까지 매 3개월이 되는 날(이하 “콜옵션 행사일”이라 한다)에 인수인 또는 사채권자가 보유하고 있는 본 사채를 매수할 수 있으며, 그에 따라 매수청구권자는 콜옵션 행사일까지 3개월 단위 연복리 0.1%의 수익률이 보장된 본 계약 제(1)호의 콜옵션 행사금액만큼 인수인에게 조기상환 할 수 있다. </SPAN>
+</P>
+<P USERMARK="F-GL11">단, 최대주주 및 최대주주의 특수관계인(이하 “최대주주 등”)이 매수인이 되는 경우, 각 최대주주 등이 매수할 수 있는 본 사채의 수량은 “증권의 발행 및 공시 등에 관한 규정” 제5-21조 제3항에서 정하는 한도로 제한된다.</P>
+<P USERMARK="F-GL11">매수청구권자는 각 인수인별로 각각 최초 전자등록총액의 20%를 초과하여 콜옵션(Call Option)을 행사할 수 없다. 콜옵션 행사일이 영업일(공휴일이 아닌 날로서 서울에서 은행들이 일상적인 업무를 영위하는 날을 말하며, 다만 일부 은행 또는 은행의 일부 점포만이 영업하는 날은 제외한다, 이하 같음)이 아닌 경우에는 그 다음 영업일에 콜옵션 행사금액을 지급하되 콜옵션 행사일부터 다음 영업일까지의 이자는 계산하지 아니한다.</P>
+<P USERMARK="F-GL11">(1) 콜옵션(Call Option) 행사금액:</P>
+<P USERMARK="F-GL11">2024년 08월 24일: 전자등록금액의 100.1000% </P>
+<P USERMARK="F-GL11">2024년 11월 24일: 전자등록금액의 100.1250% </P>
+<P USERMARK="F-GL11">2025년 02월 24일: 전자등록금액의 100.1500%2025년 05월 24일: 전자등록금액의 100.1751%</P>
+<P USERMARK="F-GL11">2025년 08월 24일: 전자등록금액의 100.2001%</P>
+<P USERMARK="F-GL11">(2) 콜옵션 청구대금 지급장소: 신한은행 판교테크노밸리 기업금융센터지점(3) 콜옵션 청구기간 및 절차: 매수청구권자가 콜옵션을 행사하고자 하는 경우 매수청구권자는 각 “콜옵션 행사일”로부터 20일전부터 10일전까지(이하 “콜옵션 청구기간”이라 한다) 인수인에게 콜옵션 행사청구인명, 콜옵션 행사대상 사채의 수량 및 행사가격을 서면으로 통지하는 방법으로 콜옵션 행사청구를 하여야 한다. 단, 콜옵션 청구기간의 종료일이 영업일이 아닌 경우에는 그 다음 영업일까지 콜옵션 행사를 청구할 수 있다. 매수청구권자의 위 콜옵션 행사 통지가 인수인에게 도달한 시점에 콜옵션 대상 사채에 대한 매매계약이 체결된 것으로 본다.</P>
+<P USERMARK="F-GL11"> </P>
+
+<TABLE BORDER="1" WIDTH="544" ACLASS="NORMAL" AFIXTABLE="N">
+
+<COLGROUP>
+<COL WIDTH="51"></COL>
+<COL WIDTH="112"></COL>
+<COL WIDTH="112"></COL>
+<COL WIDTH="112"></COL>
+<COL WIDTH="112"></COL>
+</COLGROUP>
+
+<THEAD ALIGN="LEFT" VALIGN="TOP">
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TH ROWSPAN="2" WIDTH="60" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="60">
+<P>구분</P>
+</TH>
+
+<TH COLSPAN="2" WIDTH="242" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="30">
+<P>콜옵션 청구기간</P>
+</TH>
+
+<TH ROWSPAN="2" WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="60">
+<P>콜옵션 행사일</P>
+</TH>
+
+<TH ROWSPAN="2" WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="60">
+<P>콜옵션 행사금액</P>
+</TH>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TH WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="30">
+<P>FROM</P>
+</TH>
+
+<TH WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="30">
+<P>TO</P>
+</TH>
+</TR>
+</THEAD>
+
+<TBODY>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="60" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>1차</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2024-08-04</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2024-08-14</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2024-08-24</P>
+</TD>
+
+<TD WIDTH="121" ALIGN="CENTER" HEIGHT="30">
+<P>100.1000%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="60" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2차</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2024-11-04</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2024-11-14</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2024-11-24</P>
+</TD>
+
+<TD WIDTH="121" ALIGN="CENTER" HEIGHT="30">
+<P>100.1250%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="60" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>3차</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-02-04</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-02-14</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-02-24</P>
+</TD>
+
+<TD WIDTH="121" ALIGN="CENTER" HEIGHT="30">
+<P>100.1500%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="60" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>4차</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-05-04</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-05-14</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-05-24</P>
+</TD>
+
+<TD WIDTH="121" ALIGN="CENTER" HEIGHT="30">
+<P>100.1751%</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="60" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>5차</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-08-04</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-08-14</P>
+</TD>
+
+<TD WIDTH="121" VALIGN="MIDDLE" ALIGN="CENTER" HEIGHT="30">
+<P>2025-08-24</P>
+</TD>
+
+<TD WIDTH="121" ALIGN="CENTER" HEIGHT="30">
+<P>100.2001%</P>
+</TD>
+</TR>
+</TBODY>
+</TABLE>
+<P USERMARK="F-GL11"> </P>
+<P USERMARK="F-GL11">(4) 콜옵션 행사에 따른 사채인도 및 대금지급</P>
+<P USERMARK="F-GL11">매수청구권자는 콜옵션 행사일에 인수인에게 인수인이 지정하는 방식으로 본 계약 제(1)호의 콜옵션 행사금액을 지급하고, 인수인은 위 금액을 지급받음과 동시에 매수청구권자에게 콜옵션 대상 사채를 계좌대체의 방식으로 인도한다. 단, 콜옵션 행사일이 영업일이 아닌 경우에는 그 다음 영업일에 매수청구권자는 콜옵션 행사금액을 지급하고 인수인은 콜옵션 행사 대상 사채를 인도하며, 이 때 콜옵션 행사일 이후의 이자는 계산하지 아니한다.</P>
+<P USERMARK="F-GL11">매수청구권자가 콜옵션 행사일에 콜옵션 행사금액을 인수인에게 지급하지 않을 경우, 매수청구권자는 콜옵션 행사금액에 대하여 콜옵션 행사일 다음 날부터 콜옵션 행사금액을 실제로 지급하는 날까지 연복리 9.0%의 이율로 계산한 연체이자를 가산하여 지급하기로 한다. 연체이자는 1년을 365일(윤년의 경우 366일)로 하여 1일 단위로 계산한다.</P>
+<P USERMARK="F-GL11">매수청구권자가 본 계약 제(1)호 내지 제(3)호, 제(4)호에서 정하는 방법에 따라 인수인에게 콜옵션 행사를 청구 및 콜옵션 행사금액을 지급하였으나, 인수인이 콜옵션 대상 사채를 매수청구권자에게 인도하지 않는 경우, 인수인은 콜옵션 행사금액에 대하여 콜옵션 행사일 다음 날부터 콜옵션 행사에 응하는 날까지 연복리 9.0%의 이율로 계산한 연체이자를 지급하기로 한다. 연체이자는 1년을 365일(윤년의 경우 366일)로 하여 1일 단위로 계산한다.</P>
+<P USERMARK="F-GL11">(5) 본 사채의 인수인은 콜옵션 행사기간이 종료되는 시점(2025년 08월 24일)까지 본 계약에서 정한 콜옵션 대상 사채에 대해서는 신주인수권을 행사하지 않고 신주인수권부사채의 형태로 보유하여야 하며(이하 “의무보유”라 한다), 제3자에게 본 사채를 양도하는 경우에도 콜옵션 대상 사채에 대하여 콜옵션 행사기간 만료 시까지 신주인수권을 행사하지 않고 신주인수권부사채로 보유할 의무를 부담하도록 함으로써 매수청구권자의 본 항 콜옵션 행사를 보장하여야 한다. 인수인이 본항을 위반하여 매수청구권자가 콜옵션 행사의 권리를 침해당하는 경우 인수인은 이로 인한 손해를 보상하여야 한다. 단, 본건 사채 인수계약 제4조 11항에 따른 조기상환청구 및 제4조 제23항 발행회사의 기한 이익상실의 경우에는 예외로 한다.</P>
+<P USERMARK="F-GL11">(6) 본 건 콜옵션 행사보다 “사채인수계약”상 사채권자의 조기상환청구권이 우선하며, 조기상환청구권 행사 시 제(5)호의 “의무보유”의무는 소멸한 것으로 본다.</P>
+<P USERMARK="F-GL11">매수청구권자의 콜옵션 행사를 보장하기 위하여 본 사채의 인수인은 사채권을 제3자에게 양도할 경우 발행회사에 사채의 양도와 관한 사항에 대하여 양도 이후 서면으로 통지하고 본 협약에 의한 콜옵션 행사가 보장되는 방법으로 하여야 한다. 인수인은 이러한 방식으로 제3자에게 본 사채를 양도한 경우, 양도한 범위에서 본 협약상 인수인의 의무(매수청구권자의 콜옵션을 보장하고 이에 응하여야 하는 의무 포함)는 소멸한 것으로 본다.</P>
+
+<P>
+<SPAN USERMARK="F-GL11 B">라. 신주인수권에 관한 사항</SPAN>
+<SPAN USERMARK="F-GL11">(1) 신주인수권 행사에 따라 발행할 주식의 종류: 나무기술 주식회사 기명식 보통주</SPAN>
+</P>
+<P USERMARK="F-GL11">(2) 신주인수권의 종류 및 주금 납입방법: 비분리형 신주인수권 / 대용납입</P>
+<P USERMARK="F-GL11">(3) 행사비율: 행사 청구한 전자등록금액을 행사일 현재의 행사가액으로 나누어 산출된 수로 하되, 1주 미만의 단수주에 상당하는 사채원금은 신주인수권 행사대상 주식 교부 시 명의개서대리인이 현금으로 지급하며, 단수주 대금의 해당기간이자는 지급하지 아니한다.</P>
+<P USERMARK="F-GL11">(4) 행사가액: 금 2,717원 (1주당 액면금액 100원 기준) (본 사채 발행을 위한 이사회 결의일 전일을 기산일로 하여 그 기산일로부터 소급하여 산정한 1개월 가중산술평균주가, 1주일 가중산술평균주가 및 최근일 가중산술평균주가를 산술평균한 가액과 최근일 가중산술평균주가 및 청약일(2023년 08월 18일) 3거래일 전 가중산술평균주가 중 높은 가액으로서 원단위 미만을 절상한 금액)</P>
+<P USERMARK="F-GL11">(5) 행사기간: 본 사채 발행일 이후 1년이 경과한 날(2024년 08월 24일)로부터 만기일 1개월 전(2028년 7월 24일)까지로 하되, 행사기간의 말일이 영업일이 아닐 경우 익영업일로 한다. 다만, 원리금지급일 2영업일 전부터 지급일까지는 청구할 수 없다.</P>
+<P USERMARK="F-GL11">(6) 행사장소: 발행회사의 명의개서대행기관(한국예탁결제원)</P>
+<P USERMARK="F-GL11">(7) 신주인수권 행사절차 및 방법: 사채권자가 고객계좌에 전자등록된 경우에는 거래하는 계좌관리기관을 통하여 한국예탁결제원에 신주인수권을 행사하고 자기계좌에 전자등록된 경우에는 한국예탁결제원에 신주인수권을 행사하면, 한국예탁결제원이 이를 취합하여 행사장소에 행사한다. </P>
+<P USERMARK="F-GL11">(8) 신주인수권 행사의 효력 발생시기: 위 행사장소에 신주인수권 행사청구서 및 관계서류 일체를 제출한 때에 효력이 발생한다. 행사에 의하여 교부된 주식은 행사일에 발행된 것으로 본다.</P>
+<P USERMARK="F-GL11">(9) 신주인수권 행사로 발행된 주식의 교부방법 및 장소: 신주인수권 행사로 인하여 발행되는 주식은 한국예탁결제원에 전자등록되므로 그 주권을 교부하지 아니한다. 단, 신주인수권 행사로 인하여 발행되는 주식은 명의개서대리인과 협의하여 행사일로부터 10영업일 이내에 추가상장에 필요한 모든 절차를 완료하여야 한다.</P>
+<P USERMARK="F-GL11">(10) 신주인수권 행사로 인하여 발행된 주식의 최초 배당금 및 이자: 신주인수권 행사에 의하여 발행된 주식에 대한 이익이나 이자의 배당에 관하여는 신주인수권을 행사한 날이 속한 영업년도의 직전 영업년도 말에 발행된 것으로 보아 배당의 효력을 가지며, 기지급된 이자에 대하여는 영향을 미치지 아니한다. 대용납입의 경우, 신주인수권 행사청구일까지 도래하지 않은 이자지급일의 이자는 신주인수권 행사청구로 인하여 소멸한다.</P>
+<P USERMARK="F-GL11">(11) 미발행 주식의 보유: 발행회사는 행사기간 종료 시까지 발행회사가 발행할 주식의 총수 중에 신주인수권 행사로 인하여 발행될 주식수를 미발행 주식으로 보유하여야 한다.</P>
+<P USERMARK="F-GL11">(12) 신주인수권 행사로 인한 증자등기: 신주인수권 행사에 따른 증자 등기는 행사일이 속한 월의 말일로부터 2주 이내에 한다.</P>
+<P USERMARK="F-GL11">(13) 행사가액 조정 시 통지: 행사가액이 조정될 경우에 한국예탁결제원에 즉시 통보하고, 발행회사는 공시 또는 인수인에게 통보한다.</P>
+<P></P>
+
+<TABLE-GROUP ACLASS="CRP_ISSU" ADELETETABLE="N">
+
+<TABLE ACLASS="NORMAL" AFIXTABLE="Y" WIDTH="600" BORDER="0">
+
+<COLGROUP>
+<COL WIDTH="591"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD WIDTH="600" HEIGHT="30" AUPDATECONT="N">【특정인에 대한 대상자별 사채발행내역】</TD>
+</TR>
+</TBODY>
+</TABLE>
+
+<TABLE ACLASS="EXTRACTION" AFIXTABLE="N" WIDTH="1048" BORDER="1">
+
+<COLGROUP>
+<COL WIDTH="247"></COL>
+<COL WIDTH="99"></COL>
+<COL WIDTH="364"></COL>
+<COL WIDTH="104"></COL>
+<COL WIDTH="141"></COL>
+<COL WIDTH="39"></COL>
+</COLGROUP>
+
+<THEAD>
+
+<TR ACOPY="N" ADELETE="N">
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="256" HEIGHT="99" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">발행 대상자명</TH>
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="108" HEIGHT="99" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">회사 또는최대주주와의관계</TH>
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="373" HEIGHT="99" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">선정경위</TH>
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="113" HEIGHT="99" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">발행결정 전후6월이내거래내역 및계획</TH>
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="150" HEIGHT="99" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">발행권면(전자등록)총액(원)</TH>
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="48" HEIGHT="99" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">비고</TH>
+</TR>
+</THEAD>
+
+<TBODY>
+
+<TR ACOPY="Y" ADELETE="N">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">NH투자증권 주식회사(본건 펀드1의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">200,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">NH투자증권 주식회사(본건 펀드2의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">200,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">NH투자증권 주식회사(본건 펀드3의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">300,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">NH투자증권 주식회사(본건 펀드4의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">600,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">NH투자증권 주식회사(본건 펀드5의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">1,500,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">NH투자증권 주식회사(본건 펀드6의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">200,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">KB증권 주식회사(본건 펀드7의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">150,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">NH투자증권 주식회사(본건 펀드8의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">200,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">한국투자증권 주식회사(본건 펀드9의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">50,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">삼성증권 주식회사(본건 펀드10의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">600,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">미래에셋증권 주식회사(본건 펀드11의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">400,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">미래에셋증권 주식회사(본건 펀드12의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">100,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">미래에셋증권 주식회사(본건 펀드13의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">400,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">KB증권 주식회사(본건 펀드14의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">100,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">KB증권 주식회사(본건 펀드15의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">600,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">KB증권 주식회사(본건 펀드16의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">200,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">KB증권 주식회사(본건 펀드17의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">100,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">KB증권 주식회사(본건 펀드18의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">100,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">NH투자증권 주식회사(본건 펀드19의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">300,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">NH투자증권 주식회사(본건 펀드20의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">300,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">NH투자증권 주식회사(본건 펀드21의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">500,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">KB증권 주식회사(본건 펀드22의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">900,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">삼성증권 주식회사(본건 펀드23의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">1,400,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="256" HEIGHT="53" ACODE="ISSU_NM" VALIGN="MIDDLE" ALIGN="CENTER">삼성증권 주식회사(본건 펀드24의 신탁업자 지위에서)</TE>
+<TE WIDTH="108" HEIGHT="53" ACODE="RLT" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE WIDTH="373" HEIGHT="53" ACODE="ISSU_SLT">경영상 목적 달성 및 신속한 자금 조달을 위해투자자의 납입능력 및투자의향 등을 고려하여 선정함</TE>
+<TE WIDTH="113" HEIGHT="53" ACODE="ISSU_HST" VALIGN="MIDDLE" ALIGN="CENTER">-</TE>
+<TE ALIGN="RIGHT" WIDTH="150" HEIGHT="53" ACODE="ISSU_AMT" VALIGN="MIDDLE">600,000,000</TE>
+<TE ALIGN="CENTER" WIDTH="48" HEIGHT="53" ACODE="ISSU_ETC">-</TE>
+</TR>
+</TBODY>
+</TABLE>
+</TABLE-GROUP>
+<P USERMARK="F-GL11">주) 펀드별 상세내역</P>
+
+<TABLE ACLASS="NORMAL" AFIXTABLE="N" BORDER="1" WIDTH="557">
+
+<COLGROUP>
+<COL WIDTH="95"></COL>
+<COL WIDTH="444"></COL>
+</COLGROUP>
+
+<THEAD ALIGN="LEFT" VALIGN="TOP">
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TH WIDTH="104" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="30">
+<P>구분</P>
+</TH>
+
+<TH WIDTH="453" VALIGN="MIDDLE" ALIGN="CENTER" ACOPYCOL="Y" ADELETECOL="Y" AMOVECOL="N" HEIGHT="30">
+<P>집합투자기구</P>
+</TH>
+</TR>
+</THEAD>
+
+<TBODY>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 1</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="BOTTOM" HEIGHT="30">
+<P>에이원컨버터블메자닌일반사모증권투자신탁</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 2</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="BOTTOM" HEIGHT="30">
+<P>에이원밸류업코스닥벤처일반사모투자신탁2호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 3</P>
+</TD>
+
+<TD WIDTH="453" HEIGHT="30">
+<P>에이원메자닌밸런스업일반사모투자신탁2호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 4</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="BOTTOM" HEIGHT="30">
+<P>에이원메자닌플러스일반사모투자신탁2호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 5</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="BOTTOM" HEIGHT="30">
+<P>에이원프라임코스닥벤처일반사모투자신탁</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 6</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="BOTTOM" HEIGHT="30">
+<P>에이원스테이블메자닌일반사모투자신탁</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 7</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="BOTTOM" HEIGHT="30">
+<P>에이원그레이스메자닌일반사모투자신탁2호 </P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 8</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="BOTTOM" HEIGHT="30">
+<P>에이원메자닌코스닥벤처일반사모투자신탁 </P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 9</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="BOTTOM" HEIGHT="30">
+<P>에이원브라이트메자닌일반사모투자신탁2호 </P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 10</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="BOTTOM" HEIGHT="30">
+<P>에이원 The banks 1 일반 사모투자신탁 </P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 11</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>포커스 슈퍼리치 일반 사모투자신탁 제7호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 12</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>포커스 LUX-메자닌 일반(전문투자자) 사모증권투자신탁 제1호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 13</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>포커스 The banks1 일반(전문투자자) 사모증권투자신탁 제1호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 14</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>포커스 유니콘 코스닥벤처 일반 사모투자신탁 제2호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 15</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>포커스 챔피온 일반 사모투자신탁 제2호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 16</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>포커스 골든플러스 코스닥벤처 일반 사모투자신탁 제2호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 17</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>포커스 퍼시픽 코스닥벤처 일반(전문투자자) 사모투자신탁 제2호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 18</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>포커스 얼라이언스 일반 사모투자신탁 제1호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 19</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>오라이언 명품 코스닥벤처 일반 사모투자신탁 제72호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 20</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>오라이언 명품 코스닥벤처 일반 사모투자신탁 제76호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 21</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>오라이언 명품 코스닥벤처 일반 사모투자신탁 제82호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 22</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>오라이언 명품 코스닥벤처 일반 사모투자신탁 제80호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 23</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>NH앱솔루트리턴 일반 사모투자신탁 제1호</P>
+</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD WIDTH="104" ALIGN="CENTER" HEIGHT="30">
+<P>본건 펀드 24</P>
+</TD>
+
+<TD WIDTH="453" VALIGN="MIDDLE" HEIGHT="30">
+<P>NH 앱솔루트 Mezzanine 일반 사모투자신탁 제4호</P>
+</TD>
+</TR>
+</TBODY>
+</TABLE>
+<P USERMARK="F-GL11"></P>
+
+<P USERMARK="F-GL11"></P>
+<P USERMARK="F-GL11"></P>
+
+<P USERMARK="F-GL11"></P>
+<P USERMARK="F-GL11"></P>
+
+<TABLE ACLASS="NORMAL" AFIXTABLE="Y" WIDTH="600" BORDER="0">
+
+<COLGROUP>
+<COL WIDTH="591"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="600" HEIGHT="30" AUPDATECONT="N">【조달자금의 구체적 사용 목적】</TD>
+</TR>
+</TBODY>
+</TABLE>
+
+<LIBRARY>
+<TABLE-GROUP ACLASS="TBL_FND1" ADELETETABLE="N">
+
+<TABLE ACLASS="NORMAL" AFIXTABLE="Y" WIDTH="600" BORDER="0">
+
+<COLGROUP>
+<COL WIDTH="591"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="600" HEIGHT="30" AUPDATECONT="N">【운영자금ㆍ기타자금의 경우】</TD>
+</TR>
+</TBODY>
+</TABLE>
+
+<TABLE ACLASS="EXTRACTION" AFIXTABLE="Y" WIDTH="600" BORDER="0">
+
+<COLGROUP>
+<COL WIDTH="450"></COL>
+<COL WIDTH="132"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="459" HEIGHT="30" AUPDATECONT="N" VALIGN="MIDDLE"></TD>
+<TU WIDTH="141" HEIGHT="30" VALIGN="MIDDLE" ALIGN="RIGHT" AUNIT="WON" AUNITVALUE="3">(단위 : 백만원)</TU>
+</TR>
+</TBODY>
+</TABLE>
+
+<TABLE ACLASS="EXTRACTION" WIDTH="600" BORDER="1">
+
+<COLGROUP>
+<COL WIDTH="91"></COL>
+<COL WIDTH="91"></COL>
+<COL WIDTH="91"></COL>
+<COL WIDTH="91"></COL>
+<COL WIDTH="91"></COL>
+<COL WIDTH="91"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="N" ADELETE="N">
+<TD ROWSPAN="2" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="100" HEIGHT="60" AUPDATECONT="N">자금용도</TD>
+<TD ROWSPAN="2" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="100" HEIGHT="60" AUPDATECONT="N">세부내역*</TD>
+<TD COLSPAN="4" ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="400" HEIGHT="30" AUPDATECONT="N">연도별 사용 예정 금액</TD>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TE ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="100" HEIGHT="30" ACODE="FND1_PRD1">'23년</TE>
+<TE ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="100" HEIGHT="30" ACODE="FND1_PRD2">'24년</TE>
+<TE ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="100" HEIGHT="30" ACODE="FND1_PRD3">'25년 이후</TE>
+<TD ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="100" HEIGHT="30" AUPDATECONT="N">합계</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="N">
+<TU ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="100" HEIGHT="30" AUNIT="FND1_PPS" AUNITVALUE="1">운영자금</TU>
+<TE ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="100" HEIGHT="30" ACODE="FND1_DTL">일반운영자금</TE>
+<TE ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="100" HEIGHT="30" ACODE="FND1_AMT1">5,600</TE>
+<TE ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="100" HEIGHT="30" ACODE="FND1_AMT2">-</TE>
+<TE ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="100" HEIGHT="30" ACODE="FND1_AMT3">-</TE>
+<TE ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="100" HEIGHT="30" ACODE="FND1_AMTT">5,600</TE>
+</TR>
+</TBODY>
+</TABLE>
+</TABLE-GROUP>
+<P>* 클라우드플랫폼 및 AI 빅데이터 분야 연구개발비(경상연구개발비,인건비) 투자</P>
+</LIBRARY>
+
+<LIBRARY>
+<TABLE-GROUP ACLASS="TBL_FND3" ADELETETABLE="N">
+
+<TABLE ACLASS="NORMAL" AFIXTABLE="Y" WIDTH="600" BORDER="0">
+
+<COLGROUP>
+<COL WIDTH="591"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="600" HEIGHT="30" AUPDATECONT="N">【채무상환자금의 경우】</TD>
+</TR>
+</TBODY>
+</TABLE>
+
+<TABLE ACLASS="EXTRACTION" AFIXTABLE="Y" WIDTH="600" BORDER="0">
+
+<COLGROUP>
+<COL WIDTH="450"></COL>
+<COL WIDTH="132"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="459" HEIGHT="30" AUPDATECONT="N" VALIGN="MIDDLE"></TD>
+<TU WIDTH="141" HEIGHT="30" VALIGN="MIDDLE" ALIGN="RIGHT" AUNIT="WONPERCENT" AUNITVALUE="3">(단위 : 백만원, %)</TU>
+</TR>
+</TBODY>
+</TABLE>
+
+<TABLE ACLASS="EXTRACTION" WIDTH="588" BORDER="1">
+
+<COLGROUP>
+<COL WIDTH="101"></COL>
+<COL WIDTH="54"></COL>
+<COL WIDTH="69"></COL>
+<COL WIDTH="128"></COL>
+<COL WIDTH="128"></COL>
+<COL WIDTH="54"></COL>
+</COLGROUP>
+
+<THEAD>
+
+<TR ACOPY="N" ADELETE="N">
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="110" HEIGHT="30" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">종목*</TH>
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="63" HEIGHT="30" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">차입처</TH>
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="78" HEIGHT="30" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">차입금액</TH>
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="137" HEIGHT="30" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">차입일</TH>
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="137" HEIGHT="30" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">만기일</TH>
+<TH ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="63" HEIGHT="30" ACOPYCOL="N" ADELETECOL="N" AMOVECOL="N" AUPDATECONT="N">이자율</TH>
+</TR>
+</THEAD>
+
+<TBODY>
+
+<TR ACOPY="Y" ADELETE="N">
+<TE ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="110" HEIGHT="30" ACODE="FND3_ITEM">나무기술 6EB</TE>
+<TE ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="63" HEIGHT="30" ACODE="FND3_BRW">-</TE>
+<TE ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="78" HEIGHT="30" ACODE="FND3_BRW_PRC">4,400</TE>
+<TU ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="137" HEIGHT="30" AUNIT="FND3_BRW_DT" AUNITVALUE="20230310">2023년 03월 10일</TU>
+<TU ALIGN="CENTER" VALIGN="MIDDLE" WIDTH="137" HEIGHT="30" AUNIT="FND3_MTR_DT" AUNITVALUE="20230910">2023년 09월 10일</TU>
+<TE ALIGN="RIGHT" VALIGN="MIDDLE" WIDTH="63" HEIGHT="30" ACODE="FND3_INT_RT">0.0</TE>
+</TR>
+</TBODY>
+</TABLE>
+</TABLE-GROUP>
+<P>* 제 5회 교환사채 만기상환(`23.09.10) 예정</P>
+</LIBRARY>
+
+<P USERMARK="F-GL11"></P>
+<P USERMARK="F-GL11"></P>
+
+<TABLE-GROUP ACLASS="SBN_ISSU" ADELETETABLE="N">
+
+<TABLE ACLASS="EXTRACTION" AFIXTABLE="Y" WIDTH="600" BORDER="0">
+
+<COLGROUP>
+<COL WIDTH="591"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD WIDTH="600" HEIGHT="30" AUPDATECONT="N">【신주인수권에 관한 사항】</TD>
+</TR>
+</TBODY>
+</TABLE>
+
+<TABLE ACLASS="EXTRACTION" AFIXTABLE="Y" WIDTH="600" BORDER="1">
+
+<COLGROUP>
+<COL WIDTH="118"></COL>
+<COL WIDTH="72"></COL>
+<COL WIDTH="110"></COL>
+<COL WIDTH="264"></COL>
+</COLGROUP>
+
+<TBODY ALIGN="LEFT" VALIGN="TOP">
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD ROWSPAN="4" VALIGN="MIDDLE" WIDTH="127" HEIGHT="120" AUPDATECONT="N">
+<P>신주인수권</P>
+<P>가치산정 관련사항</P>
+</TD>
+<TD VALIGN="MIDDLE" WIDTH="200" HEIGHT="30" AUPDATECONT="N" COLSPAN="2">이론가격</TD>
+<TE VALIGN="MIDDLE" WIDTH="273" HEIGHT="30" ACODE="SBS_PRC" ALIGN="CENTER">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD VALIGN="MIDDLE" WIDTH="200" HEIGHT="30" AUPDATECONT="N" COLSPAN="2">이론가격 산정모델</TD>
+<TE VALIGN="MIDDLE" WIDTH="273" HEIGHT="30" ACODE="SBS_PRM" ALIGN="CENTER">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD VALIGN="MIDDLE" WIDTH="200" HEIGHT="30" AUPDATECONT="N" COLSPAN="2">신주인수권의 가치</TD>
+<TE VALIGN="MIDDLE" WIDTH="273" HEIGHT="30" ACODE="SBS_VAL" ALIGN="CENTER">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD VALIGN="MIDDLE" WIDTH="200" HEIGHT="30" AUPDATECONT="N" COLSPAN="2">비  고</TD>
+<TE VALIGN="MIDDLE" WIDTH="273" HEIGHT="30" ACODE="SBS_NOT" ALIGN="CENTER">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD ROWSPAN="6" VALIGN="MIDDLE" WIDTH="127" HEIGHT="310" AUPDATECONT="N">
+<P>신주인수권증권</P>
+<P>매각 관련 사항</P>
+</TD>
+<TD VALIGN="MIDDLE" WIDTH="81" HEIGHT="189" AUPDATECONT="N" ROWSPAN="4">매각 계획</TD>
+<TD VALIGN="MIDDLE" WIDTH="119" HEIGHT="30" AUPDATECONT="N">매각예정일</TD>
+<TU VALIGN="MIDDLE" WIDTH="273" HEIGHT="30" AUNIT="SBW_DT" AUNITVALUE="-" ALIGN="CENTER">-</TU>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD VALIGN="MIDDLE" WIDTH="119" HEIGHT="53" AUPDATECONT="N">권면(전자등록)총액</TD>
+<TE VALIGN="MIDDLE" WIDTH="273" HEIGHT="53" ACODE="SBW_DNM_TOT" ALIGN="CENTER">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD VALIGN="MIDDLE" WIDTH="119" HEIGHT="53" AUPDATECONT="N">신주인수권증권매각총액</TD>
+<TE VALIGN="MIDDLE" WIDTH="273" HEIGHT="53" ACODE="SBW_SLL_TOT" ALIGN="CENTER">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD VALIGN="MIDDLE" WIDTH="119" HEIGHT="53" AUPDATECONT="N">신주인수권증권매각단가</TD>
+<TE VALIGN="MIDDLE" WIDTH="273" HEIGHT="53" ACODE="SBW_SLL_UNT" ALIGN="CENTER">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TD VALIGN="MIDDLE" WIDTH="200" HEIGHT="30" AUPDATECONT="N" COLSPAN="2">매각 상대방</TD>
+<TE VALIGN="MIDDLE" WIDTH="273" HEIGHT="30" ACODE="SBW_OTR" ALIGN="CENTER">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+
+<TD VALIGN="MIDDLE" WIDTH="200" HEIGHT="91" AUPDATECONT="N" COLSPAN="2">
+<P>매각 상대방과</P>
+<P>회사 또는</P>
+<P>최대주주와의 관계 </P>
+</TD>
+<TE VALIGN="MIDDLE" WIDTH="273" HEIGHT="91" ACODE="SBW_RLN" ALIGN="CENTER">-</TE>
+</TR>
+</TBODY>
+</TABLE>
+</TABLE-GROUP>
+<P USERMARK="F-GL11"></P>
+<P USERMARK="F-GL11"></P>
+
+<P USERMARK="F-GL11"></P>
+<P USERMARK="F-GL11"></P>
+
+<TABLE-GROUP ACLASS="TBL_NSB" ADELETETABLE="N">
+
+<TABLE ACLASS="NORMAL" AFIXTABLE="Y" WIDTH="600" BORDER="0">
+
+<COLGROUP>
+<COL WIDTH="591"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="600" HEIGHT="30" AUPDATECONT="N">【미상환 주권 관련 사채권에 관한 사항】</TD>
+</TR>
+</TBODY>
+</TABLE>
+
+<TABLE ACLASS="EXTRACTION" AFIXTABLE="N" WIDTH="881" BORDER="1">
+
+<COLGROUP>
+<COL WIDTH="51"></COL>
+<COL WIDTH="54"></COL>
+<COL WIDTH="104"></COL>
+<COL WIDTH="112"></COL>
+<COL WIDTH="81"></COL>
+<COL WIDTH="31"></COL>
+<COL WIDTH="75"></COL>
+<COL WIDTH="268"></COL>
+<COL WIDTH="24"></COL>
+</COLGROUP>
+
+<TBODY>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="60" HEIGHT="203" ROWSPAN="6" ALIGN="CENTER" VALIGN="MIDDLE" AUPDATECONT="N">전환(행사)가능주식</TD>
+<TD WIDTH="63" HEIGHT="143" ROWSPAN="4" ALIGN="CENTER" VALIGN="MIDDLE" AUPDATECONT="N">기발행미상환사채권</TD>
+<TD WIDTH="113" HEIGHT="53" ALIGN="CENTER" VALIGN="MIDDLE" AUPDATECONT="N">종류</TD>
+<TD WIDTH="121" HEIGHT="53" ALIGN="CENTER" VALIGN="MIDDLE" AUPDATECONT="N">잔액(원)</TD>
+<TD WIDTH="90" HEIGHT="53" ALIGN="CENTER" VALIGN="MIDDLE" AUPDATECONT="N">전환(행사)가액(원)</TD>
+<TD WIDTH="124" HEIGHT="53" COLSPAN="2" ALIGN="CENTER" VALIGN="MIDDLE" AUPDATECONT="N">전환(행사)가능주식수(주)</TD>
+<TD WIDTH="277" HEIGHT="53" ALIGN="CENTER" VALIGN="MIDDLE" AUPDATECONT="N">전환(행사)가능기간</TD>
+<TD WIDTH="33" HEIGHT="53" ALIGN="CENTER" VALIGN="MIDDLE" AUPDATECONT="N">비고</TD>
+</TR>
+
+<TR ACOPY="Y" ADELETE="N">
+<TE WIDTH="113" HEIGHT="30" ALIGN="CENTER" ACODE="DEB_KND">사모 교환사채</TE>
+<TE WIDTH="121" HEIGHT="30" ALIGN="RIGHT" ACODE="BAL_AMT">4,400,000,000</TE>
+<TE WIDTH="90" HEIGHT="30" ALIGN="RIGHT" ACODE="EXE_MN">3,213</TE>
+<TE WIDTH="124" HEIGHT="30" COLSPAN="2" ALIGN="RIGHT" ACODE="EXE_STK">1,369,436</TE>
+<TU WIDTH="277" HEIGHT="30" ALIGN="CENTER" AUNIT="EXE_DT" AUNITVALUE="20230313-20230904">2023년 03월 13일 ~ 2023년 09월 04일</TU>
+<TE WIDTH="33" HEIGHT="30" ALIGN="CENTER" ACODE="NOTE_CONT">-</TE>
+</TR>
+
+<TR ACOPY="Y" ADELETE="Y">
+<TE WIDTH="113" HEIGHT="30" ALIGN="CENTER" ACODE="DEB_KND" VALIGN="MIDDLE">-</TE>
+<TE WIDTH="121" HEIGHT="30" ALIGN="CENTER" ACODE="BAL_AMT" VALIGN="MIDDLE">-</TE>
+<TE WIDTH="90" HEIGHT="30" ALIGN="CENTER" ACODE="EXE_MN" VALIGN="MIDDLE">-</TE>
+<TE WIDTH="124" HEIGHT="30" COLSPAN="2" ALIGN="CENTER" ACODE="EXE_STK" VALIGN="MIDDLE">-</TE>
+<TU WIDTH="277" HEIGHT="30" ALIGN="CENTER" AUNIT="EXE_DT" AUNITVALUE="-" VALIGN="MIDDLE">-</TU>
+<TE WIDTH="33" HEIGHT="30" ALIGN="CENTER" ACODE="NOTE_CONT" VALIGN="MIDDLE">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="113" HEIGHT="30" ALIGN="CENTER" AUPDATECONT="N">소계</TD>
+<TE WIDTH="121" HEIGHT="30" ALIGN="RIGHT" ACODE="SUB_TOT_BAL">4,400,000,000</TE>
+<TE WIDTH="90" HEIGHT="30" ALIGN="CENTER" ACODE="SUB_TOT_EXE" VALIGN="MIDDLE">-</TE>
+<TD WIDTH="40" HEIGHT="30" ALIGN="CENTER" AUPDATECONT="N">(A)</TD>
+<TE WIDTH="84" HEIGHT="30" ALIGN="RIGHT" ACODE="SUB_TOT_STK">1,369,436</TE>
+<TD WIDTH="277" HEIGHT="30" ALIGN="CENTER" AUPDATECONT="N">-</TD>
+<TE WIDTH="33" HEIGHT="30" ALIGN="CENTER" ACODE="SUB_NOTE">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="176" HEIGHT="30" COLSPAN="2" ALIGN="CENTER" AUPDATECONT="N">신규 발행 사채권</TD>
+<TE WIDTH="121" HEIGHT="30" ALIGN="RIGHT" ACODE="ISSU_BAL">10,000,000,000</TE>
+<TE WIDTH="90" HEIGHT="30" ALIGN="CENTER" ACODE="ISSU_EXE" VALIGN="MIDDLE">-</TE>
+<TD WIDTH="40" HEIGHT="30" ALIGN="CENTER" AUPDATECONT="N">(B)</TD>
+<TE WIDTH="84" HEIGHT="30" ALIGN="RIGHT" ACODE="ISSU_STK">3,680,529</TE>
+<TU WIDTH="277" HEIGHT="30" ALIGN="CENTER" AUNIT="ISSU_DT" AUNITVALUE="20240824-20280724">2024년 08월 24일 ~ 2028년 07월 24일</TU>
+<TE WIDTH="33" HEIGHT="30" ALIGN="CENTER" ACODE="ISSU_NOTE">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="176" HEIGHT="30" COLSPAN="2" ALIGN="CENTER" AUPDATECONT="N">합계</TD>
+<TE WIDTH="121" HEIGHT="30" ALIGN="RIGHT" ACODE="TOT_BAL">14,400,000,000</TE>
+<TE WIDTH="90" HEIGHT="30" ALIGN="CENTER" ACODE="TOT_EXE" VALIGN="MIDDLE">-</TE>
+<TE WIDTH="124" HEIGHT="30" COLSPAN="2" ALIGN="RIGHT" ACODE="TOT_STK">5,049,965</TE>
+<TD WIDTH="277" HEIGHT="30" ALIGN="CENTER" AUPDATECONT="N">-</TD>
+<TE WIDTH="33" HEIGHT="30" ALIGN="CENTER" ACODE="TOT_NOTE">-</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="447" HEIGHT="30" COLSPAN="5" ALIGN="CENTER" AUPDATECONT="N">기발행주식 총수(주) (C)</TD>
+<TE WIDTH="434" HEIGHT="30" COLSPAN="4" ALIGN="CENTER" ACODE="ISSU_TOT">34,606,264</TE>
+</TR>
+
+<TR ACOPY="N" ADELETE="N">
+<TD WIDTH="447" HEIGHT="30" COLSPAN="5" ALIGN="CENTER" AUPDATECONT="N">기발행주식총수 대비 비율(%) (D=(A+B)/C)</TD>
+<TE WIDTH="434" HEIGHT="30" COLSPAN="4" ALIGN="CENTER" ACODE="ISSU_STK_RT">14.6</TE>
+</TR>
+</TBODY>
+</TABLE>
+</TABLE-GROUP>
+<P USERMARK="F-GL11">주) 상기 [미상환 주권 관련 사채권에 관한 사항]에서 기발행 미상환 사채권의 사모 교환사채 4,400,000,000원은 발행회사가 보유한 자기주식을 기초로 발행된 바, 해당 교환가능주식수인 1,369,436주가 교환되더라도 발행주식의 총수가 늘어나는 것 또는 동 수량만큼의 신주가 발행되는 것을 의미하지 아니함</P>
+</SECTION-1>
+</BODY>
+</DOCUMENT>

@@ -22,11 +22,11 @@ class CapitalIncreaseXmlParser(BaseXmlParser):
     """
 
     @classmethod
-    def parse(cls, file_path: str, rcept_no: Optional[str] = None, parent_rcp_no: Optional[str] = None) -> Optional[CapitalIncreaseDecision]:
+    def parse(cls, xml_source, rcept_no: Optional[str] = None, parent_rcp_no: Optional[str] = None, source_filename: Optional[str] = None) -> Optional[CapitalIncreaseDecision]:
         """XML 파일을 파싱하여 도메인 객체로 변환합니다.
         
         Args:
-            file_path: XML 파일 경로
+            xml_source: XML 파일 경로 또는 메모리 file-like 객체
             rcept_no: 접수번호 (제공되지 않으면 파일명에서 추출 시도)
             parent_rcp_no: 상위 공시(이전 정정 공시) 접수번호
             
@@ -36,11 +36,11 @@ class CapitalIncreaseXmlParser(BaseXmlParser):
         try:
             # recover 모드를 사용하여 Entity 에러 무시
             parser = etree.XMLParser(recover=True)
-            tree = etree.parse(file_path, parser)
+            tree = etree.parse(xml_source, parser)
             root = tree.getroot()
 
             # 공통 정보 추출 (회사명, 보고서명, 정정여부, 파일명 기반 rcept_no)
-            common_info = cls._extract_common_info(file_path, root)
+            common_info = cls._extract_common_info(source_filename or str(xml_source), root)
 
             # 주식 수량 (신주)
             cst_node = root.find(".//TE[@ACODE='CST_CNT']")

@@ -5,7 +5,6 @@ BonusSharesSqliteRepository를 그대로 재사용합니다(유무상증자 공�
 결정으로 쪼갠 뒤, 이미 그 결정 타입을 저장하는 리포지토리에 얹는 구조 - 별도 스토리지를 둘
 이유가 없음). 이 설계의 핵심 이점(오케스트레이션 순서 무관하게 병합됨)까지 검증합니다.
 """
-import shutil
 from datetime import date
 from pathlib import Path
 
@@ -16,6 +15,7 @@ from src.application.capital_increase_services import CapitalIncreaseService
 from src.application.bonus_services import BonusSharesService
 from src.domain import CapitalIncreaseDecision, BonusSharesDecision
 from src.domain.value_objects import StockInfo, FundingPurpose
+from src.infrastructure.dart_api import DownloadedXml
 
 
 def _make_capital_decision(rcept_no: str, parent_rcp_no=None) -> CapitalIncreaseDecision:
@@ -60,25 +60,21 @@ def services(tmp_path):
 
 @pytest.fixture
 def dual_with_real_xml_samples(tmp_path):
-    """실제 유무상증자 XML 샘플 2개로 파서 연동까지 실제로 태운다."""
-    src_dir = Path("data/유무상증자/xml")
+    """실제 유무상증자 XML 바이트로 파서 연동까지 실제로 태운다."""
+    src_dir = Path("tests/fixtures/xml/유무상증자")
     sample_files = list(src_dir.glob("*.xml"))[:2]
     if not sample_files:
         pytest.skip("유무상증자 XML 샘플이 없습니다")
 
-    dual_dir = tmp_path / "dual"
-    xml_dir = dual_dir / "xml"
-    xml_dir.mkdir(parents=True)
-    for f in sample_files:
-        shutil.copy(f, xml_dir / f.name)
-
-    return DualIncreaseService(
-        data_directory=str(dual_dir),
+    dual = DualIncreaseService(
+        data_directory=str(tmp_path / "dual"),
         capital_data_directory=str(tmp_path / "capital"),
         bonus_data_directory=str(tmp_path / "bonus"),
         api_key="dummy-key",
         enable_google_drive=False,
     )
+    documents = [DownloadedXml(f.stem.rsplit("_", 1)[-1], f.name, f.read_bytes()) for f in sample_files]
+    return dual, documents
 
 
 class TestNoDedicatedStorage:
@@ -88,10 +84,14 @@ class TestNoDedicatedStorage:
         dual, standalone_capital, _ = services
 
         dual.capital_service.repository.upsert([_make_capital_decision("20240101000001")])
+        assert dual.capital_service.database_session.persist()
 
-        # dual이 쓴 데이터가 독립적으로 생성한 CapitalIncreaseService에서도 그대로 보여야 함
-        # (같은 DB 파일을 가리키고 있다는 뜻)
-        got = standalone_capital.repository.get_all()
+        refreshed_capital = CapitalIncreaseService(
+            data_directory=str(standalone_capital.data_directory), api_key="dummy-key", enable_google_drive=False,
+        )
+
+        # 새 세션이 source storage의 최신 DB 작업 사본을 읽는다.
+        got = refreshed_capital.repository.get_all()
         assert len(got) == 1
         assert got[0].rcept_no == "20240101000001"
 
@@ -104,10 +104,21 @@ class TestOrderIndependence:
 
         # CI가 자기 몫을 먼저 저장
         standalone_capital.repository.upsert([_make_capital_decision("20240101000001")])
+        assert standalone_capital.database_session.persist()
+        dual = DualIncreaseService(
+            data_directory=str(dual.data_directory),
+            capital_data_directory=str(standalone_capital.data_directory),
+            bonus_data_directory=str(dual.bonus_service.data_directory),
+            api_key="dummy-key", enable_google_drive=False,
+        )
         # Dual이 나중에 자기 몫(유무상증자에서 파생된 유상분)을 저장
         dual.capital_service.repository.upsert([_make_capital_decision("20240102000002")])
+        assert dual.capital_service.database_session.persist()
 
-        all_rows = {d.rcept_no for d in standalone_capital.repository.get_all()}
+        refreshed_capital = CapitalIncreaseService(
+            data_directory=str(standalone_capital.data_directory), api_key="dummy-key", enable_google_drive=False,
+        )
+        all_rows = {d.rcept_no for d in refreshed_capital.repository.get_all()}
         assert all_rows == {"20240101000001", "20240102000002"}
 
 
@@ -119,6 +130,13 @@ class TestGetRelationMap:
             _make_capital_decision("20240101000001"),
             _make_capital_decision("20240102000002", parent_rcp_no="20240101000001"),
         ])
+        assert standalone_capital.database_session.persist()
+        dual = DualIncreaseService(
+            data_directory=str(dual.data_directory),
+            capital_data_directory=str(standalone_capital.data_directory),
+            bonus_data_directory=str(standalone_bonus.data_directory),
+            api_key="dummy-key", enable_google_drive=False,
+        )
 
         relation_map = dual.get_relation_map()
 
@@ -127,9 +145,9 @@ class TestGetRelationMap:
 
 class TestParseAndExportToExcelWiredEndToEnd:
     def test_parses_real_samples_into_capital_and_bonus_repositories(self, dual_with_real_xml_samples):
-        dual = dual_with_real_xml_samples
+        dual, documents = dual_with_real_xml_samples
 
-        count = dual.parse_and_export_to_excel()
+        count = dual.parse_and_export_to_excel(documents)
 
         assert count >= 1
         # 유상/무상 어느 한쪽이든 결과가 저장 + 엑셀이 각자 서비스의 파일로 생성돼야 함
@@ -137,9 +155,9 @@ class TestParseAndExportToExcelWiredEndToEnd:
         assert total_db_rows == count
 
     def test_second_run_without_new_xml_is_idempotent(self, dual_with_real_xml_samples):
-        dual = dual_with_real_xml_samples
+        dual, documents = dual_with_real_xml_samples
 
-        first_count = dual.parse_and_export_to_excel()
-        second_count = dual.parse_and_export_to_excel()
+        first_count = dual.parse_and_export_to_excel(documents)
+        second_count = dual.parse_and_export_to_excel(documents)
 
         assert first_count == second_count

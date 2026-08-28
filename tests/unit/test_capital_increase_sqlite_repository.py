@@ -99,6 +99,19 @@ class TestUpsertAndGetAll:
         count = repo.upsert([_make_decision("20240101000001"), _make_decision("20240101000002")])
         assert count == 2
 
+    def test_upsert_rolls_back_every_write_when_later_item_fails(self, repo):
+        with pytest.raises(AttributeError):
+            repo.upsert([_make_decision("20240101000001"), None])
+
+        assert repo.get_all() == []
+
+    def test_existing_rcept_nos_returns_only_stored_receipt_numbers(self, repo):
+        repo.upsert([_make_decision("20240101000001")])
+
+        existing = repo.existing_rcept_nos(["20240101000001", "20240101000002"])
+
+        assert existing == {"20240101000001"}
+
 
 class TestDedupeByRceptNo:
     def test_reupsert_same_rcept_no_updates_in_place(self, repo):

@@ -21,11 +21,11 @@ class BondWithWarrantXmlParser(BaseXmlParser):
     """
 
     @classmethod
-    def parse(cls, file_path: str, rcept_no: Optional[str] = None, parent_rcp_no: Optional[str] = None) -> Optional[BondWithWarrantDecision]:
+    def parse(cls, xml_source, rcept_no: Optional[str] = None, parent_rcp_no: Optional[str] = None, source_filename: Optional[str] = None) -> Optional[BondWithWarrantDecision]:
         """XML 파일을 파싱하여 도메인 객체로 변환합니다.
         
         Args:
-            file_path: XML 파일 경로
+            xml_source: XML 파일 경로 또는 메모리 file-like 객체
             rcept_no: 접수번호 (제공되지 않으면 파일명에서 추출 시도)
             parent_rcp_no: 상위 공시(이전 정정 공시) 접수번호
             
@@ -35,11 +35,11 @@ class BondWithWarrantXmlParser(BaseXmlParser):
         try:
             # recover 모드를 사용하여 Entity 에러 무시
             parser = etree.XMLParser(recover=True)
-            tree = etree.parse(file_path, parser)
+            tree = etree.parse(xml_source, parser)
             root = tree.getroot()
 
             # 공통 정보 추출
-            common_info = cls._extract_common_info(file_path, root)
+            common_info = cls._extract_common_info(source_filename or str(xml_source), root)
 
             # ACODE 기반 필드 (TE 노드)
             # XML ACODE는 CB와 동일한 EXE_RT/EXE_PRC/STK_CNT/STK_RT/SB_BGN_DT/SB_END_DT를 사용함

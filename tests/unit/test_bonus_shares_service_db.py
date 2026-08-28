@@ -1,7 +1,6 @@
 """BonusSharesService의 DB SSOT 배선(parse_and_export_to_excel/export_to_excel/get_relation_map)
 자체를 검증하는 테스트. (CapitalIncreaseService 쪽 배선 테스트와 동일한 이유로 작성)
 """
-import shutil
 from datetime import date
 from pathlib import Path
 
@@ -10,6 +9,7 @@ import pytest
 from src.application.bonus_services import BonusSharesService
 from src.domain import BonusSharesDecision
 from src.domain.value_objects import StockInfo
+from src.infrastructure.dart_api import DownloadedXml
 
 
 def _make_decision(rcept_no: str, parent_rcp_no=None, company_name: str = "테스트회사") -> BonusSharesDecision:
@@ -40,23 +40,19 @@ def service(tmp_path):
 
 @pytest.fixture
 def service_with_real_xml_samples(tmp_path):
-    """실제 무상증자 XML 샘플 2개를 임시 데이터 디렉토리에 복사해 파서 연동까지 실제로 태운다."""
-    src_dir = Path("data/무상증자/xml")
+    """실제 무상증자 XML 바이트로 파서 연동까지 실제로 태운다."""
+    src_dir = Path("tests/fixtures/xml/무상증자")
     sample_files = list(src_dir.glob("*.xml"))[:2]
     if not sample_files:
         pytest.skip("무상증자 XML 샘플이 없습니다")
 
-    data_dir = tmp_path / "data"
-    xml_dir = data_dir / "xml"
-    xml_dir.mkdir(parents=True)
-    for f in sample_files:
-        shutil.copy(f, xml_dir / f.name)
-
-    return BonusSharesService(
-        data_directory=str(data_dir),
+    service = BonusSharesService(
+        data_directory=str(tmp_path / "data"),
         api_key="dummy-key",
         enable_google_drive=False,
     )
+    documents = [DownloadedXml(f.stem.rsplit("_", 1)[-1], f.name, f.read_bytes()) for f in sample_files]
+    return service, documents
 
 
 class TestGetRelationMap:
@@ -91,9 +87,9 @@ class TestExportToExcel:
 
 class TestParseAndExportToExcelWiredEndToEnd:
     def test_parses_real_samples_into_db_and_excel(self, service_with_real_xml_samples):
-        service = service_with_real_xml_samples
+        service, documents = service_with_real_xml_samples
 
-        count = service.parse_and_export_to_excel()
+        count = service.parse_and_export_to_excel(documents)
 
         assert count >= 1
         db_rows = service.repository.get_all()
@@ -101,10 +97,10 @@ class TestParseAndExportToExcelWiredEndToEnd:
         assert service.excel_path.exists()
 
     def test_second_run_without_new_xml_is_idempotent(self, service_with_real_xml_samples):
-        service = service_with_real_xml_samples
+        service, documents = service_with_real_xml_samples
 
-        first_count = service.parse_and_export_to_excel()
-        second_count = service.parse_and_export_to_excel()
+        first_count = service.parse_and_export_to_excel(documents)
+        second_count = service.parse_and_export_to_excel(documents)
 
         assert first_count == second_count
         assert len(service.repository.get_all()) == first_count

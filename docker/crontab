@@ -1,0 +1,3 @@
+# 평일 16:00 KST: 최근 30일 공시를 DB 완료 키 기준으로 멱등 백필한다.
+# cron 자체는 /proc/1/fd/1 리다이렉션 권한 때문에 root로 실행한다.
+0 16 * * 1-5 root /app/docker/run-daily.sh >> /proc/1/fd/1 2>&1

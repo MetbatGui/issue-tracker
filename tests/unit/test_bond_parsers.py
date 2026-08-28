@@ -12,8 +12,8 @@ from src.infrastructure import ConvertibleBondXmlParser
 from src.infrastructure.bond_with_warrant_xml_parser import BondWithWarrantXmlParser
 
 
-CB_XML_DIR = Path("data/전환사채/xml")
-BW_XML_DIR = Path("data/신주인수권부사채/xml")
+CB_XML_DIR = Path("tests/fixtures/xml/전환사채")
+BW_XML_DIR = Path("tests/fixtures/xml/신주인수권부사채")
 
 CB_SAMPLE = CB_XML_DIR / "3S_20241209000388.xml"
 BW_SAMPLE = BW_XML_DIR / "BGF에코머티리얼즈_20211104000334.xml"
@@ -56,7 +56,7 @@ class TestConvertibleBondXmlParser:
         assert decision.funding.other == 0
 
     def test_parse_all_samples(self):
-        """전체 샘플 파일이 예외 없이 파싱되고, 핵심 필드 결측률이 낮음을 확인"""
+        """고정 fixture 파일이 예외 없이 파싱되고, 핵심 필드 결측률이 낮음을 확인"""
         xml_files = list(CB_XML_DIR.glob("*.xml"))
         if not xml_files:
             pytest.skip("CB 샘플 XML이 없습니다")
@@ -99,7 +99,7 @@ class TestBondWithWarrantXmlParser:
         assert decision.board_resolution_date == date(2021, 11, 4)
 
     def test_parse_all_samples(self):
-        """전체 샘플 파일이 예외 없이 파싱되고, 핵심 필드 결측률이 낮음을 확인"""
+        """고정 fixture 파일이 예외 없이 파싱되고, 핵심 필드 결측률이 낮음을 확인"""
         xml_files = list(BW_XML_DIR.glob("*.xml"))
         if not xml_files:
             pytest.skip("BW 샘플 XML이 없습니다")
