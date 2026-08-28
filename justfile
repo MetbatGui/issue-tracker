@@ -1,4 +1,4 @@
-# 유상증자 데이터 처리 프로젝트 - Just 명령어
+# 증자·사채 공시 추적기 - Just 명령어
 
 # PowerShell 사용 설정
 set shell := ["powershell.exe", "-Command"]
@@ -7,30 +7,33 @@ set shell := ["powershell.exe", "-Command"]
 default:
     @just --list
 
-# 전체 업데이트 (2020년부터)
-full:
-    uv run python -m src.cli update --full
-
-# 일일 업데이트 (어제~오늘)
+# 전체(유상+무상+전환+신주+유무상) 일일 업데이트 - cron이 실행하는 것과 동일
 daily:
-    uv run python -m src.cli daily
+    uv run python -m src.cli all daily
 
 # 최근 N일 업데이트
 daily-n days:
-    uv run python -m src.cli daily --days {{days}}
+    uv run python -m src.cli all daily --days {{days}}
 
-# 엑셀 파일 생성 (다운로드된 XML 파싱)
-export:
-    uv run python -m src.cli export
+# 특정 날짜부터 오늘까지 전체(유상+무상+전환+신주) 백필
+full start:
+    uv run python -m src.cli all daily --start {{start}}
 
-# XML 파일 UTF-8 변환
-convert:
-    uv run python -m src.cli convert
+# 도커 이미지 빌드
+build:
+    docker compose -f docker/docker-compose.yml build
 
-# 특정 날짜부터 오늘까지 다운로드
-download start:
-    uv run python -m src.cli download --start {{start}}
+# 컨테이너 내장 cron 서비스를 백그라운드로 기동 (스케줄: docker/crontab)
+cron-up:
+    docker compose -f docker/docker-compose.yml up -d --build issue-tracker-cron
 
-# 특정 기간 데이터 다운로드
-download-period start end:
-    uv run python -m src.cli download --start {{start}} --end {{end}}
+setup-release:
+    git checkout master
+    git remote add employers-issue-tracker https://github.com/guruta71/issue-tracker.git
+
+# Release to employers-issue-tracker
+# Usage: just release
+release:
+    git checkout -B release master
+    git push -u employers-issue-tracker release:main
+    git checkout master
